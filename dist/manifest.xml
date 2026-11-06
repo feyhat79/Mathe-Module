@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp 
+    xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" 
+    xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+    xsi:type="TaskPaneApp">
+
+    <Id>e3d7cb51-68be-419b-b5d1-6783e9b14f82</Id>
+    <Version>1.0.0.0</Version>
+    <ProviderName>AufgabenBuilder</ProviderName>
+    <DefaultLocale>de-DE</DefaultLocale>
+    <DisplayName DefaultValue="AufgabenBuilder Mathe" />
+    <Description DefaultValue="Fügt mathematische Diagramme, Baumdiagramme, Funktionsgraphen und Tabellen direkt an der Cursorposition in Word ein." />
+    <IconUrl DefaultValue="https://feyhat79.github.io/Mathe-Module/assets/icon-32.png" />
+    <HighResolutionIconUrl DefaultValue="https://feyhat79.github.io/Mathe-Module/assets/icon-64.png" />
+    <SupportUrl DefaultValue="https://feyhat79.github.io/Mathe-Module" />
+    
+    <Hosts>
+        <Host Name="Document" />
+    </Hosts>
+    
+    <DefaultSettings>
+        <SourceLocation DefaultValue="https://feyhat79.github.io/Mathe-Module/taskpane.html" />
+    </DefaultSettings>
+    
+    <Permissions>ReadWriteDocument</Permissions>
+
+    <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+        <Hosts>
+            <Host xsi:type="Document">
+                <DesktopFormFactor>
+                    <FunctionFile resid="Taskpane.Url" />
+                    <ExtensionPoint xsi:type="PrimaryCommandSurface">
+                        <CustomTab id="TabMathBuilder">
+                            <Group id="GroupMathBuilder">
+                                <Label resid="GroupLabel" />
+                                <Icon>
+                                    <bt:Image size="16" resid="Icon.16" />
+                                    <bt:Image size="32" resid="Icon.32" />
+                                    <bt:Image size="80" resid="Icon.80" />
+                                </Icon>
+                                <Control xsi:type="Button" id="BtnOpenTaskpane">
+                                    <Label resid="ButtonLabel" />
+                                    <Supertip>
+                                        <Title resid="ButtonTitle" />
+                                        <Description resid="ButtonDesc" />
+                                    </Supertip>
+                                    <Icon>
+                                        <bt:Image size="16" resid="Icon.16" />
+                                        <bt:Image size="32" resid="Icon.32" />
+                                        <bt:Image size="80" resid="Icon.80" />
+                                    </Icon>
+                                    <Action xsi:type="ShowTaskpane">
+                                        <TaskpaneId>MathBuilderTaskpane</TaskpaneId>
+                                        <SourceLocation resid="Taskpane.Url" />
+                                    </Action>
+                                </Control>
+                            </Group>
+                            <Label resid="TabLabel" />
+                        </CustomTab>
+                    </ExtensionPoint>
+                </DesktopFormFactor>
+            </Host>
+        </Hosts>
+        
+        <Resources>
+            <bt:Images>
+                <bt:Image id="Icon.16" DefaultValue="https://feyhat79.github.io/Mathe-Module/assets/icon-16.png" />
+                <bt:Image id="Icon.32" DefaultValue="https://feyhat79.github.io/Mathe-Module/assets/icon-32.png" />
+                <bt:Image id="Icon.80" DefaultValue="https://feyhat79.github.io/Mathe-Module/assets/icon-80.png" />
+            </bt:Images>
+            <bt:Urls>
+                <bt:Url id="Taskpane.Url" DefaultValue="https://feyhat79.github.io/Mathe-Module/taskpane.html" />
+            </bt:Urls>
+            <bt:ShortStrings>
+                <bt:String id="TabLabel" DefaultValue="AufgabenBuilder" />
+                <bt:String id="GroupLabel" DefaultValue="Mathe-Module" />
+                <bt:String id="ButtonLabel" DefaultValue="Modul einfügen" />
+                <bt:String id="ButtonTitle" DefaultValue="Mathe-Modul an Cursor einfügen" />
+            </bt:ShortStrings>
+            <bt:LongStrings>
+                <bt:String id="ButtonDesc" DefaultValue="Öffnet die Seitenleiste zur schnellen Erstellung von Baumdiagrammen, Funktionsgraphen, Urnen, 4-Felder-Tafeln und Tabellen direkt in Word." />
+            </bt:LongStrings>
+        </Resources>
+    </VersionOverrides>
+</OfficeApp>

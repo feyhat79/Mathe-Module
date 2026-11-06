@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Musterlösung: 1. Informatik-Test – Klasse 5</title>
+  <style>
+    /* ============================================================
+       RESET & BASE (Calibri Schulblatt-Standard)
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+      font-size: 10pt;
+      color: #111827;
+      background: white;
+      line-height: 1.28;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 9mm 12mm;
+    }
+
+    .page {
+      width: 186mm;
+      margin: 0 auto;
+      padding: 0;
+      page-break-after: always;
+      position: relative;
+    }
+    .page:last-child {
+      page-break-after: auto;
+    }
+
+    @media print {
+      body { font-size: 10pt; }
+      .no-print { display: none !important; }
+      .page { width: 100%; margin: 0; }
+    }
+
+    /* ============================================================
+       KOPFZEILE & DOKUMENT-ELEMENTE
+    ============================================================ */
+    .doc-header {
+      margin-bottom: 2px;
+    }
+
+    .doc-title {
+      font-size: 13.5pt;
+      font-weight: 700;
+      color: #dc2626;
+      line-height: 1.15;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .solution-badge {
+      font-size: 8.5pt;
+      background: #dc2626;
+      color: white;
+      padding: 1px 7px;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+    }
+
+    .doc-meta {
+      font-size: 8.5pt;
+      color: #374151;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+      margin-top: 1px;
+    }
+
+    .doc-rule {
+      border: none;
+      border-top: 1.5px solid #dc2626;
+      margin-bottom: 4px;
+    }
+
+    /* ============================================================
+       TASTATUR SCHAUBILD (Vektor CSS mit Großbuchstaben & ohne Unterstreichung)
+    ============================================================ */
+    .schaubild-wrap {
+      border: 1.5px solid #334155;
+      border-radius: 4px;
+      background: #fbfcfd;
+      padding: 3px 4px 4px 4px;
+      margin-bottom: 6px;
+    }
+
+    .schaubild-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+
+    .section-label {
+      font-size: 8.2pt;
+      font-weight: 700;
+      color: #1e3a8a;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kb-schaubild {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5px;
+      align-items: center;
+    }
+
+    .kb-row {
+      display: flex;
+      gap: 1.5px;
+    }
+
+    .key {
+      height: 27px;
+      border: 1px solid #64748b;
+      border-radius: 2.5px;
+      background: white;
+      position: relative;
+      font-family: 'Consolas', 'Courier New', monospace;
+      flex-shrink: 0;
+    }
+
+    /* Buchstaben: nur Großbuchstabe */
+    .key .kl {
+      position: absolute;
+      top: 2px;
+      left: 3px;
+      font-weight: 700;
+      color: #111827;
+      font-size: 8.6pt;
+      line-height: 1;
+    }
+
+    /* Normale Zeichen (unten links) */
+    .key .kn {
+      position: absolute;
+      bottom: 1.5px;
+      left: 2.5px;
+      font-weight: 700;
+      color: #111827;
+      font-size: 8.5pt;
+      line-height: 1;
+    }
+
+    /* Shift-Zeichen (oben links, OHNE Unterstreichung) */
+    .key .ks {
+      position: absolute;
+      top: 1.5px;
+      left: 2.5px;
+      font-size: 7.2pt;
+      font-weight: 700;
+      color: #111827;
+      line-height: 1;
+    }
+
+    /* AltGr-Zeichen (unten rechts – TIEFGESTELLT) */
+    .key .kg {
+      position: absolute;
+      bottom: 1.5px;
+      right: 2.5px;
+      font-size: 7.2pt;
+      font-weight: 700;
+      font-style: italic;
+      color: #1e3a8a;
+      line-height: 1;
+    }
+
+    /* Sondertasten */
+    .key.sp {
+      background: #e2e8f0;
+      border: 1px solid #475569;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .key.sp .lbl {
+      font-size: 7.2pt;
+      color: #0f172a;
+      font-weight: 700;
+      white-space: nowrap;
+      font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+    }
+
+    .key.k-shift {
+      background: repeating-linear-gradient(135deg, #fff, #fff 2px, #cbd5e1 2px, #cbd5e1 3px);
+      border: 1.2px solid #334155;
+    }
+    .key.k-shift .lbl {
+      font-size: 7pt;
+      font-weight: 700;
+      color: #0f172a;
+      font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+    }
+
+    .key.k-altgr {
+      background: #94a3b8;
+      border: 1.5px solid #0f172a;
+    }
+    .key.k-altgr .lbl {
+      font-size: 7pt;
+      font-weight: 800;
+      color: #ffffff;
+      font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+    }
+
+    /* Tastenbreiten */
+    .w30  { width: 30px;  }
+    .w38  { width: 38px;  }
+    .w46  { width: 46px;  }
+    .w54  { width: 54px;  }
+    .w62  { width: 62px;  }
+    .w70  { width: 70px;  }
+    .w85  { width: 85px;  }
+    .w180 { width: 180px; }
+
+    .kb-legend {
+      font-size: 7.2pt;
+      color: #374151;
+      margin-top: 2px;
+      line-height: 1.3;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px dotted #cbd5e1;
+      padding-top: 2px;
+    }
+
+    /* ============================================================
+       AUFGABEN & TYPOGRAFIE
+    ============================================================ */
+    .task-block {
+      margin-bottom: 7px;
+    }
+
+    .task-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .task-num {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: #1e3a8a;
+      color: white;
+      font-size: 8.8pt;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .task-title {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #111827;
+      flex: 1;
+    }
+
+    .task-points {
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .task-desc {
+      font-size: 9.6pt;
+      color: #111827;
+      margin-bottom: 3px;
+      margin-left: 23px;
+      line-height: 1.25;
+    }
+
+    .task-body {
+      margin-left: 23px;
+      font-size: 9.6pt;
+    }
+
+    .kbd {
+      display: inline-block;
+      background: #f1f5f9;
+      border: 1px solid #94a3b8;
+      border-radius: 3px;
+      padding: 0 4px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 8.6pt;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    /* Lehrer-Lösung in Rot */
+    .sol {
+      color: #dc2626;
+      font-weight: 700;
+    }
+    .sol-tag {
+      background: #fee2e2;
+      border: 1px solid #f87171;
+      color: #b91c1c;
+      padding: 0 4px;
+      border-radius: 3px;
+      font-size: 8pt;
+      font-weight: 700;
+      margin-left: 4px;
+    }
+
+    /* Tabellen */
+    .table-custom {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+      margin-top: 2px;
+      margin-bottom: 2px;
+    }
+
+    .table-custom th {
+      background: #1e3a8a;
+      color: white;
+      font-size: 8.5pt;
+      font-weight: 700;
+      padding: 2.5px 5px;
+      text-align: left;
+      border: 1px solid #1e3a8a;
+    }
+
+    .table-custom td {
+      border: 1px solid #94a3b8;
+      padding: 3.5px 5px;
+      vertical-align: middle;
+      line-height: 1.25;
+    }
+
+    /* Kacheln für Funktionstasten */
+    .fn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      margin-top: 3px;
+    }
+
+    .fn-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      background: #f8fafc;
+      padding: 4px 7px;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5px;
+    }
+
+    .fn-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .key-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border: 1.5px solid #475569;
+      border-radius: 3px;
+      padding: 0 6px;
+      height: 21px;
+      font-family: 'Consolas', monospace;
+      font-weight: 700;
+      font-size: 9pt;
+      color: #0f172a;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+    }
+
+    /* Punkteabschluss */
+    .score-wrap {
+      border: 1.5px solid #dc2626;
+      border-radius: 4px;
+      background: #fef2f2;
+      padding: 6px 10px;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .score-calc {
+      display: flex;
+      gap: 16px;
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #dc2626;
+    }
+
+    .grade-box {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #dc2626;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SEITE 1: TEIL A – DIE TASTATUR & SONDERZEICHEN (13 P.)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="page">
+    <div class="doc-header">
+      <div class="doc-title">
+        <span>1. Informatik-Test: Tastatur &amp; Passw&ouml;rter &ndash; MUSTERL&Ouml;SUNG</span>
+        <span class="solution-badge">LEHREREXEMPLAR</span>
+      </div>
+      <div class="doc-meta">
+        <span>Klasse: <strong>5____</strong> &nbsp;&bull;&nbsp; Datum: Musterl&ouml;sung</span>
+        <span>Musterl&ouml;sung &amp; Bewertungsschl&uuml;ssel</span>
+        <span>Gesamtpunkte: <strong>26 Punkte</strong></span>
+      </div>
+      <hr class="doc-rule">
+    </div>
+
+    <!-- SCHAUBILD TASTATUR -->
+    <div class="schaubild-wrap">
+      <div class="schaubild-header">
+        <span class="section-label">Schaubild: QWERTZ-Tastatur (Drei Ebenen)</span>
+        <span style="font-size: 7.5pt; color: #475569;">Orientierung f&uuml;r Seite 1 (AltGr-Zeichen tiefgestellt unten rechts)</span>
+      </div>
+
+      <div class="kb-schaubild">
+        <!-- Reihe 1: Zahlenreihe -->
+        <div class="kb-row">
+          <div class="key sp w30"><span class="lbl">^</span></div>
+          <div class="key w30"><span class="ks">!</span><span class="kn">1</span></div>
+          <div class="key w30"><span class="ks">"</span><span class="kn">2</span></div>
+          <div class="key w30"><span class="ks">&sect;</span><span class="kn">3</span></div>
+          <div class="key w30"><span class="ks">$</span><span class="kn">4</span></div>
+          <div class="key w30"><span class="ks">%</span><span class="kn">5</span></div>
+          <div class="key w30"><span class="ks">&amp;</span><span class="kn">6</span></div>
+          <div class="key w30"><span class="ks">/</span><span class="kg">{</span><span class="kn">7</span></div>
+          <div class="key w30"><span class="ks">(</span><span class="kg">[</span><span class="kn">8</span></div>
+          <div class="key w30"><span class="ks">)</span><span class="kg">]</span><span class="kn">9</span></div>
+          <div class="key w30"><span class="ks">=</span><span class="kg">}</span><span class="kn">0</span></div>
+          <div class="key w30"><span class="ks">?</span><span class="kg">\</span><span class="kn">&szlig;</span></div>
+          <div class="key w30"><span class="ks">`</span><span class="kn">&acute;</span></div>
+          <div class="key sp w62"><span class="lbl" style="font-size:8.5pt;">&#x232B;</span></div>
+        </div>
+
+        <!-- Reihe 2: QWERTZ (nur Großbuchstabe) -->
+        <div class="kb-row">
+          <div class="key sp w46"><span class="lbl">&#x21E5; Tab</span></div>
+          <div class="key w30"><span class="kl">Q</span><span class="kg">@</span></div>
+          <div class="key w30"><span class="kl">W</span></div>
+          <div class="key w30"><span class="kl">E</span><span class="kg">&euro;</span></div>
+          <div class="key w30"><span class="kl">R</span></div>
+          <div class="key w30"><span class="kl">T</span></div>
+          <div class="key w30"><span class="kl">Z</span></div>
+          <div class="key w30"><span class="kl">U</span></div>
+          <div class="key w30"><span class="kl">I</span></div>
+          <div class="key w30"><span class="kl">O</span></div>
+          <div class="key w30"><span class="kl">P</span></div>
+          <div class="key w30"><span class="kl">&Uuml;</span></div>
+          <div class="key w30"><span class="ks">*</span><span class="kg">~</span><span class="kn">+</span></div>
+          <div class="key sp w46"><span class="lbl" style="font-size:8.5pt;">&#x21B5;</span></div>
+        </div>
+
+        <!-- Reihe 3: ASDF (nur Großbuchstabe) -->
+        <div class="kb-row">
+          <div class="key sp w54"><span class="lbl" style="font-size:8.5pt;">&#x21EA;</span></div>
+          <div class="key w30"><span class="kl">A</span></div>
+          <div class="key w30"><span class="kl">S</span></div>
+          <div class="key w30"><span class="kl">D</span></div>
+          <div class="key w30"><span class="kl">F</span></div>
+          <div class="key w30"><span class="kl">G</span></div>
+          <div class="key w30"><span class="kl">H</span></div>
+          <div class="key w30"><span class="kl">J</span></div>
+          <div class="key w30"><span class="kl">K</span></div>
+          <div class="key w30"><span class="kl">L</span></div>
+          <div class="key w30"><span class="kl">&Ouml;</span></div>
+          <div class="key w30"><span class="kl">&Auml;</span></div>
+          <div class="key w38"><span class="ks">'</span><span class="kn">#</span></div>
+        </div>
+
+        <!-- Reihe 4: YXCV (nur Großbuchstabe) -->
+        <div class="kb-row">
+          <div class="key sp k-shift w70"><span class="lbl">&#x21E7; Shift</span></div>
+          <div class="key w30"><span class="ks">&gt;</span><span class="kg">|</span><span class="kn">&lt;</span></div>
+          <div class="key w30"><span class="kl">Y</span></div>
+          <div class="key w30"><span class="kl">X</span></div>
+          <div class="key w30"><span class="kl">C</span></div>
+          <div class="key w30"><span class="kl">V</span></div>
+          <div class="key w30"><span class="kl">B</span></div>
+          <div class="key w30"><span class="kl">N</span></div>
+          <div class="key w30"><span class="kl">M</span><span class="kg">&micro;</span></div>
+          <div class="key w30"><span class="ks">;</span><span class="kn">,</span></div>
+          <div class="key w30"><span class="ks">:</span><span class="kn">.</span></div>
+          <div class="key w30"><span class="ks">_</span><span class="kn">-</span></div>
+          <div class="key sp k-shift w85"><span class="lbl">&#x21E7; Shift</span></div>
+        </div>
+
+        <!-- Reihe 5: Unterste Leiste -->
+        <div class="kb-row">
+          <div class="key sp w46"><span class="lbl">Strg</span></div>
+          <div class="key sp w30"><span class="lbl">Win</span></div>
+          <div class="key sp w46"><span class="lbl">Alt</span></div>
+          <div class="key sp w180"></div>
+          <div class="key sp k-altgr w46"><span class="lbl">AltGr</span></div>
+          <div class="key sp w30"><span class="lbl">Win</span></div>
+          <div class="key sp w46"><span class="lbl">Strg</span></div>
+        </div>
+      </div>
+
+      <div class="kb-legend">
+        <span>Normale Tasten: <strong>unten links</strong> (bzw. Gro&szlig;buchstabe)</span>
+        <span>Shift-Zeichen: <strong>oben links</strong></span>
+        <span>AltGr-Zeichen: <strong>unten rechts (tiefgestellt)</strong></span>
+        <span><span style="background:repeating-linear-gradient(135deg,#fff,#fff 2px,#cbd5e1 2px,#cbd5e1 3px); border:1px solid #333; padding:0 3px;">Schraffiert</span> = Shift</span>
+        <span><span style="background:#94a3b8; border:1px solid #111; padding:0 3px; color:#fff;">Dunkel</span> = AltGr</span>
+      </div>
+    </div>
+
+    <!-- AUFGABE 1: DREI EBENEN AN TASTE 7 -->
+    <div class="task-block">
+      <div class="task-header">
+        <span class="task-num">1</span>
+        <span class="task-title">Das Drei-Ebenen-System an der Taste <kbd>7</kbd></span>
+        <span class="task-points">(3 Punkte)</span>
+      </div>
+      <p class="task-desc">
+        Betrachte im Schaubild oben die Taste mit der Ziffer <kbd>7</kbd>. Auf ihr sind drei Zeichen aufgedruckt: <kbd>/</kbd>, <kbd>{</kbd> und <kbd>7</kbd>.
+      </p>
+      <div class="task-body" style="display: flex; flex-direction: column; gap: 3.5px; margin-top: 2px;">
+        <div>
+          a) Welches Zeichen erscheint, wenn du die Taste <strong>einfach direkt dr&uuml;ckst</strong>? &rarr;
+          Zeichen: <strong class="sol">7</strong> <span class="sol-tag">1 P.</span>
+          <span style="font-size:8.5pt; color:#475569; margin-left: 10px;">(Ebene 1: Normale Ebene)</span>
+        </div>
+        <div>
+          b) Welches Zeichen erscheint, wenn du <kbd>Shift</kbd> gedr&uuml;ckt h&auml;ltst und <kbd>7</kbd> tippst? &rarr;
+          Zeichen: <strong class="sol">/</strong> &nbsp;(Schr&auml;gstrich) <span class="sol-tag">1 P.</span>
+          <span style="font-size:8.5pt; color:#475569; margin-left: 10px;">(Ebene 2: Shift-Ebene)</span>
+        </div>
+        <div>
+          c) Welches Zeichen erscheint, wenn du <kbd>AltGr</kbd> gedr&uuml;ckt h&auml;ltst und <kbd>7</kbd> tippst? &rarr;
+          Zeichen: <strong class="sol">{</strong> &nbsp;(geschweifte Klammer auf) <span class="sol-tag">1 P.</span>
+          <span style="font-size:8.5pt; color:#475569; margin-left: 10px;">(Ebene 3: AltGr-Ebene)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUFGABE 2: TASTENKOMBINATIONEN & SONDERZEICHEN -->
+    <div class="task-block">
+      <div class="task-header">
+        <span class="task-num">2</span>
+        <span class="task-title">Tastenkombinationen &amp; Sonderzeichen</span>
+        <span class="task-points">(6 Punkte)</span>
+      </div>
+      <div class="task-body">
+        <p style="margin-bottom: 3px;">
+          <strong>a) Welches Zeichen entsteht bei der Tastenkombination?</strong> <span class="sol-tag">je 1 P. = 4 P.</span>
+        </p>
+        <div style="display:flex; gap: 28px; margin-bottom: 5px;">
+          <div><kbd>Shift</kbd> + <kbd>1</kbd> = <strong class="sol">!</strong></div>
+          <div><kbd>AltGr</kbd> + <kbd>E</kbd> = <strong class="sol">&euro;</strong></div>
+          <div><kbd>AltGr</kbd> + <kbd>Q</kbd> = <strong class="sol">@</strong></div>
+          <div><kbd>AltGr</kbd> + <kbd>&szlig;</kbd> = <strong class="sol">\</strong></div>
+        </div>
+
+        <p style="margin-top: 4px; margin-bottom: 3px;">
+          <strong>b) Welche Tasten musst du dr&uuml;cken, um folgende Zeichen zu tippen?</strong> <span class="sol-tag">je 1 P. = 2 P.</span>
+        </p>
+        <div style="display:flex; gap: 28px;">
+          <div>Fragezeichen <kbd>?</kbd> &rarr; <span class="sol"><kbd>Shift</kbd> + <kbd>&szlig;</kbd></span></div>
+          <div>Doppelpunkt <kbd>:</kbd> &rarr; <span class="sol"><kbd>Shift</kbd> + <kbd>.</kbd> (Punkt-Taste)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUFGABE 3: WICHTIGE FUNKTIONSTASTEN -->
+    <div class="task-block">
+      <div class="task-header">
+        <span class="task-num">3</span>
+        <span class="task-title">Wichtige Sondertasten: Name &amp; Aufgabe benennen</span>
+        <span class="task-points">(4 Punkte)</span>
+      </div>
+      <p class="task-desc">
+        Trage f&uuml;r jede abgebildete Taste den <strong>Namen</strong> und ihre <strong>Aufgabe beim Tippen</strong> ein: <span class="sol-tag">je Kachel: 0,5 P. Name + 0,5 P. Aufgabe = 4 P.</span>
+      </p>
+
+      <div class="task-body">
+        <div class="fn-grid">
+          <!-- Backspace -->
+          <div class="fn-card">
+            <div class="fn-head">
+              <span class="key-badge">&#x232B;</span>
+              <span style="font-weight:700;">Name:</span>
+              <span class="sol">R&uuml;cktaste / Backspace</span>
+            </div>
+            <div style="font-size: 8.8pt;">
+              <strong>Aufgabe:</strong> L&ouml;scht <span class="sol">das Zeichen links vom Cursor (Schreibmarke).</span>
+            </div>
+          </div>
+
+          <!-- Enter -->
+          <div class="fn-card">
+            <div class="fn-head">
+              <span class="key-badge">&#x21B5;</span>
+              <span style="font-weight:700;">Name:</span>
+              <span class="sol">Enter / Eingabetaste</span>
+            </div>
+            <div style="font-size: 8.8pt;">
+              <strong>Aufgabe:</strong> F&auml;ngt eine <span class="sol">neue Zeile (Absatz) an / best&auml;tigt Eingaben.</span>
+            </div>
+          </div>
+
+          <!-- CapsLock -->
+          <div class="fn-card">
+            <div class="fn-head">
+              <span class="key-badge">&#x21EA;</span>
+              <span style="font-weight:700;">Name:</span>
+              <span class="sol">Feststelltaste / Caps Lock</span>
+            </div>
+            <div style="font-size: 8.8pt;">
+              <strong>Aufgabe:</strong> Schaltet <span class="sol">Gro&szlig;buchstaben</span> dauerhaft ein.
+            </div>
+          </div>
+
+          <!-- Leertaste -->
+          <div class="fn-card">
+            <div class="fn-head">
+              <span class="key-badge" style="width: 55px; height: 16px;"></span>
+              <span style="font-weight:700;">Name:</span>
+              <span class="sol">Leertaste / Space</span>
+            </div>
+            <div style="font-size: 8.8pt;">
+              <strong>Aufgabe:</strong> F&uuml;gt ein <span class="sol">Leerzeichen (Abstand)</span> zwischen W&ouml;rtern ein.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       SEITE 2: TEIL B – SICHERE PASSWÖRTER & SCHUTZREGELN (13 P.)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="page">
+    <div class="doc-header">
+      <div class="doc-title">
+        <span>Teil B: Sichere Passw&ouml;rter &amp; Schutzregeln &ndash; MUSTERL&Ouml;SUNG</span>
+        <span class="solution-badge">LEHREREXEMPLAR</span>
+      </div>
+      <div class="doc-meta">
+        <span>Informatik Klasse 5 &bull; Test Seite 2</span>
+        <span>Musterl&ouml;sung Teil B</span>
+        <span>Punkte Teil B: <strong>13 Punkte</strong></span>
+      </div>
+      <hr class="doc-rule">
+    </div>
+
+    <!-- AUFGABE 4: KRITERIEN -->
+    <div class="task-block">
+      <div class="task-header">
+        <span class="task-num">4</span>
+        <span class="task-title">Die Kriterien f&uuml;r ein starkes Passwort</span>
+        <span class="task-points">(3 Punkte)</span>
+      </div>
+      <p class="task-desc">
+        Nenne <strong>drei verschiedene Kriterien / Regeln</strong>, die ein Passwort sicher machen: <span class="sol-tag">3 aus 5 Kriterien, je 1 P. = 3 P.</span>
+      </p>
+      <div class="task-body" style="display:flex; flex-direction:column; gap: 5px;">
+        <div><strong>1.</strong> <span class="sol">Mindestl&auml;nge von mindestens 8 Zeichen (besser 10&ndash;12 Zeichen).</span></div>
+        <div><strong>2.</strong> <span class="sol">Kombination aus Gro&szlig;- und Kleinbuchstaben (A&ndash;Z, a&ndash;z).</span></div>
+        <div><strong>3.</strong> <span class="sol">Mindestens eine Zahl (0&ndash;9) und mindestens ein Sonderzeichen (!, ?, @, #, $, ...).</span></div>
+        <div style="font-size: 8.3pt; color: #475569; margin-left: 14px;">
+          <em>(Alternativ voll g&uuml;ltig: Keine pers&ouml;nlichen Daten wie Name, Geburtstag, Tiername oder reine W&ouml;rterbuchbegriffe!)</em>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUFGABE 5: PASSWORT-CHECK -->
+    <div class="task-block" style="margin-top: 8px;">
+      <div class="task-header">
+        <span class="task-num">5</span>
+        <span class="task-title">Passwort-Check mit Begr&uuml;ndung</span>
+        <span class="task-points">(4 Punkte)</span>
+      </div>
+      <p class="task-desc">
+        Beurteile die beiden Passw&ouml;rter: <span class="sol-tag">je Passwort: 1 P. Urteil + 1 P. Begr&uuml;ndung = 4 P.</span>
+      </p>
+      <div class="task-body">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th style="width: 120px;">Passwort</th>
+              <th style="width: 130px; text-align: center;">Urteil (einkreisen)</th>
+              <th>Begr&uuml;ndung (Warum sicher bzw. was fehlt?)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><kbd style="font-size:9.5pt;">Sommer2026</kbd></td>
+              <td style="text-align: center; font-size:9.5pt;">
+                sicher &nbsp;|&nbsp; <strong class="sol" style="border: 1.5px solid #dc2626; padding: 1px 5px; border-radius: 3px;">unsicher</strong>
+              </td>
+              <td>
+                <span class="sol">Unsicher: Normales W&ouml;rterbuch-Wort + Jahreszahl. Es fehlen Sonderzeichen und eine echte Mischung aus Gro&szlig;-/Kleinbuchstaben. Leicht erratbar.</span>
+              </td>
+            </tr>
+            <tr>
+              <td><kbd style="font-size:9.5pt;">P!4mK#8z</kbd></td>
+              <td style="text-align: center; font-size:9.5pt;">
+                <strong class="sol" style="border: 1.5px solid #dc2626; padding: 1px 5px; border-radius: 3px;">sicher</strong> &nbsp;|&nbsp; unsicher
+              </td>
+              <td>
+                <span class="sol">Sicher: Mind. 8 Zeichen lang, alle 4 Zeichenarten (Gro&szlig;-/Kleinbuchstaben, Zahlen, Sonderzeichen) kombiniert, keine pers&ouml;nlichen Daten.</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AUFGABE 6: MERKSATZ-METHODE (OFFENER GESTALTET) -->
+    <div class="task-block" style="margin-top: 8px;">
+      <div class="task-header">
+        <span class="task-num">6</span>
+        <span class="task-title">Ein sicheres Passwort mit der Merksatz-Methode bilden</span>
+        <span class="task-points">(4 Punkte)</span>
+      </div>
+      <p class="task-desc">
+        Gegeben: <strong>&bdquo;Meine Katze Mimi schl&auml;ft fast den ganzen Tag.&ldquo;</strong>
+      </p>
+      <div class="task-body" style="display:flex; flex-direction:column; gap: 5px;">
+        <div>
+          <span style="font-weight:700;">Zwischenschritte:</span> <span class="sol-tag">2 P.</span><br>
+          <span class="sol">1. Anfangsbuchstaben: <strong>M K M s f d g T</strong> (Gro&szlig;-/Kleinschreibung beachtet: M, K, M, T gro&szlig;; s, f, d, g klein).</span><br>
+          <span class="sol">2. Ersetzungen planen: z. B. s &rarr; $, g &rarr; 9 oder d &rarr; 7, am Ende ein !</span>
+        </div>
+        <div style="margin-top: 3px;">
+          <span style="font-weight:700;">Muster-L&ouml;sung f&uuml;r fertiges Passwort:</span> <span class="sol-tag">2 P.</span><br>
+          <span class="sol" style="font-family:'Consolas',monospace; font-size:11pt; background:#fee2e2; padding:2px 8px; border-radius:4px; display:inline-block; margin-top:2px;">
+            M#Msfd7T! &nbsp;oder&nbsp; M!Msfd9T? &nbsp;oder&nbsp; M+Msfd8T$
+          </span><br>
+          <span style="font-size:8.3pt; color:#475569;">(Volle 4 Punkte, wenn die Anfangsbuchstaben erkennbar hergeleitet wurden, mindestens zwei Zeichen durch Zahlen/Sonderzeichen ersetzt wurden und ein starkes Passwort mit mind. 8 Zeichen entstanden ist).</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUFGABE 7: DIE ZAHNBÜRSTEN-REGEL / SCHUTZREGEL -->
+    <div class="task-block" style="margin-top: 8px;">
+      <div class="task-header">
+        <span class="task-num">7</span>
+        <span class="task-title">Passwort-Sicherheit im Schulalltag</span>
+        <span class="task-points">(2 Punkte)</span>
+      </div>
+      <p class="task-desc">
+        Im Computerraum fragt dich dein bester Freund nach deinem Passwort: <span class="sol-tag">1 P. klares Nein + 1 P. Begr&uuml;ndung = 2 P.</span>
+      </p>
+      <div class="task-body" style="display:flex; flex-direction:column; gap: 4px;">
+        <div class="sol">
+          1. Ich gebe mein Passwort <strong>auf keinen Fall</strong> weiter (auch nicht an den besten Freund!). (1 P.)<br>
+          2. Begr&uuml;ndung / Zahnb&uuml;rsten-Regel: Passw&ouml;rter sind privat und streng geheim, damit niemand in fremdem Namen Unfug anstellt oder private Daten liest. Mein Freund muss die Lehrkraft um Hilfe bitten. (1 P.)
+        </div>
+      </div>
+    </div>
+
+    <!-- PUNKTEABSCHLUSS (OHNE NOTENSPIEGEL) -->
+    <div class="score-wrap">
+      <div class="score-calc">
+        <span>Teil A (Tastatur): _____ / 13 P.</span>
+        <span>Teil B (Passw&ouml;rter): _____ / 13 P.</span>
+        <span>Gesamt: _____ / 26 P.</span>
+      </div>
+      <div class="grade-box">
+        <span>Note: <strong>_________</strong></span>
+        <span style="margin-left: 20px; font-weight: normal; font-size: 8.8pt; color: #7f1d1d;">Unterschrift der Lehrkraft: ___________________________</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

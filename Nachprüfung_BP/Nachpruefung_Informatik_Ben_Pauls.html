@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nachprüfung Informatik 9 – Ben Pauls</title>
+    <style>
+        /* --- RESET & GRUNDLAYOUT --- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.35;
+            color: #1e293b;
+            background-color: #f1f5f9;
+            padding: 20px;
+        }
+
+        /* --- A4 SEITEN-CONTAINER (4 SEITEN / 2 BLÄTTER DOPPELSEITIG) --- */
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto 25px auto;
+            background: #ffffff;
+            padding: 13mm 16mm 13mm 16mm;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        /* --- DRUCK-EINSTELLUNGEN --- */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .page {
+                width: 100%;
+                min-height: 100%;
+                margin: 0;
+                padding: 11mm 15mm;
+                box-shadow: none;
+                page-break-after: always;
+                break-after: page;
+            }
+            .page:last-child {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* --- SCREEN TOOLBAR --- */
+        .toolbar {
+            max-width: 210mm;
+            margin: 0 auto 15px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .toolbar h1 {
+            font-size: 14pt;
+            font-weight: 600;
+        }
+        .btn-print {
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            font-size: 11pt;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .btn-print:hover {
+            background: #1d4ed8;
+        }
+
+        /* --- AUFGABENBUILDER KOPFZEILE (OHNE ELTERN-UNTERSCHRIFT) --- */
+        .print-header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 0 6px 0;
+            font-size: 9.5pt;
+        }
+        .print-header-table td, 
+        .print-header-table th {
+            border: 1.5px solid #64748b;
+            padding: 5px 10px;
+            vertical-align: middle;
+        }
+        .print-header-table th.title-cell {
+            text-align: left;
+            font-size: 12.5pt;
+            font-weight: 700;
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+        .info-table .logo-cell {
+            width: 26%;
+            text-align: center;
+            padding: 6px;
+            background-color: #ffffff;
+        }
+        .info-table .logo-cell img {
+            max-width: 130px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .info-table .compact-cell {
+            width: 12%;
+            white-space: nowrap;
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+        }
+        .empty-write-area {
+            height: 24px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        /* Grading Table: Nur Punkte & Note */
+        .grading-table {
+            margin-top: 4px;
+            margin-bottom: 6px;
+        }
+        .grading-table td:first-child {
+            width: 45%;
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+        }
+        .grading-combined-cell {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .grading-sep {
+            width: 1px;
+            height: 18px;
+            background-color: #94a3b8;
+            margin: 0 10px;
+        }
+        .points-write-area {
+            display: inline-block;
+            width: 50px;
+            border-bottom: 1px dotted #64748b;
+            margin-right: 4px;
+        }
+        .note-write-area {
+            display: inline-block;
+            width: 60px;
+            border-bottom: 1px dotted #64748b;
+            margin-right: 4px;
+        }
+
+        .print-hinweise {
+            font-size: 8.5pt;
+            color: #475569;
+            border: 1px dashed #94a3b8;
+            background-color: #f8fafc;
+            border-radius: 4px;
+            padding: 4px 10px;
+            margin-bottom: 8px;
+        }
+
+        /* --- THEMEN-TRENNER --- */
+        .section-banner {
+            background: linear-gradient(90deg, #1e293b 0%, #334155 100%);
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 10.5pt;
+            font-weight: 700;
+            margin: 6px 0 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .section-badge {
+            background: rgba(255,255,255,0.2);
+            font-size: 8.5pt;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* --- AUFGABEN-STIL --- */
+        .task-card {
+            margin-bottom: 10px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 2px;
+            margin-bottom: 6px;
+        }
+        .task-title {
+            font-size: 10.5pt;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .task-points-badge {
+            font-size: 9pt;
+            font-weight: 600;
+            background: #e2e8f0;
+            color: #1e293b;
+            padding: 1px 7px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+        }
+        .task-text {
+            font-size: 9.5pt;
+            color: #334155;
+            margin-bottom: 6px;
+            text-align: justify;
+        }
+        .subtask-label {
+            font-weight: 700;
+            color: #0f172a;
+            margin-right: 4px;
+        }
+
+        /* --- CODE-BLÖCKE --- */
+        .code-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 3.5px solid #3b82f6;
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 8.5pt;
+            line-height: 1.35;
+            color: #0f172a;
+            margin: 6px 0;
+            white-space: pre-wrap;
+        }
+        .code-keyword {
+            color: #7c3aed;
+            font-weight: bold;
+        }
+        .code-method {
+            color: #2563eb;
+            font-weight: bold;
+        }
+        .code-comment {
+            color: #64748b;
+            font-style: italic;
+        }
+        .code-writing-box {
+            background: #ffffff;
+            border: 1.5px solid #94a3b8;
+            border-left: 3.5px solid #2563eb;
+            padding: 8px 12px;
+            line-height: 1.6;
+        }
+
+        /* --- STRUKTOGRAMM RENDERER --- */
+        .struct-container {
+            border: 1.5px solid #0f172a;
+            background: #ffffff;
+            margin: 6px auto;
+            font-size: 8.5pt;
+            line-height: 1.2;
+            text-align: center;
+        }
+        .struct-block {
+            border-bottom: 1px solid #0f172a;
+            padding: 4px 8px;
+            background: #ffffff;
+        }
+        .struct-block:last-child {
+            border-bottom: none;
+        }
+        
+        /* Schleife: Header ohne Trennstrich zum linken Balken */
+        .struct-loop {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #0f172a;
+            background: #ffffff;
+        }
+        .struct-loop-header {
+            padding: 4px 8px;
+            font-weight: 600;
+            background: #ffffff;
+            text-align: left;
+        }
+        .struct-loop-body {
+            display: flex;
+            background: #ffffff;
+        }
+        .struct-loop-bar {
+            width: 24px;
+            background: #ffffff;
+            border-right: 1.5px solid #0f172a;
+            flex-shrink: 0;
+        }
+        .struct-loop-inner {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid #0f172a;
+        }
+
+        /* Verzweigung */
+        .struct-branch-header {
+            position: relative;
+            height: 32px;
+            border-bottom: 1px solid #0f172a;
+            background: #f8fafc;
+            overflow: hidden;
+        }
+        .struct-branch-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .struct-branch-text {
+            position: absolute;
+            top: 2px;
+            width: 100%;
+            text-align: center;
+            font-weight: 600;
+            font-size: 8pt;
+        }
+        .struct-branch-yes {
+            position: absolute;
+            bottom: 2px;
+            left: 8px;
+            font-weight: 700;
+            font-size: 8pt;
+            color: #166534;
+        }
+        .struct-branch-no {
+            position: absolute;
+            bottom: 2px;
+            right: 8px;
+            font-weight: 700;
+            font-size: 8pt;
+            color: #991b1b;
+        }
+        .struct-branch-bodies {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-bottom: 1px solid #0f172a;
+        }
+        .struct-branch-left {
+            border-right: 1px solid #0f172a;
+            padding: 4px 8px;
+        }
+        .struct-branch-right {
+            padding: 4px 8px;
+        }
+
+        /* --- ANTWORTBEREICHE & SCHREIBLINIEN --- */
+        .answer-lines {
+            margin: 4px 0 8px 0;
+        }
+        .line {
+            height: 25px;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        .answer-grid {
+            border: 1px solid #94a3b8;
+            background-color: #ffffff;
+            background-image: 
+                linear-gradient(to right, #e2e8f0 1px, transparent 1px),
+                linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+            background-size: 5mm 5mm;
+            border-radius: 4px;
+            margin: 6px 0;
+        }
+
+        /* --- KARA WELT & SPICKZETTEL --- */
+        .cheat-sheet-box {
+            background: #eff6ff;
+            border: 1.5px solid #3b82f6;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            font-size: 8.5pt;
+        }
+        .cheat-sheet-title {
+            font-weight: 700;
+            color: #1d4ed8;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .cheat-sheet-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .cheat-category-title {
+            font-weight: 600;
+            color: #1e293b;
+            text-decoration: underline;
+            margin-bottom: 2px;
+        }
+        .cheat-list {
+            list-style: none;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 8.5pt;
+        }
+        .cheat-list li {
+            margin-bottom: 1px;
+        }
+
+        .kara-visual-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 8px;
+            margin: 6px 0;
+        }
+
+        /* --- FEHLERTABELLE AUFGABE 5 --- */
+        .syntax-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9pt;
+            margin-top: 6px;
+        }
+        .syntax-table th {
+            background: #e2e8f0;
+            border: 1px solid #94a3b8;
+            padding: 6px 8px;
+            text-align: left;
+        }
+        .syntax-table td {
+            border: 1px solid #cbd5e1;
+            padding: 6px 8px;
+            height: 38px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SCREEN PRINT BUTTON (Wird im Ausdruck automatisch ausgeblendet) -->
+    <div class="toolbar no-print">
+        <div>
+            <h1>📄 Nachprüfung Informatik (Klasse 9) – Ben Pauls</h1>
+            <span style="font-size: 9pt; opacity: 0.8;">Themen: Struktogramme, Calliope mini &amp; Java Kara</span>
+        </div>
+        <button class="btn-print" onclick="window.print()">
+            🖨️ Als PDF drucken / Speichern
+        </button>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SEITE 1: KOPF, AUFGABE 1 & AUFGABE 2                          -->
+    <!-- ============================================================== -->
+    <div class="page">
+        
+        <!-- AUFGABENBUILDER KOPFZEILE -->
+        <table class="print-header-table info-table">
+            <tr>
+                <td rowspan="3" class="logo-cell">
+                    <img src="../LOGO-SGL.jpg" alt="School Logo" onerror="this.src='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYEBAYNCgwKDV0NDQ0NXQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ3/wAARCAAnALADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD//Z'">
+                </td>
+                <th colspan="2" class="title-cell">Nachprüfung – Informatik – Klasse 9</th>
+            </tr>
+            <tr>
+                <td class="compact-cell">Datum:</td>
+                <td>31.08.2026</td>
+            </tr>
+            <tr>
+                <td class="compact-cell">Name:</td>
+                <td class="empty-write-area">Ben Pauls</td>
+            </tr>
+        </table>
+
+        <!-- GRADING TABLE: NUR PUNKTE & NOTE (OHNE ELTERN-UNTERSCHRIFT) -->
+        <table class="print-header-table grading-table">
+            <tr>
+                <td>Punkte &amp; Note</td>
+                <td>
+                    <div class="grading-combined-cell">
+                        <div>
+                            <span class="points-write-area"></span> / 30 P.
+                        </div>
+                        <div class="grading-sep"></div>
+                        <div>
+                            <span class="note-write-area"></span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        
+        <div class="print-hinweise">
+            Bearbeitungszeit: 45 Minuten. Hilfsmittel: Keine (nur Stift und Lineal). Löse alle Aufgaben sorgfältig direkt auf diesem Bogen.
+        </div>
+
+        <!-- TEIL 1 BANNER -->
+        <div class="section-banner">
+            <span>TEIL 1: Struktogramme &amp; Algorithmen</span>
+            <span class="section-badge">14 Punkte</span>
+        </div>
+
+        <!-- AUFGABE 1 -->
+        <div class="task-card">
+            <div class="task-header">
+                <div class="task-title">Aufgabe 1: Struktogramm lesen – Der Kakao-Automat</div>
+                <div class="task-points-badge">4 Punkte</div>
+            </div>
+            <div class="task-text">
+                Dir liegt folgendes Struktogramm für die Zubereitung eines heißen Kakaos an einem Automaten vor:
+            </div>
+
+            <!-- STRUKTOGRAMM GRAFIK -->
+            <div class="struct-container" style="max-width: 460px;">
+                <div class="struct-block">Pappbecher unter den Auslauf stellen</div>
+                <div class="struct-loop">
+                    <div class="struct-loop-header">Solange Füllstand &lt; 200 ml</div>
+                    <div class="struct-loop-body">
+                        <div class="struct-loop-bar"></div>
+                        <div class="struct-loop-inner">
+                            <div class="struct-block">Heiße Milch einfüllen (50 ml)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="struct-block">Kakaopulver einrühren</div>
+                <div class="struct-branch-header">
+                    <svg class="struct-branch-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <polygon points="0,0 100,0 50,100" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.5" />
+                        <line x1="50" y1="100" x2="50" y2="100" stroke="#0f172a" stroke-width="1" />
+                    </svg>
+                    <div class="struct-branch-text">Wünscht der Kunde Marshmallows?</div>
+                    <div class="struct-branch-yes">Ja</div>
+                    <div class="struct-branch-no">Nein</div>
+                </div>
+                <div class="struct-branch-bodies">
+                    <div class="struct-branch-left">Marshmallows oben auflegen</div>
+                    <div class="struct-branch-right"><i>(nichts tun)</i></div>
+                </div>
+                <div class="struct-block">Fertigen Becher entnehmen</div>
+            </div>
+
+            <!-- a) DOPPELTER SCHREIBPLATZ: 6 VOLLE LINIEN -->
+            <div class="task-text" style="margin-top: 6px;">
+                <span class="subtask-label">a)</span> Beschreibe den Ablauf in 2 bis 3 vollständigen Sätzen: Wie genau arbeitet der Automat? (2 P.)
+            </div>
+            <div class="answer-lines">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+
+            <!-- b) 3 LINIEN -->
+            <div class="task-text">
+                <span class="subtask-label">b)</span> Erkläre den Unterschied: Woran erkennt man im Struktogramm formal eine <strong>Schleife</strong> (Wiederholung) und woran eine <strong>Verzweigung</strong> (Entscheidung)? (2 P.)
+            </div>
+            <div class="answer-lines">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+        </div>
+
+        <!-- AUFGABE 2 -->
+        <div class="task-card">
+            <div class="task-header">
+                <div class="task-title">Aufgabe 2: Struktogramm zeichnen – Smarter Nachtwächter</div>
+                <div class="task-points-badge">6 Punkte</div>
+            </div>
+            <div class="task-text">
+                Ein Calliope mini soll als automatisches Nachtlicht und Alarmanlage dienen. Übersetze den folgenden Ablaufplan in ein <strong>vollständiges, formal korrektes Struktogramm</strong>:
+            </div>
+            
+            <div class="code-box" style="padding: 4px 8px; margin: 3px 0; font-size: 8.5pt; line-height: 1.25;">
+<span class="code-keyword">Dauerschleife</span>:
+    <span class="code-keyword">Wenn</span> Lichtsensor &lt; 20 (es ist dunkel):
+        Zeige Mond-Symbol auf dem Display
+        <span class="code-keyword">Wenn</span> Erschütterung registriert:
+            Spiele Alarmton
+    <span class="code-keyword">Sonst</span> (es ist hell):
+        Lösche Display
+            </div>
+
+            <div class="task-text" style="margin-top: 4px;">
+                <strong>Arbeitsauftrag:</strong> Zeichne das Struktogramm sauber in das vorgegebene Raster. Achte auf den äußeren Schleifenrahmen und die korrekten Dreiecke für die Verzweigungen!
+            </div>
+
+            <!-- VERDOPPELTES KARORASTER: EXAKT 100 MM HOCH -->
+            <div class="answer-grid" style="height: 100mm; width: 100%;"></div>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SEITE 2: AUFGABE 3 & PLATZ FÜR NOTIZEN / SKIZZEN               -->
+    <!-- ============================================================== -->
+    <div class="page">
+        
+        <!-- AUFGABE 3 -->
+        <div class="task-card">
+            <div class="task-header">
+                <div class="task-title">Aufgabe 3: Calliope mini – Fehleranalyse (Zähler &amp; Schleife)</div>
+                <div class="task-points-badge">4 Punkte</div>
+            </div>
+            <div class="task-text">
+                Ein Schüler möchte einen Klick-Zähler programmieren, der zählt, wie oft Button A gedrückt wurde. Er hat folgenden Code auf den Calliope geladen:
+            </div>
+
+            <div class="code-box" style="max-width: 450px;">
+<span class="code-keyword">Dauerschleife</span>:
+    klicks = 0
+    <span class="code-keyword">Wenn</span> Button A gedrückt:
+        klicks = klicks + 1
+        Zeige Zahl klicks
+            </div>
+
+            <!-- a) DOPPELTER SCHREIBPLATZ: 6 VOLLE LINIEN -->
+            <div class="task-text" style="margin-top: 10px;">
+                <span class="subtask-label">a)</span> Wenn man Button A mehrmals hintereinander drückt, zählt das Programm niemals auf 2 oder höher, sondern zeigt immer nur 1 an. <strong>Warum ist das so? Welchen logischen Denkfehler hat der Schüler gemacht?</strong> (2 P.)
+            </div>
+            <div class="answer-lines">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+
+            <!-- b) DOPPELTER SCHREIBPLATZ: 6 VOLLE LINIEN -->
+            <div class="task-text" style="margin-top: 10px;">
+                <span class="subtask-label">b)</span> <strong>Korrektur:</strong> Wie muss das Programm korrigiert werden, damit der Zähler wie gewünscht funktioniert? (2 P.)
+            </div>
+            <div class="answer-lines">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+        </div>
+
+        <!-- LEERZEILEN / NOTIZBEREICH NACH AUFGABE 3 -->
+        <div style="margin-top: 25px; border-top: 1px dashed #cbd5e1; padding-top: 10px;">
+            <div style="font-size: 8.5pt; font-weight: 600; color: #64748b; margin-bottom: 8px;">
+                Platz für eigene Notizen / Skizzen / Nebenrechnungen:
+            </div>
+            <div class="answer-lines">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SEITE 3: TEIL 2 SPICKZETTEL, AUFGABE 4 & AUFGABE 5             -->
+    <!-- ============================================================== -->
+    <div class="page">
+        
+        <!-- TEIL 2 BANNER (STARTET SAUBER OBEN AUF SEITE 3) -->
+        <div class="section-banner">
+            <span>TEIL 2: Programmieren mit Java Kara</span>
+            <span class="section-badge">16 Punkte</span>
+        </div>
+
+        <!-- SPICKZETTEL / CHEAT SHEET -->
+        <div class="cheat-sheet-box">
+            <div class="cheat-sheet-title">
+                📌 Karas offizieller Befehlskatalog (Spickzettel)
+            </div>
+            <div class="cheat-sheet-grid">
+                <div>
+                    <div class="cheat-category-title">Sensoren (Bedingungen für if / while):</div>
+                    <ul class="cheat-list">
+                        <li><code>kara.onLeaf()</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (steht auf Kleeblatt?)</li>
+                        <li><code>!kara.onLeaf()</code> &nbsp;&nbsp;&nbsp;&nbsp; (steht NICHT auf Blatt?)</li>
+                        <li><code>kara.treeFront()</code> &nbsp;&nbsp;&nbsp; (Baum direkt vor ihm?)</li>
+                        <li><code>!kara.treeFront()</code> &nbsp;&nbsp; (kein Baum vorn?)</li>
+                        <li><code>kara.treeLeft()</code> / <code>kara.treeRight()</code></li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="cheat-category-title">Aktoren (Befehle zur Ausführung):</div>
+                    <ul class="cheat-list">
+                        <li><code>kara.move();</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (1 Schritt vorwärts)</li>
+                        <li><code>kara.turnLeft();</code> &nbsp;&nbsp;&nbsp; (nach links drehen)</li>
+                        <li><code>kara.turnRight();</code> &nbsp;&nbsp; (nach rechts drehen)</li>
+                        <li><code>kara.putLeaf();</code> &nbsp;&nbsp;&nbsp;&nbsp; (Kleeblatt ablegen)</li>
+                        <li><code>kara.removeLeaf();</code> &nbsp;(Kleeblatt aufheben)</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="font-size: 7.5pt; color: #dc2626; font-weight: 600; margin-top: 4px;">
+                ⚠️ Wichtig: Kara kann nicht seitwärts gehen! Es gibt KEINE Befehle wie <code>moveRight()</code> oder <code>leafRight()</code>.
+            </div>
+        </div>
+
+        <!-- AUFGABE 4 -->
+        <div class="task-card">
+            <div class="task-header">
+                <div class="task-title">Aufgabe 4: Code verstehen &amp; Welt visualisieren</div>
+                <div class="task-points-badge">4 Punkte</div>
+            </div>
+            <div class="task-text">
+                Kara befindet sich in der unten abgebildeten Welt mit Blickrichtung nach <strong>rechts</strong>:
+            </div>
+
+            <div class="kara-visual-container">
+                <!-- SVG KARA WELT: 1 REIHE -->
+                <svg width="350" height="50" viewBox="0 0 350 50" style="background:#ffffff; border:1.5px solid #64748b; border-radius:4px;">
+                    <defs>
+                        <g id="leaf">
+                            <circle cx="20" cy="18" r="7" fill="#16a34a" />
+                            <circle cx="28" cy="22" r="7" fill="#16a34a" />
+                            <circle cx="22" cy="28" r="7" fill="#16a34a" />
+                            <path d="M 23,24 Q 25,36 29,38" stroke="#15803d" stroke-width="2" fill="none" />
+                        </g>
+                        <g id="tree">
+                            <rect x="21" y="30" width="8" height="14" fill="#78350f" />
+                            <polygon points="12,32 38,32 25,10" fill="#15803d" />
+                            <polygon points="15,22 35,22 25,5" fill="#16a34a" />
+                        </g>
+                        <g id="kara-right">
+                            <line x1="16" y1="12" x2="34" y2="12" stroke="#0f172a" stroke-width="2" />
+                            <line x1="14" y1="25" x2="36" y2="25" stroke="#0f172a" stroke-width="2" />
+                            <line x1="16" y1="38" x2="34" y2="38" stroke="#0f172a" stroke-width="2" />
+                            <ellipse cx="23" cy="25" rx="14" ry="12" fill="#dc2626" stroke="#0f172a" stroke-width="1.5" />
+                            <line x1="10" y1="25" x2="37" y2="25" stroke="#0f172a" stroke-width="1.5" />
+                            <circle cx="18" cy="19" r="2.5" fill="#0f172a" />
+                            <circle cx="27" cy="18" r="2" fill="#0f172a" />
+                            <circle cx="18" cy="31" r="2.5" fill="#0f172a" />
+                            <circle cx="27" cy="32" r="2" fill="#0f172a" />
+                            <path d="M 34,19 A 7,7 0 0,1 34,31 Z" fill="#0f172a" />
+                            <line x1="37" y1="21" x2="43" y2="17" stroke="#0f172a" stroke-width="1.5" />
+                            <line x1="37" y1="29" x2="43" y2="33" stroke="#0f172a" stroke-width="1.5" />
+                        </g>
+                    </defs>
+
+                    <line x1="50" y1="0" x2="50" y2="50" stroke="#cbd5e1" stroke-width="1.5" />
+                    <line x1="100" y1="0" x2="100" y2="50" stroke="#cbd5e1" stroke-width="1.5" />
+                    <line x1="150" y1="0" x2="150" y2="50" stroke="#cbd5e1" stroke-width="1.5" />
+                    <line x1="200" y1="0" x2="200" y2="50" stroke="#cbd5e1" stroke-width="1.5" />
+                    <line x1="250" y1="0" x2="250" y2="50" stroke="#cbd5e1" stroke-width="1.5" />
+                    <line x1="300" y1="0" x2="300" y2="50" stroke="#cbd5e1" stroke-width="1.5" />
+
+                    <use href="#kara-right" x="0" y="0" />
+                    <use href="#leaf" x="50" y="0" />
+                    <use href="#leaf" x="150" y="0" />
+                    <use href="#leaf" x="200" y="0" />
+                    <use href="#tree" x="250" y="0" />
+                </svg>
+            </div>
+
+            <div class="task-text">Folgendes Programm wird gestartet:</div>
+            <div class="code-box">
+<span class="code-keyword">void</span> <span class="code-method">myProgram</span>() {
+    <span class="code-keyword">while</span> (!kara.<span class="code-method">treeFront</span>()) {
+        <span class="code-keyword">if</span> (kara.<span class="code-method">onLeaf</span>()) {
+            kara.<span class="code-method">removeLeaf</span>();
+        }
+        kara.<span class="code-method">move</span>();
+    }
+    kara.<span class="code-method">putLeaf</span>();
+}
+            </div>
+
+            <!-- a) DOPPELTER SCHREIBPLATZ: 6 VOLLE LINIEN -->
+            <div class="task-text">
+                <span class="subtask-label">a)</span> Beschreibe präzise, was Kara tut und welche Aktion er auf seinem Weg ausführt (2 P.):
+            </div>
+            <div class="answer-lines">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+
+            <!-- b) 3 LINIEN -->
+            <div class="task-text">
+                <span class="subtask-label">b)</span> <strong>Endzustand der Welt:</strong> Wo bleibt Kara am Ende stehen und wo liegt nach Ablauf des Programms noch ein Kleeblatt? (2 P.)
+            </div>
+            <div class="answer-lines">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+        </div>
+
+        <!-- AUFGABE 5 -->
+        <div class="task-card" style="margin-top: 10px;">
+            <div class="task-header">
+                <div class="task-title">Aufgabe 5: Finde die 4 Syntaxfehler</div>
+                <div class="task-points-badge">4 Punkte</div>
+            </div>
+            <div class="task-text">
+                Im folgenden Java-Programm haben sich exakt <strong>4 Syntaxfehler</strong> eingeschlichen. 
+                <br><em>Tipp: Achte besonders auf runde Klammern bei Bedingungen, geschweifte Klammern für Blöcke und Semikolons!</em>
+            </div>
+
+            <div class="code-box" style="font-size: 9.5pt; line-height: 1.4;">
+<span style="color:#64748b; user-select:none;">Zeile 1:</span>  <span class="code-keyword">void</span> <span class="code-method">myProgram</span>() {
+<span style="color:#64748b; user-select:none;">Zeile 2:</span>      <span class="code-keyword">while</span> !kara.<span class="code-method">treeFront</span>() 
+<span style="color:#64748b; user-select:none;">Zeile 3:</span>      {
+<span style="color:#64748b; user-select:none;">Zeile 4:</span>          (kara.<span class="code-method">move</span>())
+<span style="color:#64748b; user-select:none;">Zeile 5:</span>          <span class="code-keyword">if</span> (kara.<span class="code-method">onLeaf</span>()) {
+<span style="color:#64748b; user-select:none;">Zeile 6:</span>              kara.<span class="code-method">removeLeaf</span>()
+<span style="color:#64748b; user-select:none;">Zeile 7:</span>          }
+<span style="color:#64748b; user-select:none;">Zeile 8:</span>      
+<span style="color:#64748b; user-select:none;">Zeile 9:</span>  }
+            </div>
+
+            <div class="task-text">
+                <strong>Arbeitsauftrag:</strong> Finde alle 4 Fehler, nenne die Zeilennummer und beschreibe kurz, was falsch ist und wie es richtig heißen muss:
+            </div>
+
+            <table class="syntax-table">
+                <thead>
+                    <tr>
+                        <th style="width: 16%;">Zeile</th>
+                        <th style="width: 42%;">Was ist fehlerhaft?</th>
+                        <th style="width: 42%;">Wie muss es richtig heißen?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align:center;"><strong>1. Fehler:</strong> Zeile ___</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><strong>2. Fehler:</strong> Zeile ___</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><strong>3. Fehler:</strong> Zeile ___</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><strong>4. Fehler:</strong> Zeile ___</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SEITE 4: AUFGABE 6 – EXTRA GROSSES EINGABEFELD (+50%)          -->
+    <!-- ============================================================== -->
+    <div class="page">
+
+        <!-- AUFGABE 6 -->
+        <div class="task-card">
+            <div class="task-header">
+                <div class="task-title">Aufgabe 6: Eigenes Programm schreiben – „Der Baum-Ausweicher“</div>
+                <div class="task-points-badge">8 Punkte</div>
+            </div>
+            
+            <div style="display: flex; gap: 16px; align-items: center; margin: 8px 0 12px 0;">
+                <svg width="210" height="70" viewBox="0 0 200 65" style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:4px; flex-shrink: 0;">
+                    <line x1="0" y1="32" x2="200" y2="32" stroke="#e2e8f0" stroke-width="1.5" />
+                    <line x1="50" y1="0" x2="50" y2="65" stroke="#e2e8f0" stroke-width="1.5" />
+                    <line x1="100" y1="0" x2="100" y2="65" stroke="#e2e8f0" stroke-width="1.5" />
+                    <line x1="150" y1="0" x2="150" y2="65" stroke="#e2e8f0" stroke-width="1.5" />
+                    
+                    <circle cx="25" cy="48" r="11" fill="#dc2626" />
+                    <text x="25" y="52" font-size="8" fill="#fff" font-weight="bold" text-anchor="middle">Kara ▶</text>
+                    <polygon points="65,58 85,58 75,38" fill="#15803d" />
+                    <rect x="73" y="58" width="4" height="5" fill="#78350f" />
+                    <path d="M 25,40 Q 25,14 75,14 Q 125,14 125,44" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="3,2" />
+                    <polygon points="123,41 125,48 128,41" fill="#2563eb" />
+                    <circle cx="175" cy="48" r="9" fill="#16a34a" />
+                    <text x="175" y="51" font-size="9" fill="#fff" text-anchor="middle">🍀</text>
+                </svg>
+                <div class="task-text" style="margin: 0; font-size: 10pt;">
+                    Kara läuft auf das <strong>Kleeblatt</strong> zu. Auf seinem Weg versperrt ihm ein <strong>einzelner Baum</strong> die Bahn. Kara soll dem Baum nach links ausweichen und seinen Weg zum Ziel fortsetzen.
+                </div>
+            </div>
+
+            <div class="task-text" style="margin-top: 10px;">
+                <span class="subtask-label">a)</span> Schreibe eine Hilfsmethode <code>void umgeheBaum()</code>, mit der Kara dem Baum ausweicht und sich wieder auf die ursprüngliche Bahn ausrichtet (4 P.):
+            </div>
+
+            <!-- EINGABEFELD UM CA. 50% VERGRÖSSERT: MIN-HEIGHT 180 PX -->
+            <div class="code-box code-writing-box" style="min-height: 180px; margin-bottom: 14px;">
+<span class="code-keyword">void</span> <span class="code-method">umgeheBaum</span>() {
+    <span class="code-comment">// Dein Code für das Ausweichen:</span>
+
+
+
+
+
+
+
+
+
+}
+            </div>
+
+            <div class="task-text">
+                <span class="subtask-label">b)</span> Schreibe das Hauptprogramm <code>void myProgram()</code>, sodass Kara bis zum Kleeblatt läuft und dabei den Baum umgeht (4 P.):
+            </div>
+
+            <!-- EINGABEFELD UM CA. 50% VERGRÖSSERT: MIN-HEIGHT 200 PX -->
+            <div class="code-box code-writing-box" style="min-height: 200px;">
+<span class="code-keyword">void</span> <span class="code-method">myProgram</span>() {
+    <span class="code-comment">// Dein Hauptprogramm mit Schleife, Bedingung und Methodenaufruf:</span>
+
+
+
+
+
+
+
+
+
+
+}
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AufgabenBuilder – Word Add-in</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css?v=1.1">
+    <link rel="stylesheet" href="css/builder-ui.css?v=1.1">
+
+    <!-- Office.js CDN -->
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+
+    <!-- JSXGraph for Geometry and Graphs -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+
+    <!-- KaTeX CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <!-- Word Addin Script -->
+    <script type="module" src="/src/wordAddin.ts"></script>
+
+    <!-- Alpine.js CDN -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8fafc;
+            color: #1e293b;
+            font-family: 'Inter', -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .word-taskpane-header {
+            padding: 10px 14px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .word-logo-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .word-status-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 9999px;
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        .word-category-bar {
+            display: flex;
+            background: #f1f5f9;
+            padding: 4px;
+            gap: 3px;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+
+        .word-cat-btn {
+            flex: 1;
+            padding: 6px 4px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            border-radius: 5px;
+            cursor: pointer;
+            white-space: nowrap;
+            text-align: center;
+            transition: all 0.15s ease;
+        }
+
+        .word-cat-btn:hover {
+            color: #0f172a;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .word-cat-btn.active {
+            background: #ffffff;
+            color: #6366f1;
+            font-weight: 700;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .word-module-select-bar {
+            padding: 8px 12px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .word-module-select {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #1e293b;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .word-module-select:focus {
+            border-color: #6366f1;
+        }
+
+        .word-scroll-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .word-preview-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .word-preview-header {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .word-preview-container {
+            min-height: 120px;
+            max-height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            padding: 6px;
+            background: #fafafa;
+            border-radius: 6px;
+        }
+
+        .word-preview-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .word-bottom-bar {
+            padding: 10px 14px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .btn-insert-word {
+            width: 100%;
+            padding: 11px 14px;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+            transition: all 0.15s ease;
+        }
+
+        .btn-insert-word:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-insert-word:active {
+            transform: translateY(0);
+        }
+
+        .word-toast {
+            position: fixed;
+            bottom: 70px;
+            left: 12px;
+            right: 12px;
+            background: #0f172a;
+            color: #ffffff;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+            animation: toastPop 0.2s ease-out;
+            z-index: 9999;
+        }
+
+        @keyframes toastPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body x-data="wordAddinComponent()">
+
+    <!-- Header -->
+    <header class="word-taskpane-header">
+        <div class="word-logo-title">
+            <span>📐</span>
+            <span>AufgabenBuilder</span>
+        </div>
+        <span class="word-status-badge" x-text="isWord ? '● Word verbunden' : 'Browser-Vorschau'"></span>
+    </header>
+
+    <!-- Categories -->
+    <nav class="word-category-bar">
+        <button type="button" class="word-cat-btn" :class="{ 'active': activeCategory === 'stochastik' }" @click="selectCategory('stochastik')">🎲 Stochastik</button>
+        <button type="button" class="word-cat-btn" :class="{ 'active': activeCategory === 'analysis' }" @click="selectCategory('analysis')">📈 Analysis</button>
+        <button type="button" class="word-cat-btn" :class="{ 'active': activeCategory === 'geometrie' }" @click="selectCategory('geometrie')">📐 Geometrie</button>
+        <button type="button" class="word-cat-btn" :class="{ 'active': activeCategory === 'algebra' }" @click="selectCategory('algebra')">🧮 Algebra</button>
+        <button type="button" class="word-cat-btn" :class="{ 'active': activeCategory === 'layout' }" @click="selectCategory('layout')">📝 Layout</button>
+    </nav>
+
+    <!-- Module Selector -->
+    <div class="word-module-select-bar">
+        <select class="word-module-select" :value="activeModuleType" @change="loadModuleType($event.target.value)">
+            <template x-for="m in getModulesForCategory(activeCategory)" :key="m.type">
+                <option :value="m.type" x-text="(m.icon || '▪') + ' ' + m.name"></option>
+            </template>
+        </select>
+    </div>
+
+    <!-- Scrollable Body (Preview + Inspector) -->
+    <main class="word-scroll-body" x-data="{ get d() { return workingModule.data; } }">
+
+        <!-- 1. LIVE PREVIEW CARD -->
+        <div class="word-preview-card">
+            <span class="word-preview-header">Live-Vorschau</span>
+            <div class="word-preview-container" x-html="renderPreview()"></div>
+        </div>
+
+        <!-- 2. MODULE SETTINGS -->
+
+        <!-- A) BAUMDIAGRAMM -->
+        <template x-if="workingModule.type === 'baum'">
+            <div class="insp-section insp-section-outline">
+                <div class="insp-section-header"><span class="insp-section-label">Struktur &amp; Stufen</span></div>
+                <div class="insp-field">
+                    <label>Stufen</label>
+                    <div class="insp-seg-bar">
+                        <button type="button" :class="{ 'active': d.depth == 1 }" @click="d.depth = 1; applyTreeStructure()">1</button>
+                        <button type="button" :class="{ 'active': d.depth == 2 }" @click="d.depth = 2; applyTreeStructure()">2</button>
+                        <button type="button" :class="{ 'active': d.depth == 3 }" @click="d.depth = 3; applyTreeStructure()">3</button>
+                    </div>
+                </div>
+                <div class="insp-field">
+                    <label>Äste pro Knoten</label>
+                    <div class="insp-seg-bar">
+                        <button type="button" :class="{ 'active': d.branches == 2 }" @click="d.branches = 2; applyTreeStructure()">2</button>
+                        <button type="button" :class="{ 'active': d.branches == 3 }" @click="d.branches = 3; applyTreeStructure()">3</button>
+                    </div>
+                </div>
+                <div class="insp-field">
+                    <label>Druckhöhe in Word (cm)</label>
+                    <div class="insp-seg-compact">
+                        <button type="button" :class="{ 'active': d.height == 5 }" @click="d.height = 5">5 cm</button>
+                        <button type="button" :class="{ 'active': d.height == 6.5 }" @click="d.height = 6.5">6.5 cm</button>
+                        <button type="button" :class="{ 'active': d.height == 8.5 }" @click="d.height = 8.5">8.5 cm</button>
+                    </div>
+                </div>
+                <div class="insp-chip-grid margin-top-xs">
+                    <button type="button" class="insp-toggle-chip" :class="{ 'active': d.colorNodes }" @click="d.colorNodes = !d.colorNodes">Farben anzeigen</button>
+                </div>
+            </div>
+        </template>
+
+        <!-- B) 4-FELDER-TAFEL -->
+        <template x-if="workingModule.type === 'vierfeldertafel'">
+            <div class="insp-section insp-section-outline">
+                <div class="insp-section-header"><span class="insp-section-label">Ereignisse</span></div>
+                <div class="insp-2col-grid">
+                    <div class="insp-field"><label>Spalte</label><input type="text" x-model="d.labels.top1" class="insp-text-input insp-input-center"></div>
+                    <div class="insp-field"><label>Gegenereignis</label><input type="text" x-model="d.labels.top2" class="insp-text-input insp-input-center"></div>
+                    <div class="insp-field"><label>Zeile</label><input type="text" x-model="d.labels.left1" class="insp-text-input insp-input-center"></div>
+                    <div class="insp-field"><label>Gegenereignis</label><input type="text" x-model="d.labels.left2" class="insp-text-input insp-input-center"></div>
+                </div>
+                <div class="insp-section-header margin-top-xs"><span class="insp-section-label">Werte (👁 = sichtbar, ▭ = Lücke)</span></div>
+                <div class="insp-vf-grid">
+                    <template x-for="r in [0, 1, 2]" :key="r">
+                        <div class="insp-vf-row">
+                            <span class="insp-vf-rowlabel" x-text="r === 0 ? d.labels.left1 : (r === 1 ? d.labels.left2 : 'Σ')"></span>
+                            <template x-for="c in [0, 1, 2]" :key="c">
+                                <div class="insp-vf-cell" :class="{ 'is-hidden': !d.printVisibility[r][c] }">
+                                    <input type="text" x-model="d.data[r][c]" class="insp-vf-input">
+                                    <button type="button" class="insp-vf-eye" @click="d.printVisibility[r][c] = !d.printVisibility[r][c]" x-text="d.printVisibility[r][c] ? '👁' : '▭'"></button>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+        <!-- C) URNE -->
+        <template x-if="workingModule.type === 'urne'">
+            <div class="insp-section insp-section-outline">
+                <div class="insp-section-header"><span class="insp-section-label">Urne füllen</span></div>
+                <div class="insp-field">
+                    <label>Schnell-Vorlage</label>
+                    <select @change="applyUrnePreset($event.target.value); $event.target.value = ''" class="insp-select">
+                        <option value="" selected disabled>✨ Vorlage wählen…</option>
+                        <option value="two_colors">4 rote &amp; 6 blaue Kugeln</option>
+                        <option value="rgb">3 rote, 3 grüne, 3 blaue</option>
+                        <option value="numbered">10 nummerierte Kugeln</option>
+                    </select>
+                </div>
+                <div class="insp-ball-add margin-top-xs">
+                    <input type="number" min="1" max="20" x-model.number="quickKugelCount" class="insp-text-input insp-input-center" title="Anzahl">
+                    <select x-model="quickKugelColor" class="insp-select">
+                        <option value="white">Weiß</option>
+                        <option value="red">Rot</option>
+                        <option value="yellow">Gelb</option>
+                        <option value="green">Grün</option>
+                        <option value="blue">Blau</option>
+                    </select>
+                    <input type="text" x-model="quickKugelLabel" class="insp-text-input insp-input-center" placeholder="Text">
+                    <button type="button" class="insp-mini-action-btn" @click="addQuickKugeln()">＋</button>
+                </div>
+                <div class="insp-ball-grid margin-top-xs">
+                    <template x-for="k in d.kugeln" :key="k.id">
+                        <span class="insp-ball" :class="'ball-' + (k.type || 'white')">
+                            <span x-text="k.label"></span>
+                            <button type="button" class="insp-ball-del" @click="removeKugel(k.id)">×</button>
+                        </span>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+        <!-- D) GLÜCKSRAD -->
+        <template x-if="workingModule.type === 'gluecksrad'">
+            <div class="insp-section insp-section-outline">
+                <div class="insp-section-header"><span class="insp-section-label">Sektoren</span></div>
+                <div class="insp-field">
+                    <label>Schnell-Vorlage</label>
+                    <select @change="applyGluecksradPreset($event.target.value); $event.target.value = ''" class="insp-select">
+                        <option value="" selected disabled>✨ Vorlage wählen…</option>
+                        <option value="4_equal">4 gleiche Sektoren</option>
+                        <option value="farben_4">4 Farben</option>
+                        <option value="unequal">Ungleich (½, ¼, ⅛, ⅛)</option>
+                    </select>
+                </div>
+                <div class="insp-chip-grid margin-top-xs">
+                    <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showPointer }" @click="d.showPointer = !d.showPointer">Zeiger anzeigen</button>
+                    <button type="button" class="insp-mini-action-btn" @click="addSector()">＋ Sektor</button>
+                </div>
+            </div>
+        </template>
+
+        <!-- E) MULTIPLE CHOICE -->
+        <template x-if="workingModule.type === 'mcq'">
+            <div class="insp-section insp-section-outline">
+                <div class="insp-section-header">
+                    <span class="insp-section-label">Optionen</span>
+                    <button type="button" class="insp-mini-action-btn" @click="addMCQOption()">＋ Option</button>
+                </div>
+                <div class="insp-field">
+                    <label>Vorlage</label>
+                    <select @change="applyMCQPreset($event.target.value); $event.target.value = ''" class="insp-select">
+                        <option value="" selected disabled>✨ Vorlage wählen…</option>
+                        <option value="ja_nein">Ja / Nein</option>
+                        <option value="richtig_falsch">Richtig / Falsch</option>
+                        <option value="abcd">A / B / C / D</option>
+                    </select>
+                </div>
+                <div class="insp-el-list margin-top-xs">
+                    <template x-for="opt in d.options" :key="opt.id">
+                        <div class="insp-mcq-row">
+                            <span class="insp-mcq-box"></span>
+                            <input type="text" x-model="opt.text" class="insp-text-input" placeholder="Option...">
+                            <button type="button" class="insp-pt-btn insp-pt-del" :disabled="d.options.length <= 1" @click="removeMCQOption(opt.id)">✕</button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+        <!-- F) ZUORDNUNG -->
+        <template x-if="workingModule.type === 'matching'">
+            <div class="insp-section insp-section-outline">
+                <div class="insp-section-header">
+                    <span class="insp-section-label">Begriffe links</span>
+                    <button type="button" class="insp-mini-action-btn" @click="addMatchingLeft()">＋ Begriff</button>
+                </div>
+                <div class="insp-el-list">
+                    <template x-for="(item, idx) in d.leftItems" :key="item.id">
+                        <div class="insp-match-item-row">
+                            <span class="insp-match-badge" x-text="(idx + 1) + '.'"></span>
+                            <input type="text" x-model="item.text" class="insp-text-input">
+                            <button type="button" class="insp-pt-btn insp-pt-del" :disabled="d.leftItems.length <= 1" @click="removeMatchingLeft(item.id)">✕</button>
+                        </div>
+                    </template>
+                </div>
+                <div class="insp-section-header margin-top-xs">
+                    <span class="insp-section-label">Bedeutung rechts</span>
+                    <button type="button" class="insp-mini-action-btn" @click="addMatchingRight()">＋ Begriff</button>
+                </div>
+                <div class="insp-el-list">
+                    <template x-for="(item, idx) in d.rightItems" :key="item.id">
+                        <div class="insp-match-item-row">
+                            <span class="insp-match-badge" x-text="String.fromCharCode(65 + idx) + '.'"></span>
+                            <input type="text" x-model="item.text" class="insp-text-input">
+                            <button type="button" class="insp-pt-btn insp-pt-del" :disabled="d.rightItems.length <= 1" @click="removeMatchingRight(item.id)">✕</button>
+                        </div>
+                    </template>
+                </div>
+                <button type="button" class="insp-mini-action-btn margin-top-xs" style="width: 100%;" @click="shuffleMatchingRight()">🔀 Rechte Seite mischen</button>
+            </div>
+        </template>
+
+        <!-- G) WAHR / FALSCH -->
+        <template x-if="workingModule.type === 'trueFalse'">
+            <div class="insp-section insp-section-outline">
+                <div class="insp-section-header"><span class="insp-section-label">Begründungsfeld</span></div>
+                <div class="insp-chip-grid">
+                    <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showJustification }" @click="d.showJustification = !d.showJustification">Begründungsfeld anzeigen</button>
+                </div>
+                <div class="insp-field margin-top-xs" x-show="d.showJustification">
+                    <label>Höhe</label>
+                    <div class="insp-seg-compact">
+                        <button type="button" :class="{ 'active': d.spaceHeight == 2 }" @click="d.spaceHeight = 2">2 cm</button>
+                        <button type="button" :class="{ 'active': d.spaceHeight == 3.5 }" @click="d.spaceHeight = 3.5">3.5 cm</button>
+                        <button type="button" :class="{ 'active': d.spaceHeight == 5 }" @click="d.spaceHeight = 5">5 cm</button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- H) ZAHLENSTRAHL -->
+        <template x-if="workingModule.type === 'zahlenstrahl'">
+            <div class="insp-section insp-section-outline">
+                <div class="insp-section-header"><span class="insp-section-label">Skalierung</span></div>
+                <div class="insp-2col-grid">
+                    <div class="insp-field"><label>Minimum</label><input type="number" x-model.number="d.min" class="insp-text-input insp-input-center"></div>
+                    <div class="insp-field"><label>Maximum</label><input type="number" x-model.number="d.max" class="insp-text-input insp-input-center"></div>
+                    <div class="insp-field"><label>Schrittweite</label><input type="number" x-model.number="d.step" class="insp-text-input insp-input-center"></div>
+                    <div class="insp-field"><label>Unterteilungen</label><input type="number" x-model.number="d.subdivisions" class="insp-text-input insp-input-center"></div>
+                </div>
+            </div>
+        </template>
+
+        <!-- I) BRUCHTEILE -->
+        <template x-if="workingModule.type === 'bruch'">
+            <div class="insp-section insp-section-outline">
+                <div class="insp-section-header"><span class="insp-section-label">Bruch</span></div>
+                <div class="insp-2col-grid">
+                    <div class="insp-field"><label>Zähler</label><input type="number" min="0" x-model.number="d.zaehler" class="insp-text-input insp-input-center"></div>
+                    <div class="insp-field"><label>Nenner</label><input type="number" min="1" x-model.number="d.nenner" class="insp-text-input insp-input-center"></div>
+                </div>
+                <div class="insp-field margin-top-xs">
+                    <label>Darstellungsform</label>
+                    <div class="insp-seg-compact">
+                        <button type="button" :class="{ 'active': d.mode === 'circle' }" @click="d.mode = 'circle'">Kreis</button>
+                        <button type="button" :class="{ 'active': d.mode === 'bar' }" @click="d.mode = 'bar'">Balken</button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </main>
+
+    <!-- Bottom Sticky Action Bar -->
+    <footer class="word-bottom-bar">
+        <button type="button" class="btn-insert-word" @click="insertIntoWord()" :disabled="isInserting">
+            <span>✨</span>
+            <span x-text="isInserting ? 'Wird eingefügt…' : 'An Cursorposition einfügen'"></span>
+        </button>
+    </footer>
+
+    <!-- Toast Feedback -->
+    <div class="word-toast" x-show="showToast" x-text="toastMessage" style="display: none;"></div>
+
+</body>
+</html>

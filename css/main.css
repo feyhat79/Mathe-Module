@@ -1,0 +1,78 @@
+:root {
+    /* Colors - Light "Modern SaaS" Theme */
+    --bg-app: #ffffff;           /* Reines Weiß für Eingabefelder im Modal */
+    --bg-canvas: #e2e8f0;        /* Hellgrauer Hintergrund hinter dem A4 Blatt */
+    --bg-sidebar: #f8fafc;       /* Sehr zartes Blaugrau für die Sidebar */
+    --bg-paper: #ffffff;
+    
+    --text-main: #0f172a;        /* Sehr dunkles Blaugrau (fast Schwarz) für beste Lesbarkeit */
+    --text-muted: #64748b;       /* Mittleres Blaugrau für Labels und Hinweise */
+    --text-dark: #000000;
+    
+    --accent: #4f46e5;           /* Kräftiges Indigo für Buttons und Fokus-Ringe */
+    --accent-hover: #4338ca;     /* Etwas dunkleres Indigo beim Hovern */
+    
+    --border: #cbd5e1;           /* Helle, freundliche Rahmenlinien */
+    --border-color: var(--border);
+    --primary: var(--accent);
+    --input-bg: var(--bg-app);
+    --shadow-paper: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04); /* Weicher, realistischerer Schatten */
+    
+    /* Layout */
+    --sidebar-width: 225px;
+    --inspector-width: 295px;
+    
+    /* Dynamic UI Tokens (Reactive to Theme) */
+    --ui-header-bg: #ffffff;
+    --ui-sidebar-bg: #f8fafc;
+    --ui-text: #0f172a;
+    --ui-text-muted: #64748b;
+    --ui-border: #cbd5e1;
+    --ui-card-bg: #ffffff;
+    --ui-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    
+    /* Spacing & Borders */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 12px;
+    --transition-fast: all 0.15s ease;
+    --transition-normal: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Typography */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+    /* Category colors */
+    --cat-algebra: #f59e0b;
+    --cat-analysis: #3b82f6;
+    --cat-geometrie: #10b981;
+    --cat-stochastik: #ef4444;
+    --cat-layout: #64748b;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+}
+
+h1, h2, h3 {
+    font-weight: 600;
+    letter-spacing: -0.025em;
+}
+
+.divider {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+}

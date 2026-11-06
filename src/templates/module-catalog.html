@@ -1,0 +1,55 @@
+    <div x-data="moduleModal">
+        <template x-if="isModuleModalOpen">
+            <div class="modal-overlay" @click.self="closeModuleModal()">
+                <div class="modal-content module-catalog-modal">
+                    <header class="modal-header">
+                        <h2>Modul hinzufügen</h2>
+                        <button class="btn-secondary btn-close-modal" @click="closeModuleModal()">&times;</button>
+                    </header>
+                    
+                    <div class="modal-body">
+                        <p class="modal-hint-text">Wählen Sie eine Kategorie und danach ein Modul aus, um es der aktuellen Aufgabe hinzuzufügen.</p>
+                        
+                        <!-- Kategorien-Tabs (Phase 2 UI Modernisierung) -->
+                        <nav class="module-catalog-tabs">
+                            <template x-for="cat in categories" :key="cat.id">
+                                <button type="button" 
+                                        class="module-tab-btn" 
+                                        :class="[
+                                            activeCategory === cat.id ? 'active' : '', 
+                                            'tab-' + cat.id
+                                        ]"
+                                        @click="setActiveCategory(cat.id)">
+                                    <span x-text="cat.label"></span>
+                                </button>
+                            </template>
+                        </nav>
+
+                        <!-- Dynamisches Modul-Grid -->
+                        <div class="module-catalog-grid">
+                            <template x-for="item in getFilteredModules()" :key="item.type">
+                                <button type="button" 
+                                        class="module-catalog-card" 
+                                        :class="'card-' + item.def.category"
+                                        x-show="!(moduleTarget?.modules && moduleTarget.modules.some(m => m.type === item.type))"
+                                        @click="addModule(item.type)">
+                                    <div class="module-card-preview" x-html="getModulePreviewSvg(item.type)"></div>
+                                    <div class="module-card-body">
+                                        <div class="module-card-title-row">
+                                            <span class="module-icon" x-text="item.def.icon"></span>
+                                            <h4 x-text="item.def.name"></h4>
+                                        </div>
+                                        <p x-text="item.def.description"></p>
+                                    </div>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                    
+                    <footer class="modal-footer">
+                        <button class="btn-secondary" @click="closeModuleModal()">Abbrechen</button>
+                    </footer>
+                </div>
+            </div>
+        </template>
+    </div>

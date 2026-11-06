@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mündliche Nachprüfung Informatik 9 – Ben Pauls</title>
+    <style>
+        /* --- RESET & GRUNDLAYOUT --- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.35;
+            color: #1e293b;
+            background-color: #f1f5f9;
+            padding: 20px;
+        }
+
+        /* --- A4 SEITEN-CONTAINER --- */
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto 25px auto;
+            background: #ffffff;
+            padding: 13mm 16mm;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        /* --- DRUCK-EINSTELLUNGEN --- */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .page {
+                width: 100%;
+                min-height: 100%;
+                margin: 0;
+                padding: 11mm 15mm;
+                box-shadow: none;
+                page-break-after: always;
+                break-after: page;
+            }
+            .page:last-child {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* --- SCREEN TOOLBAR --- */
+        .toolbar {
+            max-width: 210mm;
+            margin: 0 auto 15px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .toolbar h1 {
+            font-size: 14pt;
+            font-weight: 600;
+        }
+        .btn-print {
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            font-size: 11pt;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .btn-print:hover {
+            background: #1d4ed8;
+        }
+
+        /* --- KOPFZEILEN --- */
+        .student-header {
+            border: 2px solid #2563eb;
+            background: #eff6ff;
+            border-radius: 6px;
+            padding: 10px 16px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .student-header h2 {
+            font-size: 13pt;
+            color: #1e3a8a;
+            font-weight: 700;
+        }
+        .student-header span {
+            font-size: 9.5pt;
+            color: #1d4ed8;
+            font-weight: 600;
+        }
+
+        .protocol-header {
+            border: 2px solid #065f46;
+            background: #ecfdf5;
+            border-radius: 6px;
+            padding: 10px 16px;
+            margin-bottom: 14px;
+        }
+        .protocol-header h2 {
+            font-size: 13pt;
+            color: #065f46;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .protocol-header span {
+            font-size: 9pt;
+            color: #047857;
+            font-weight: 600;
+        }
+
+        /* --- VORBEREITUNGSBLATT KARTEN --- */
+        .prep-card {
+            border: 1.5px solid #64748b;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            background: #ffffff;
+        }
+        .prep-title {
+            font-size: 11.5pt;
+            font-weight: 700;
+            color: #0f172a;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .prep-question {
+            font-size: 9.5pt;
+            color: #1e293b;
+            background: #f8fafc;
+            border-left: 4px solid #2563eb;
+            padding: 8px 12px;
+            margin: 10px 0 4px 0;
+            line-height: 1.45;
+        }
+
+        /* --- STRUKTOGRAMM --- */
+        .struct-container {
+            border: 2px solid #0f172a;
+            background: #ffffff;
+            margin: 10px auto;
+            font-size: 9.5pt;
+            line-height: 1.3;
+            text-align: center;
+            max-width: 520px;
+        }
+        .struct-block {
+            border-bottom: 1.5px solid #0f172a;
+            padding: 6px 10px;
+            background: #ffffff;
+        }
+        .struct-block:last-child {
+            border-bottom: none;
+        }
+        .struct-loop {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1.5px solid #0f172a;
+            background: #ffffff;
+        }
+        .struct-loop-header {
+            padding: 6px 10px;
+            font-weight: 700;
+            background: #ffffff;
+            text-align: left;
+        }
+        .struct-loop-body {
+            display: flex;
+            background: #ffffff;
+        }
+        .struct-loop-bar {
+            width: 28px;
+            background: #ffffff;
+            border-right: 2px solid #0f172a;
+            flex-shrink: 0;
+        }
+        .struct-loop-inner {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            border-top: 1.5px solid #0f172a;
+        }
+        .struct-branch-header {
+            position: relative;
+            height: 36px;
+            border-bottom: 1.5px solid #0f172a;
+            background: #f8fafc;
+            overflow: hidden;
+        }
+        .struct-branch-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .struct-branch-text {
+            position: absolute;
+            top: 3px;
+            width: 100%;
+            text-align: center;
+            font-weight: 600;
+            font-size: 8.5pt;
+        }
+        .struct-branch-yes {
+            position: absolute;
+            bottom: 3px;
+            left: 10px;
+            font-weight: 700;
+            font-size: 8.5pt;
+            color: #166534;
+        }
+        .struct-branch-no {
+            position: absolute;
+            bottom: 3px;
+            right: 10px;
+            font-weight: 700;
+            font-size: 8.5pt;
+            color: #991b1b;
+        }
+        .struct-branch-bodies {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-bottom: 1.5px solid #0f172a;
+        }
+        .struct-branch-left {
+            border-right: 1.5px solid #0f172a;
+            padding: 6px 10px;
+        }
+        .struct-branch-right {
+            padding: 6px 10px;
+        }
+
+        /* --- SCHREIBLINIEN FÜR NOTIZEN --- */
+        .answer-lines {
+            margin: 6px 0;
+        }
+        .line {
+            height: 28px;
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        /* --- VORLAGEKARTE JAVA KARA (SEITE 2) --- */
+        .kara-present-card {
+            border: 2px solid #2563eb;
+            border-radius: 8px;
+            padding: 24px;
+            background: #ffffff;
+            margin: auto 0;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+        }
+        .kara-present-header {
+            font-size: 14pt;
+            font-weight: 700;
+            color: #1e3a8a;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .code-box-large {
+            background: #f8fafc;
+            border: 2px solid #94a3b8;
+            border-left: 5px solid #2563eb;
+            border-radius: 6px;
+            padding: 16px 20px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 13pt;
+            line-height: 1.6;
+            color: #0f172a;
+            margin: 18px 0;
+        }
+        .code-keyword {
+            color: #7c3aed;
+            font-weight: bold;
+        }
+        .code-method {
+            color: #2563eb;
+            font-weight: bold;
+        }
+        .kara-visual-container-large {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border: 2px solid #64748b;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 14px 0;
+        }
+
+        /* --- PROTOKOLL-TABELLE (SEITE 3) --- */
+        .exam-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9pt;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+        .exam-table th {
+            background: #e2e8f0;
+            border: 1.5px solid #64748b;
+            padding: 8px 10px;
+            font-weight: 700;
+            color: #0f172a;
+            text-align: left;
+        }
+        .exam-table td {
+            border: 1px solid #94a3b8;
+            padding: 12px 10px;
+            vertical-align: top;
+        }
+        .exam-table tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+        .table-section-row td {
+            background: #e0f2fe !important;
+            font-weight: 700;
+            color: #0369a1;
+            padding: 6px 10px;
+            border-top: 2px solid #0284c7;
+            border-bottom: 1.5px solid #0284c7;
+        }
+        .col-q {
+            width: 32%;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .col-ew {
+            width: 38%;
+            color: #047857;
+        }
+        .col-notes {
+            width: 30%;
+            background: #ffffff !important;
+        }
+        .empty-q-space {
+            min-height: 45px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SCREEN PRINT BUTTON -->
+    <div class="toolbar no-print">
+        <div>
+            <h1>🎙️ Mündliche Nachprüfung – Ben Pauls</h1>
+            <span style="font-size: 9pt; opacity: 0.8;">Seite 1: Vorbereitungsblatt &nbsp;|&nbsp; Seite 2: Kara-Vorlagekarte &nbsp;|&nbsp; Seite 3: Prüfungsprotokoll</span>
+        </div>
+        <button class="btn-print" onclick="window.print()">
+            🖨️ Als PDF drucken / Speichern
+        </button>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SEITE 1: SCHÜLER-VORBEREITUNGSBLATT (NUR DAS STRUKTOGRAMM)     -->
+    <!-- ============================================================== -->
+    <div class="page">
+        
+        <!-- HEADER SCHÜLER -->
+        <div class="student-header">
+            <div>
+                <h2>Mündliche Nachprüfung – Informatik</h2>
+                <span style="color:#475569; font-weight: normal;">Klasse 9</span>
+            </div>
+            <div style="text-align: right;">
+                <span>Schüler: Ben Pauls</span><br>
+                <span style="font-size: 8.5pt; color: #64748b;">Datum: 01.09.2026</span>
+            </div>
+        </div>
+
+        <!-- STRUKTOGRAMM KARTE -->
+        <div class="prep-card">
+            <div class="prep-title">
+                <span>Struktogramm – „Der Saugroboter“</span>
+                <span style="font-size: 8.5pt; color: #64748b; font-weight: normal;">Vorbereitung</span>
+            </div>
+            <div style="font-size: 9pt; color: #475569; margin-bottom: 6px;">
+                Schau dir das folgende Struktogramm in Ruhe an:
+            </div>
+
+            <!-- STRUKTOGRAMM GRAFIK -->
+            <div class="struct-container">
+                <div class="struct-block">Raumkarte und Reinigungsbereich laden</div>
+                <div class="struct-loop">
+                    <div class="struct-loop-header">Solange Akku &gt; 15 %</div>
+                    <div class="struct-loop-body">
+                        <div class="struct-loop-bar"></div>
+                        <div class="struct-loop-inner">
+                            <div class="struct-block">1 Meter vorwärts fahren und saugen</div>
+                            <div class="struct-branch-header">
+                                <svg class="struct-branch-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                    <polygon points="0,0 100,0 50,100" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.5" />
+                                    <line x1="50" y1="100" x2="50" y2="100" stroke="#0f172a" stroke-width="1" />
+                                </svg>
+                                <div class="struct-branch-text">Hindernis (Möbel) direkt voraus?</div>
+                                <div class="struct-branch-yes">Ja</div>
+                                <div class="struct-branch-no">Nein</div>
+                            </div>
+                            <div class="struct-branch-bodies">
+                                <div class="struct-branch-left">Um 90° nach rechts drehen</div>
+                                <div class="struct-branch-right"><i>(Geradeaus weiterfahren)</i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="struct-block">Zurück zur Ladestation fahren und Akku laden</div>
+            </div>
+
+            <div class="prep-question">
+                <strong>Leitfragen für das anschließende Prüfungsgespräch:</strong><br>
+                1. Was passiert in diesem Ablaufplan? Erkläre den Ablauf gleich kurz mit eigenen Worten.<br>
+                2. Was würde passieren, wenn der <strong>senkrechte Strich der Schleife</strong> links bis nach <strong>ganz unten</strong> durchgezogen wäre?
+            </div>
+        </div>
+
+        <!-- REICHLICH PLATZ FÜR BENS NOTIZEN WÄHREND DER 10 MINUTEN -->
+        <div style="border-top: 1px dashed #94a3b8; padding-top: 8px; margin-top: 8px;">
+            <div style="font-size: 8.5pt; font-weight: 700; color: #475569; margin-bottom: 4px;">
+                Eigene Notizen &amp; Stichpunkte (für das Gespräch):
+            </div>
+            <div class="answer-lines">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SEITE 2: KARA-VORLAGEKARTE (WIRD BEN SPONTAN VORGELEGT)        -->
+    <!-- ============================================================== -->
+    <div class="page">
+        
+        <div style="font-size: 8.5pt; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+            📄 Materialkarte für das Prüfungsgespräch (wird dem Schüler während der Prüfung vorgelegt)
+        </div>
+
+        <div class="kara-present-card">
+            <div class="kara-present-header">
+                <span>Java Kara – Programmanalyse</span>
+                <span style="font-size: 10.5pt; color: #2563eb; font-weight: normal;">Station 2 im Prüfungsgespräch</span>
+            </div>
+
+            <div style="font-size: 11pt; color: #334155; margin-bottom: 12px;">
+                Kara steht auf <strong>Feld 1</strong> mit Blickrichtung nach <strong>rechts</strong>. Auf <strong>Feld 4</strong> steht ein Baum:
+            </div>
+
+            <!-- GROSSE KARA WELT -->
+            <div class="kara-visual-container-large">
+                <svg width="420" height="60" viewBox="0 0 350 50">
+                    <defs>
+                        <g id="tree-lg">
+                            <rect x="21" y="28" width="8" height="15" fill="#78350f" />
+                            <polygon points="11,30 39,30 25,8" fill="#15803d" />
+                            <polygon points="14,20 36,20 25,3" fill="#16a34a" />
+                        </g>
+                        <g id="kara-lg">
+                            <line x1="16" y1="12" x2="34" y2="12" stroke="#0f172a" stroke-width="2" />
+                            <line x1="14" y1="25" x2="36" y2="25" stroke="#0f172a" stroke-width="2" />
+                            <line x1="16" y1="38" x2="34" y2="38" stroke="#0f172a" stroke-width="2" />
+                            <ellipse cx="23" cy="25" rx="14" ry="12" fill="#dc2626" stroke="#0f172a" stroke-width="1.5" />
+                            <line x1="10" y1="25" x2="37" y2="25" stroke="#0f172a" stroke-width="1.5" />
+                            <circle cx="18" cy="19" r="2.5" fill="#0f172a" />
+                            <circle cx="27" cy="18" r="2" fill="#0f172a" />
+                            <circle cx="18" cy="31" r="2.5" fill="#0f172a" />
+                            <circle cx="27" cy="32" r="2" fill="#0f172a" />
+                            <path d="M 34,19 A 7,7 0 0,1 34,31 Z" fill="#0f172a" />
+                        </g>
+                    </defs>
+
+                    <line x1="50" y1="0" x2="50" y2="50" stroke="#94a3b8" stroke-width="1.5" />
+                    <line x1="100" y1="0" x2="100" y2="50" stroke="#94a3b8" stroke-width="1.5" />
+                    <line x1="150" y1="0" x2="150" y2="50" stroke="#94a3b8" stroke-width="1.5" />
+                    <line x1="200" y1="0" x2="200" y2="50" stroke="#94a3b8" stroke-width="1.5" />
+                    <line x1="250" y1="0" x2="250" y2="50" stroke="#94a3b8" stroke-width="1.5" />
+                    <line x1="300" y1="0" x2="300" y2="50" stroke="#94a3b8" stroke-width="1.5" />
+
+                    <use href="#kara-lg" x="0" y="0" />
+                    <use href="#tree-lg" x="150" y="0" />
+                </svg>
+            </div>
+
+            <!-- GROSSER CODE-BLOCK -->
+            <div class="code-box-large">
+<span class="code-keyword">while</span> (!kara.<span class="code-method">treeFront</span>()) {
+    kara.<span class="code-method">move</span>();
+}
+kara.<span class="code-method">turnLeft</span>();
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SEITE 3: PRÜFER- & PROTOKOLL-TABELLE (FRAGE | EW | BEMERKUNGEN)-->
+    <!-- ============================================================== -->
+    <div class="page">
+        
+        <!-- HEADER PROTOKOLL (OHNE "MAX. 7 MIN." UND OHNE "ZIEL: NOTE 4") -->
+        <div class="protocol-header">
+            <h2>Prüfungsprotokoll</h2>
+            <span>Mündliche Nachprüfung Informatik 9 &nbsp;|&nbsp; Schüler: Ben Pauls &nbsp;|&nbsp; Datum: 01.09.2026</span>
+        </div>
+
+        <!-- TABELLE: FRAGE | EW | BEMERKUNGEN -->
+        <table class="exam-table">
+            <thead>
+                <tr>
+                    <th style="width: 32%;">Frage (Prüfer)</th>
+                    <th style="width: 38%;">Erwartete Antwort (EW)</th>
+                    <th style="width: 30%;">Bemerkungen / Protokoll</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- TEIL 1: STRUKTOGRAMM -->
+                <tr class="table-section-row">
+                    <td colspan="3">Teil 1: Struktogramm – Auswertung der Vorbereitung</td>
+                </tr>
+                <tr>
+                    <td class="col-q">
+                        <strong>1. Ablauf Saugroboter:</strong><br>
+                        Erkläre kurz mit eigenen Worten, was im Struktogramm passiert.
+                    </td>
+                    <td class="col-ew">
+                        • Lädt Karte.<br>
+                        • <strong>Schleife:</strong> Fährt/saugt solange Akku &gt; 15 %.<br>
+                        • <strong>Verzweigung:</strong> Dreht sich bei Möbeln um 90°, sonst geradeaus.<br>
+                        • <strong>Ende:</strong> Fährt zur Ladestation zurück.
+                    </td>
+                    <td class="col-notes"></td>
+                </tr>
+                <tr>
+                    <td class="col-q">
+                        <strong>2. Senkrechtstrich durchgezogen:</strong><br>
+                        Was passiert, wenn der linke Schleifenstrich bis nach ganz unten durchgezogen wird?
+                    </td>
+                    <td class="col-ew">
+                        • Befehl <em>„Zur Ladestation fahren“</em> gehört dann <strong>mit in die Schleife</strong>!<br>
+                        • Wird nach jedem Schritt/Meter wiederholt statt erst ganz am Ende bei leerem Akku.
+                    </td>
+                    <td class="col-notes"></td>
+                </tr>
+
+                <!-- TEIL 2: JAVA KARA -->
+                <tr class="table-section-row">
+                    <td colspan="3">Teil 2: Java Kara – Spontane Vorlagekarte</td>
+                </tr>
+                <tr>
+                    <td class="col-q">
+                        <strong>3. Ablauf Kara-Code:</strong><br>
+                        Was macht Kara und wo bleibt er stehen?
+                    </td>
+                    <td class="col-ew">
+                        • Läuft in der <code>while</code>-Schleife geradeaus bis direkt vor den Baum (Feld 3).<br>
+                        • Dreht sich <strong>nach</strong> der Schleife einmal nach links.
+                    </td>
+                    <td class="col-notes"></td>
+                </tr>
+                <tr>
+                    <td class="col-q">
+                        <strong>4. Klammern &amp; Schleifenrumpf:</strong><br>
+                        Was passiert, wenn <code>turnLeft();</code> <strong>in</strong> der geschweiften Klammer <code>{ ... }</code> steht?
+                    </td>
+                    <td class="col-ew">
+                        • <code>{ ... }</code> ist der Schleifenrumpf.<br>
+                        • Dreht sich <strong>nach jedem einzelnen Schritt</strong> nach links (dreht im Kreis / biegt sofort ab), statt erst am Baum!
+                    </td>
+                    <td class="col-notes"></td>
+                </tr>
+                <tr>
+                    <td class="col-q">
+                        <strong>5. Abschlussfrage:</strong><br>
+                        Was passiert, wenn wir das <code>!</code> weglassen: <code>while (kara.treeFront())</code>?
+                    </td>
+                    <td class="col-ew">
+                        • Läuft <strong>gar nicht erst los</strong>!<br>
+                        • Startbedingung sofort <code>false</code> (kein Baum da). Überspringt Schleife und dreht sich nur sofort.
+                    </td>
+                    <td class="col-notes"></td>
+                </tr>
+
+                <!-- SPONTANE ZUSATZFRAGEN -->
+                <tr class="table-section-row">
+                    <td colspan="3">Spontane Zusatzfragen / Nachfragen (optional)</td>
+                </tr>
+                <tr>
+                    <td class="col-q">
+                        <strong>6. Spontane Frage:</strong>
+                        <div class="empty-q-space"></div>
+                    </td>
+                    <td class="col-ew">
+                        <div class="empty-q-space"></div>
+                    </td>
+                    <td class="col-notes">
+                        <div class="empty-q-space"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-q">
+                        <strong>7. Spontane Frage:</strong>
+                        <div class="empty-q-space"></div>
+                    </td>
+                    <td class="col-ew">
+                        <div class="empty-q-space"></div>
+                    </td>
+                    <td class="col-notes">
+                        <div class="empty-q-space"></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</body>
+</html>

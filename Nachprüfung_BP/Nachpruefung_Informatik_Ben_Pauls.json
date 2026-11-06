@@ -1,0 +1,180 @@
+{
+  "fileType": "math-builder-collection",
+  "version": "1.2",
+  "meta": {
+    "docType": "test",
+    "art": "Nachprüfung",
+    "nr": "1",
+    "titel": "Nachprüfung Informatik: Struktogramme & Java Kara",
+    "fach": "Informatik",
+    "klasse": "Klasse 9",
+    "datum": "2026-08-31",
+    "hinweise": "Bearbeitungszeit: 45 Minuten. Hilfsmittel: Keine (nur Stift und Lineal). Löse alle Aufgaben sorgfältig direkt auf diesem Bogen."
+  },
+  "tasks": [
+    {
+      "id": 100,
+      "type": "section",
+      "title": "TEIL 1: Struktogramme & Algorithmen",
+      "subtitle": "14 Punkte – Lineare Abläufe, Verzweigungen und Schleifen",
+      "context": "",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": []
+    },
+    {
+      "id": 101,
+      "type": "task",
+      "context": "Dir liegt folgendes Struktogramm für die Zubereitung eines heißen Kakaos an einem Automaten vor:\n\n[1. Pappbecher unter den Auslauf stellen]\n[2. SCHLEIFE: Solange Füllstand < 200 ml: Heiße Milch einfüllen (50 ml)]\n[3. Kakaopulver einrühren]\n[4. VERZWEIGUNG: Wünscht der Kunde Marshmallows?\n    - JA-Zweig: Marshmallows oben auflegen\n    - NEIN-Zweig: (nichts tun)]\n[5. Fertigen Becher entnehmen]",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1011,
+          "text": "Beschreibe den Ablauf der Kakao-Zubereitung in 2 bis 3 vollständigen Sätzen mit deinen eigenen Worten:",
+          "points": 2,
+          "spaceType": "linien",
+          "spaceHeight": 4.8,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1012,
+          "text": "Erkläre den Unterschied: Woran erkennt man im Struktogramm formal eine **Schleife** (Wiederholung) und woran eine **Verzweigung** (Entscheidung)?",
+          "points": 2,
+          "spaceType": "linien",
+          "spaceHeight": 2.8,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "type": "task",
+      "context": "Ein Calliope mini soll als automatisches Nachtlicht und Alarmanlage dienen. Übersetze den folgenden Ablaufplan in ein **vollständiges, formal korrektes Struktogramm**:\n\n**Dauerschleife:**\n  **Wenn** Lichtsensor < 20 (es ist dunkel):\n    Zeige Mond-Symbol auf dem Display\n    **Wenn** Erschütterung registriert:\n      Spiele Alarmton\n  **Sonst** (es ist hell):\n    Lösche Display",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1021,
+          "text": "Zeichne das Struktogramm sauber in das Karofeld. Achte besonders auf den äußeren Schleifenrahmen und die korrekten Dreiecke für die beiden Verzweigungen!",
+          "points": 6,
+          "spaceType": "karo",
+          "spaceHeight": 10.0,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 103,
+      "type": "task",
+      "context": "Ein Schüler möchte einen Klick-Zähler auf dem Calliope programmieren, der zählt, wie oft Button A gedrückt wurde. Er hat folgenden Code geschrieben:\n\n**Dauerschleife:**\n  klicks = 0\n  **Wenn** Button A gedrückt:\n    klicks = klicks + 1\n    Zeige Zahl klicks",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1031,
+          "text": "Wenn man Button A mehrmals hintereinander drückt, zählt das Programm niemals auf 2 oder höher, sondern zeigt immer nur 1 an. Warum ist das so? Welchen logischen Fehler hat der Schüler gemacht?",
+          "points": 2,
+          "spaceType": "linien",
+          "spaceHeight": 4.8,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1032,
+          "text": "Korrektur: Wie muss das Programm korrigiert werden, damit der Zähler wie gewünscht funktioniert?",
+          "points": 2,
+          "spaceType": "linien",
+          "spaceHeight": 4.8,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 104,
+      "type": "section",
+      "title": "TEIL 2: Programmieren mit Java Kara",
+      "subtitle": "16 Punkte – Befehle, Syntaxfehler und eigene Hilfsmethoden",
+      "context": "",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": []
+    },
+    {
+      "id": 105,
+      "type": "task",
+      "context": "Kara befindet sich in der abgebildeten Welt mit Blickrichtung nach rechts. Vor ihm auf einer geraden Bahn liegen auf Feld 2, 4 und 5 Kleeblätter. Auf Feld 6 steht ein Baum als Hindernis.\nFolgendes Programm wird gestartet:\n\n```java\nvoid myProgram() {\n    while (!kara.treeFront()) {\n        if (kara.onLeaf()) {\n            kara.removeLeaf();\n        }\n        kara.move();\n    }\n    kara.putLeaf();\n}\n```",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1051,
+          "text": "Beschreibe präzise, was Kara tut und welche Aktionen er auf seinem Weg ausführt:",
+          "points": 2,
+          "spaceType": "linien",
+          "spaceHeight": 4.8,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1052,
+          "text": "Endzustand der Welt: Wo bleibt Kara am Ende stehen und wo liegt nach Ablauf des Programms noch ein Kleeblatt?",
+          "points": 2,
+          "spaceType": "linien",
+          "spaceHeight": 2.8,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 106,
+      "type": "task",
+      "context": "Im folgenden Java-Programm haben sich exakt **4 Syntaxfehler** eingeschlichen:\n\nZeile 1:  void myProgram() {\nZeile 2:      while !kara.treeFront()\nZeile 3:      {\nZeile 4:          (kara.move())\nZeile 5:          if (kara.onLeaf()) {\nZeile 6:              kara.removeLeaf()\nZeile 7:          }\nZeile 8:      \nZeile 9:  }",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1061,
+          "text": "Nenne die Zeilennummern der 4 Fehler, erkläre kurz, was falsch ist, und schreibe auf, wie es richtig heißen muss:",
+          "points": 4,
+          "spaceType": "linien",
+          "spaceHeight": 4.5,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 107,
+      "type": "task",
+      "context": "Kara läuft auf das Kleeblatt zu. Auf seinem Weg versperrt ihm ein einzelner Baum die Bahn. Kara soll dem Baum nach links ausweichen und seinen Weg zum Ziel fortsetzen.",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1071,
+          "text": "Schreibe eine Hilfsmethode `void umgeheBaum()`, mit der Kara dem Baum ausweicht und sich wieder auf die ursprüngliche Bahn ausrichtet:",
+          "points": 4,
+          "spaceType": "karo",
+          "spaceHeight": 7.0,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1072,
+          "text": "Schreibe das Hauptprogramm `void myProgram()`, sodass Kara bis zum Kleeblatt läuft und dabei den Baum umgeht:",
+          "points": 4,
+          "spaceType": "karo",
+          "spaceHeight": 7.5,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    }
+  ]
+}

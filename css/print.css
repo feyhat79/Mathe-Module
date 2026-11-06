@@ -1,0 +1,243 @@
+@media print {
+    @page {
+        size: A4;
+        margin: 15mm 20mm 16mm 20mm; /* 4mm Sicherheitspuffer unten gegenüber Screen (20mm), damit der Browser niemals ungewollt vor .print-break-before umbricht */
+    }
+
+    body {
+        background: none;
+        color: black;
+        display: block;
+        height: auto;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: visible !important;
+    }
+
+    /* Scrollbalken im Druck komplett unterdrücken */
+    * {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+    }
+    *::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    /* UI-Elemente ausblenden */
+    .app-header,
+    .builder-sidebar,
+    .inspector-sidebar,
+    .modal-overlay,
+    .task-controls,
+    .task-kebab-menu,
+    .canvas-gutter-actions,
+    .task-canvas-actions,
+    .subtask-canvas-actions,
+    .sub-subtask-canvas-actions,
+    .spacer-ui-bar,
+    .manual-page-break-badge,
+    .visual-page-break,
+    #page-breaks-overlay,
+    .virtual-a4-page,
+    .inline-edit-hint-icon,
+    .inline-empty-placeholder,
+    .inline-module-pills,
+    .space-resize-handle,
+    .task-bottom-add-bar,
+    .sub-subtasks-add-row,
+    .canvas-bottom-add-bar,
+    .clickable-points.is-zero-points,
+    .is-empty-print-hide {
+        display: none !important;
+    }
+
+    .task-item-wrapper.is-selected-task > .task-item,
+    .task-item-wrapper.is-selected-task > .section-divider-print,
+    .task-context.is-selected-area,
+    .subtask-container.is-selected-subtask,
+    .sub-subtask-render-wrapper.is-selected-subsubtask,
+    .canvas-interactive-module,
+    .canvas-interactive-module.is-selected-module {
+        box-shadow: none !important;
+        outline: none !important;
+        background-color: transparent !important;
+    }
+
+    .canvas-area,
+    .table-values-scroll {
+        height: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: none !important;
+        display: block !important;
+        overflow: visible !important;
+        gap: 0 !important; /* Kein Gap im Druck */
+    }
+
+    .a4-page {
+        min-height: auto !important;
+        height: auto !important;
+        width: 100% !important; 
+        margin: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important; 
+        border: none;
+        background: white !important;
+        font-family: 'Inter', system-ui, sans-serif !important;
+    }
+
+    /* Im Druck: Alle Pagination-Verschiebungen (--page-push) entfernen, originale Abstände beibehalten und berechnete Seitenumbrüche exakt erzwingen */
+    .atomic-block {
+        break-inside: avoid;
+    }
+
+    .atomic-block.is-page-pushed {
+        margin-top: 0 !important;
+    }
+
+    .print-break-before,
+    .manual-page-break {
+        margin-top: 0 !important;
+        break-before: page !important;
+    }
+
+    /* Spacer im Druck: Nur die Höhe behalten, aber Rahmen & Hintergründe komplett entfernen */
+    .worksheet-spacer,
+    .line-insertion-slot {
+        border: none !important;
+        background: transparent !important;
+        margin-bottom: 0 !important;
+    }
+
+    .line-insertion-slot.is-collapsed {
+        display: none !important;
+    }
+
+    .slot-caret {
+        display: none !important;
+    }
+
+    /* Umbruch-Verhalten optimieren */
+    .task-row.header-row,
+    .task-context,
+    .subtask-container,
+    .sub-subtask-render-wrapper,
+    .math-table,
+    .math-board,
+    .print-header-table,
+    .section-divider-print {
+        break-inside: avoid;
+    }
+
+    /* Lückentext: Wort unsichtbar machen, Linie einblenden (gleiches Padding wie auf dem Screen für identischen Zeilenumbruch) */
+    .cloze-word {
+        color: transparent !important;
+        background-color: transparent !important;
+        border-bottom: 1px dashed #000 !important;
+        padding: 0 1.25rem !important;
+    }
+
+    /* --- MATHEMATISCHE HILFSRASTER IM DRUCK ERZWINGEN --- */
+    
+    /* 1. Generelle Container-Einstellungen für den Druck */
+    .karo-papier,
+    .schreib-linien,
+    .millimeter-papier,
+    .zahlenstrahl-container,
+    .gluecksrad-container {
+        max-width: 100% !important;
+    }
+
+    .karo-papier,
+    .schreib-linien,
+    .millimeter-papier {
+        background-color: #ffffff !important;
+        border-color: #64748b !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* 2. Karopapier (5mm) */
+    .karo-papier {
+        background-image:
+            linear-gradient(#cbd5e1 1px, transparent 1px),
+            linear-gradient(90deg, #cbd5e1 1px, transparent 1px) !important;
+        background-size: 5mm 5mm !important;
+    }
+
+    /* 3. Schreiblinien (8mm) */
+    .schreib-linien {
+        background-image: linear-gradient(
+            to bottom,
+            transparent 7.9mm,
+            #b0c4de 7.9mm,
+            #b0c4de 8mm,
+            transparent 8mm
+        ) !important;
+        background-size: 100% 8mm !important;
+    }
+
+    /* 4. Millimeterpapier (1mm / 10mm) */
+    /* Robuste Linienstärke in mm ohne calc()-Mischungen und kontrastreicher */
+    .millimeter-papier {
+        background-image:
+            /* 10mm-Raster (dunkel-orange, horizontal) */
+            linear-gradient(to bottom, transparent 9.8mm, #c8763c 9.8mm, #c8763c 10mm, transparent 10mm),
+            /* 10mm-Raster (dunkel-orange, vertikal) */
+            linear-gradient(to right, transparent 9.8mm, #c8763c 9.8mm, #c8763c 10mm, transparent 10mm),
+            /* 1mm-Raster (mittleres orange, horizontal) */
+            linear-gradient(to bottom, transparent 0.90mm, #e5b285 0.90mm, #e5b285 1mm, transparent 1mm),
+            /* 1mm-Raster (mittleres orange, vertikal) */
+            linear-gradient(to right, transparent 0.90mm, #e5b285 0.90mm, #e5b285 1mm, transparent 1mm) !important;
+        background-size: 10mm 10mm, 10mm 10mm, 1mm 1mm, 1mm 1mm !important;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Bruchteile-Modul – Print Overrides
+   ───────────────────────────────────────────────────────────────────────────── */
+@media print {
+    .color-mode-fill {
+        fill: #ffffff !important;
+        fill-opacity: 0 !important;
+    }
+    .bruch-answer-box {
+        break-inside: avoid;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Diagramm-Modul – Print Overrides
+   ───────────────────────────────────────────────────────────────────────────── */
+@media print {
+    .diag-solution-fill,
+    .diag-solution-line {
+        display: none !important;
+    }
+    .diag-svg-container {
+        break-inside: avoid;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Koordinatensystem-Modul – Print Overrides
+   ───────────────────────────────────────────────────────────────────────────── */
+@media print {
+    .koord-solution-point,
+    .koord-solution-line,
+    .koord-solution-text,
+    .slot-spacing-indicator {
+        display: none !important;
+    }
+    .line-insertion-slot.has-spacing {
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    .koord-svg-container {
+        break-inside: avoid;
+    }
+}
+
+
+

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musterlösung &amp; Erwartungshorizont – Nachprüfung Informatik 9 (Ben Pauls)</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.45;
+            color: #1e293b;
+            background-color: #f1f5f9;
+            padding: 20px;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto 25px auto;
+            background: #ffffff;
+            padding: 14mm 16mm;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .page {
+                width: 100%;
+                min-height: 100%;
+                margin: 0;
+                padding: 12mm 15mm;
+                box-shadow: none;
+                page-break-after: always;
+            }
+            .page:last-child {
+                page-break-after: avoid;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        .toolbar {
+            max-width: 210mm;
+            margin: 0 auto 15px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #065f46;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 8px;
+        }
+        .toolbar h1 {
+            font-size: 13pt;
+            font-weight: 600;
+        }
+        .btn-print {
+            background: #059669;
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            font-size: 10pt;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .solution-header {
+            border: 2px solid #065f46;
+            background: #ecfdf5;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+        }
+        .solution-title {
+            font-size: 13.5pt;
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 3px;
+        }
+        .solution-subtitle {
+            font-size: 9pt;
+            color: #047857;
+        }
+
+        .section-banner {
+            background: #065f46;
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 10.5pt;
+            font-weight: 700;
+            margin: 10px 0 8px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .task-card {
+            margin-bottom: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 10px 12px;
+            background: #ffffff;
+            page-break-inside: avoid;
+        }
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1.5px solid #065f46;
+            padding-bottom: 3px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: #065f46;
+        }
+        .points-badge {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 9pt;
+        }
+
+        .solution-box {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+            padding: 8px 12px;
+            margin: 6px 0;
+            font-size: 9.5pt;
+            border-radius: 0 4px 4px 0;
+        }
+        .solution-label {
+            font-weight: 700;
+            color: #047857;
+        }
+
+        .rubric-box {
+            background: #f8fafc;
+            border: 1px dashed #94a3b8;
+            padding: 6px 10px;
+            margin-top: 6px;
+            font-size: 8.5pt;
+            color: #475569;
+        }
+
+        .code-box {
+            background: #1e293b;
+            color: #f8fafc;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 9pt;
+            line-height: 1.4;
+            margin: 6px 0;
+        }
+
+        /* Struktogramm für Lösung */
+        .struct-container {
+            border: 2px solid #065f46;
+            background: #ffffff;
+            margin: 8px auto;
+            font-size: 8.5pt;
+            line-height: 1.25;
+            text-align: center;
+        }
+        .struct-block {
+            border-bottom: 1px solid #065f46;
+            padding: 5px 8px;
+        }
+        .struct-loop {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #065f46;
+        }
+        .struct-loop-header {
+            padding: 5px 8px;
+            font-weight: 600;
+            background: #ecfdf5;
+            text-align: left;
+        }
+        .struct-loop-body {
+            display: flex;
+        }
+        .struct-loop-bar {
+            width: 24px;
+            background: #ecfdf5;
+            border-right: 2px solid #065f46;
+            flex-shrink: 0;
+        }
+        .struct-loop-inner {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid #065f46;
+        }
+        .struct-branch-header {
+            position: relative;
+            height: 36px;
+            border-bottom: 1px solid #065f46;
+            background: #f8fafc;
+            overflow: hidden;
+        }
+        .struct-branch-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .struct-branch-text {
+            position: absolute;
+            top: 3px;
+            width: 100%;
+            text-align: center;
+            font-weight: 600;
+            font-size: 8pt;
+        }
+        .struct-branch-yes {
+            position: absolute;
+            bottom: 2px;
+            left: 6px;
+            font-weight: 700;
+            font-size: 8pt;
+            color: #166534;
+        }
+        .struct-branch-no {
+            position: absolute;
+            bottom: 2px;
+            right: 6px;
+            font-weight: 700;
+            font-size: 8pt;
+            color: #991b1b;
+        }
+        .struct-branch-bodies {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-bottom: 1px solid #065f46;
+        }
+        .struct-branch-left {
+            border-right: 1px solid #065f46;
+            padding: 5px 8px;
+        }
+        .struct-branch-right {
+            padding: 5px 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar no-print">
+        <div>
+            <h1>🔑 MUSTERLÖSUNG &amp; BEWERTUNGSRICHTLINIEN</h1>
+            <span style="font-size: 9pt; opacity: 0.9;">Nachprüfung Informatik 9 (Ben Pauls) – 30 Punkte</span>
+        </div>
+        <button class="btn-print" onclick="window.print()">🖨️ Drucken / PDF</button>
+    </div>
+
+    <!-- SEITE 1: TEIL 1 LÖSUNGEN -->
+    <div class="page">
+        <div class="solution-header">
+            <div class="solution-title">Musterlösung: Nachprüfung Informatik (Klasse 9)</div>
+            <div class="solution-subtitle">
+                <strong>Schüler:</strong> Ben Pauls &nbsp;|&nbsp; 
+                <strong>Klasse:</strong> Klasse 9 &nbsp;|&nbsp; 
+                <strong>Datum:</strong> 31.08.2026 &nbsp;|&nbsp; 
+                <strong>Bearbeitungszeit:</strong> 45 Minuten &nbsp;|&nbsp; 
+                <strong>Gesamtpunkte:</strong> 30 Punkte
+            </div>
+        </div>
+
+        <div class="section-banner">
+            <span>TEIL 1: Struktogramme &amp; Algorithmen (14 Punkte)</span>
+            <span>Aufgaben 1 – 3</span>
+        </div>
+
+        <!-- AUFGABE 1 LÖSUNG -->
+        <div class="task-card">
+            <div class="task-header">
+                <span>Aufgabe 1: Struktogramm lesen – Der Kakao-Automat</span>
+                <span class="points-badge">4 Punkte</span>
+            </div>
+            <div class="solution-box">
+                <div class="solution-label">Musterlösung Teil a) (2 Punkte):</div>
+                Zuerst wird der Pappbecher unter den Auslauf gestellt. Danach wird in einer Schleife so lange heiße Milch in 50-ml-Schritten eingefüllt, bis der Becher mindestens 200 ml Füllstand erreicht hat. Anschließend wird das Kakaopulver eingerührt. Wenn der Kunde Marshmallows wünscht (Ja), werden diese oben aufgelegt; wenn nicht (Nein), passiert nichts. Zum Schluss wird der fertige Becher entnommen.
+                <div class="rubric-box">
+                    <strong>Punkteverteilung a):</strong> 1 P. für korrekte Schleifeninterpretation (wiederholtes Einfüllen bis 200ml) | 1 P. für korrekte Verzweigung (Marshmallows Ja/Nein) und Gesamtablauf.
+                </div>
+
+                <div class="solution-label" style="margin-top: 8px;">Musterlösung Teil b) (2 Punkte):</div>
+                • <strong>Schleife:</strong> Erkennt man an dem nach links versetzten <strong>senkrechten Rahmen / Balken</strong>, der den zu wiederholenden Anweisungsblock umschließt, sowie der Kopfbedingung ("Solange...").<br>
+                • <strong>Verzweigung:</strong> Erkennt man an dem Block mit den <strong>diagonalen Linien (Dreiecken)</strong> oben für die Bedingung und den darunter liegenden getrennten Spalten für den <strong>Ja- und Nein-Zweig</strong>.
+                <div class="rubric-box">
+                    <strong>Punkteverteilung b):</strong> 1 P. für Nennung des Schleifenrahmens/Balkens | 1 P. für Nennung der Dreiecke / Ja-Nein-Spalten.
+                </div>
+            </div>
+        </div>
+
+        <!-- AUFGABE 2 LÖSUNG -->
+        <div class="task-card">
+            <div class="task-header">
+                <span>Aufgabe 2: Struktogramm zeichnen – Smarter Nachtwächter</span>
+                <span class="points-badge">6 Punkte</span>
+            </div>
+            <div class="solution-box">
+                <div class="solution-label">Musterlösung (Struktogramm):</div>
+                
+                <div class="struct-container" style="max-width: 440px;">
+                    <!-- Äußere Schleife: Kopf über die volle Breite -->
+                    <div class="struct-loop">
+                        <div class="struct-loop-header"><strong>Wiederhole fortlaufend (Dauerschleife)</strong></div>
+                        <div class="struct-loop-body">
+                            <div class="struct-loop-bar"></div>
+                            <div class="struct-loop-inner">
+                                
+                                <!-- Äußere Verzweigung: Lichtsensor < 20 -->
+                                <div class="struct-branch-header">
+                                    <svg class="struct-branch-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                        <polygon points="0,0 100,0 50,100" fill="#f1f5f9" stroke="#065f46" stroke-width="1.5" />
+                                    </svg>
+                                    <div class="struct-branch-text">Lichtsensor &lt; 20 (Dunkel)?</div>
+                                    <div class="struct-branch-yes">Ja</div>
+                                    <div class="struct-branch-no">Nein</div>
+                                </div>
+                                
+                                <div class="struct-branch-bodies">
+                                    <!-- Linker Zweig (Dunkel) -->
+                                    <div class="struct-branch-left">
+                                        <div class="struct-block" style="border-bottom:1px solid #065f46;">Zeige Mond-Symbol</div>
+                                        <!-- Verschachtelte Verzweigung: Erschütterung -->
+                                        <div class="struct-branch-header" style="height:32px;">
+                                            <svg class="struct-branch-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                                <polygon points="0,0 100,0 50,100" fill="#f8fafc" stroke="#065f46" stroke-width="1.5" />
+                                            </svg>
+                                            <div class="struct-branch-text" style="font-size:7.5pt;">Erschütterung?</div>
+                                            <div class="struct-branch-yes">Ja</div>
+                                            <div class="struct-branch-no">Nein</div>
+                                        </div>
+                                        <div style="display:grid; grid-template-columns:1fr 1fr;">
+                                            <div style="border-right:1px solid #065f46; padding:4px;">Spiele Alarmton</div>
+                                            <div style="padding:4px; font-style:italic;">-</div>
+                                        </div>
+                                    </div>
+                                    <!-- Rechter Zweig (Hell) -->
+                                    <div class="struct-branch-right" style="display:flex; align-items:center; justify-content:center;">
+                                        Lösche Display
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rubric-box">
+                    <strong>Punkteverteilung (6 Punkte):</strong><br>
+                    • 1.5 P. für den korrekten äußeren Schleifenrahmen (Balken links bis ganz unten).<br>
+                    • 1.5 P. für die primäre Verzweigung (Dreieck oben mit Ja/Nein-Aufteilung).<br>
+                    • 1.5 P. für die korrekte Platzierung von "Mond" und verschachtelter Erschütterungsabfrage im Ja-Zweig.<br>
+                    • 1.5 P. für den Nein-Zweig mit "Lösche Display".
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEITE 2: TEIL 2 LÖSUNGEN -->
+    <div class="page">
+
+        <!-- AUFGABE 3 LÖSUNG -->
+        <div class="task-card">
+            <div class="task-header">
+                <span>Aufgabe 3: Calliope mini – Fehleranalyse (Zähler &amp; Schleife)</span>
+                <span class="points-badge">4 Punkte</span>
+            </div>
+            <div class="solution-box">
+                <div class="solution-label">Musterlösung Teil a) (2 Punkte):</div>
+                Der Befehl <code>klicks = 0</code> steht <strong>innerhalb der Dauerschleife</strong> ganz oben. Dadurch wird die Variable <code>klicks</code> bei jedem einzelnen Schleifendurchlauf sofort wieder auf 0 zurückgesetzt! Wenn man Taste A drückt, erhöht sich der Wert zwar auf 1, im nächsten Durchlauf wird er aber augenblicklich wieder auf 0 gesetzt.
+
+                <div class="solution-label" style="margin-top: 8px;">Musterlösung Teil b) (2 Punkte):</div>
+                Die Initialisierung <code>klicks = 0</code> muss <strong>vor bzw. außerhalb</strong> der Dauerschleife stehen (beim Start des Programms). In der Schleife darf nur die Erhöhung <code>klicks = klicks + 1</code> bei Tastendruck ausgeführt werden.
+                <div class="rubric-box">
+                    <strong>Punkteverteilung:</strong> 2 P. für a) (Erkenntnis des Zurücksetzens im Loop) | 2 P. für b) (Korrektur: Platzierung VOR / AUßERHALB der Schleife).
+                </div>
+            </div>
+        </div>
+
+        <div class="section-banner">
+            <span>TEIL 2: Java Kara (16 Punkte)</span>
+            <span>Aufgaben 4 – 6</span>
+        </div>
+
+        <!-- AUFGABE 4 LÖSUNG -->
+        <div class="task-card">
+            <div class="task-header">
+                <span>Aufgabe 4: Code verstehen &amp; Welt visualisieren</span>
+                <span class="points-badge">4 Punkte</span>
+            </div>
+            <div class="solution-box">
+                <div class="solution-label">Musterlösung Teil a) (2 Punkte):</div>
+                Kara läuft in einer <code>while</code>-Schleife Schritt für Schritt geradeaus nach rechts, solange kein Baum vor ihm steht. Auf jedem Feld prüft er, ob ein Kleeblatt liegt; falls ja, hebt er es auf. Er sammelt also alle Blätter auf der Strecke ein. Wenn er direkt vor dem Baum steht, stoppt die Schleife. Danach legt er mit <code>kara.putLeaf();</code> genau ein neues Kleeblatt vor dem Baum ab.
+
+                <div class="solution-label" style="margin-top: 6px;">Musterlösung Teil b) (2 Punkte):</div>
+                • <strong>Endposition von Kara:</strong> Kara steht auf dem <strong>5. Feld (direkt vor dem Baum)</strong> mit Blickrichtung nach rechts.<br>
+                • <strong>Verbleibende Blätter:</strong> Alle vorherigen Blätter wurden aufgesammelt. Am Ende liegt <strong>nur noch ein einziges Kleeblatt</strong> genau auf dem Feld unter Kara (vor dem Baum).
+                <div class="rubric-box">
+                    <strong>Punkteverteilung:</strong> 1 P. für Schleife/Einsammeln | 1 P. für putLeaf nach der Schleife | 1 P. für richtige Position | 1 P. für Blattposition.
+                </div>
+            </div>
+        </div>
+
+        <!-- AUFGABE 5 LÖSUNG -->
+        <div class="task-card">
+            <div class="task-header">
+                <span>Aufgabe 5: Finde die 4 Syntaxfehler</span>
+                <span class="points-badge">4 Punkte</span>
+            </div>
+            <div class="solution-box">
+                <div class="solution-label">Musterlösung:</div>
+                <table style="width:100%; border-collapse:collapse; margin-top:4px; font-size:9pt;">
+                    <tr style="background:#e2e8f0;">
+                        <th style="border:1px solid #cbd5e1; padding:4px;">Zeile</th>
+                        <th style="border:1px solid #cbd5e1; padding:4px;">Fehlerhafte Stelle</th>
+                        <th style="border:1px solid #cbd5e1; padding:4px;">Korrektur</th>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #cbd5e1; padding:4px; text-align:center;"><strong>Zeile 2</strong></td>
+                        <td style="border:1px solid #cbd5e1; padding:4px;">Runde Klammern um die Schleifenbedingung fehlen: <code>while !kara.treeFront()</code></td>
+                        <td style="border:1px solid #cbd5e1; padding:4px;"><code>while (!kara.treeFront())</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #cbd5e1; padding:4px; text-align:center;"><strong>Zeile 4</strong></td>
+                        <td style="border:1px solid #cbd5e1; padding:4px;">Falsche äußere runde Klammern um den Befehl und fehlendes Semikolon: <code>(kara.move())</code></td>
+                        <td style="border:1px solid #cbd5e1; padding:4px;"><code>kara.move();</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #cbd5e1; padding:4px; text-align:center;"><strong>Zeile 6</strong></td>
+                        <td style="border:1px solid #cbd5e1; padding:4px;">Fehlendes Semikolon am Zeilenende: <code>kara.removeLeaf()</code></td>
+                        <td style="border:1px solid #cbd5e1; padding:4px;"><code>kara.removeLeaf();</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #cbd5e1; padding:4px; text-align:center;"><strong>Zeile 8</strong></td>
+                        <td style="border:1px solid #cbd5e1; padding:4px;">Schließende geschweifte Klammer <code>}</code> der while-Schleife fehlt.</td>
+                        <td style="border:1px solid #cbd5e1; padding:4px;"><code>}</code> vor Zeile 9 einfügen</td>
+                    </tr>
+                </table>
+                <div class="rubric-box">
+                    <strong>Punkte:</strong> Exakt 1 Punkt pro richtig erkannter und korrigierter Fehlerstelle.
+                </div>
+            </div>
+        </div>
+
+        <!-- AUFGABE 6 LÖSUNG -->
+        <div class="task-card">
+            <div class="task-header">
+                <span>Aufgabe 6: Eigenes Programm – „Der Baum-Ausweicher“</span>
+                <span class="points-badge">8 Punkte</span>
+            </div>
+            <div class="solution-box">
+                <div class="solution-label">Musterlösung Teil a) – Hilfsmethode (4 Punkte):</div>
+                <div class="code-box">
+void umgeheBaum() {
+    kara.turnLeft();
+    kara.move();
+    kara.turnRight();
+    kara.move();
+    kara.move();
+    kara.turnRight();
+    kara.move();
+    kara.turnLeft();
+}
+                </div>
+                <div class="rubric-box">
+                    <strong>Punkte a):</strong> 1 P. für korrekte Drehungen links/rechts | 2 P. für richtige Schrittfolge | 1 P. für fehlerfreie Syntax (Semikolons, Klammern).
+                </div>
+
+                <div class="solution-label" style="margin-top: 8px;">Musterlösung Teil b) – Hauptprogramm (4 Punkte):</div>
+                <div class="code-box">
+void myProgram() {
+    while (!kara.onLeaf()) {
+        if (kara.treeFront()) {
+            umgeheBaum();
+        } else {
+            kara.move();
+        }
+    }
+}
+                </div>
+                <div class="rubric-box">
+                    <strong>Punkte b):</strong> 1 P. für <code>while (!kara.onLeaf())</code> | 1 P. für <code>if (kara.treeFront())</code> | 1 P. für korrekten Methodenaufruf <code>umgeheBaum();</code> im if-Zweig | 1 P. für <code>else { kara.move(); }</code>.
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

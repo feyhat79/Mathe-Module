@@ -1,0 +1,79 @@
+    <aside class="builder-sidebar" x-data="sidebar" x-show="isSidebarOpen" x-transition>
+        <header class="sidebar-header">
+            <div class="sidebar-header-flex">
+                <span class="sidebar-header-title">Sammlung</span>
+                <div class="sidebar-header-actions">
+                    <button type="button" @click="window.dispatchEvent(new CustomEvent('start-onboarding-tour'))" class="btn-theme-toggle btn-tour-trigger" title="Einführungstour starten">
+                        Tour
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="sidebar-content">
+            <section class="collection-area">
+                <template x-if="!collectionFileHandle">
+                    <div class="collection-setup-box">
+                        <p class="setup-hint">Verknüpfen Sie eine lokale Datei auf Ihrer Festplatte, um Ihre persönliche Aufgabensammlung zu nutzen.</p>
+                        <button @click="loadOrCreateCollection()" class="btn-secondary btn-full margin-bottom-sm">Sammlung laden</button>
+                        <button @click="createNewCollection()" class="btn-text btn-full">+ Neue Sammlung erstellen</button>
+                    </div>
+                </template>
+
+                <template x-if="collectionFileHandle">
+                    <div class="active-collection">
+                        <div class="collection-file-badge">
+                            <span class="file-name" x-text="collectionFileHandle.name"></span>
+                            <button type="button" @click="closeCollection()" class="btn-close-collection" title="Sammlung schließen">✕</button>
+                        </div>
+
+                        <div class="search-wrapper">
+                            <input type="text" x-model="collectionSearchQuery" placeholder="Sammlung durchsuchen..." class="collection-search-input">
+                            <button x-show="collectionSearchQuery" @click="collectionSearchQuery = ''" class="btn-clear-search">&times;</button>
+                        </div>
+
+                        <div class="collection-list">
+                            <template x-for="cTask in getFilteredCollection()" :key="cTask.id">
+                                <div class="collection-card" 
+                                     :class="[
+                                         expandedCollectionTaskId === cTask.id ? 'active' : '', 
+                                         'card-' + getBadgeColorClass(getTaskModules(cTask)[0] || 'Text')
+                                     ]" 
+                                     @click="expandedCollectionTaskId = (expandedCollectionTaskId === cTask.id ? null : cTask.id)">
+                                    <div class="collection-card-header">
+                                        <h3 class="collection-card-title" x-text="cTask.collectionTitle"></h3>
+                                        <span class="collection-card-points" x-text="getTaskPoints(cTask) + ' P.'"></span>
+                                    </div>
+
+                                    <div class="collection-card-badges">
+                                        <template x-for="mod in getTaskModules(cTask)">
+                                            <span class="collection-badge" 
+                                                  :class="'badge-' + getBadgeColorClass(mod)" 
+                                                  x-text="mod"></span>
+                                        </template>
+                                    </div>
+
+                                    <div class="collection-card-preview" x-show="expandedCollectionTaskId === cTask.id" x-collapse>
+                                        <p x-text="cTask.context ? cTask.context : cTask.subtasks[0].text" class="preview-text"></p>
+                                    </div>
+
+                                    <div class="collection-card-actions" @click.stop>
+                                        <button @click="importTaskFromCollection(cTask)" class="btn-secondary btn-compact">+ Hinzufügen</button>
+                                        <button @click="removeTaskFromCollection(cTask.id)" class="btn-delete-subtask" title="Aus Sammlung löschen">✕</button>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template x-if="getFilteredCollection().length === 0">
+                                <p class="collection-empty-msg">Keine passenden Aufgaben gefunden.</p>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </section>
+        </div>
+
+        <footer class="sidebar-footer">
+            Gesamtpunkte: <strong x-text="getTotalPoints()"></strong>
+        </footer>
+    </aside>

@@ -1,0 +1,372 @@
+{
+  "fileType": "math-builder-collection",
+  "version": "1.2",
+  "meta": {
+    "docType": "test",
+    "art": "Klassenarbeit",
+    "nr": "3",
+    "titel": "Klassenarbeit Nr. 3: Geometrie und LGS",
+    "fach": "Mathematik",
+    "klasse": "Klasse 8",
+    "datum": "2026-06-17",
+    "hinweise": "Bearbeitungszeit: 45 Minuten. Hilfsmittel: Geodreieck, Taschenrechner und Formelsammlung erlaubt. Achte auf saubere Rechenwege! Löse alle Aufgaben direkt in deinem Heft."
+  },
+  "tasks": [
+    {
+      "id": 3000,
+      "type": "task",
+      "context": "Kreuze jeweils die einzige mathematisch korrekte Aussage an.",
+      "subtaskColumns": 2,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 3001,
+          "text": "Welche Eigenschaft trifft auf ein Parallelogramm immer zu?",
+          "points": 1,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [
+            {
+              "id": "mod-3002",
+              "type": "mcq",
+              "data": {
+                "options": [
+                  { "id": 3004, "text": "Alle vier Innenwinkel betragen 90°." },
+                  { "id": 3003, "text": "Gegenüberliegende Seiten sind parallel." },
+                  { "id": 3005, "text": "Die Diagonalen stehen senkrecht aufeinander." },
+                  { "id": 3006, "text": "Es hat vier gleich lange Seiten." }
+                ]
+              }
+            }
+          ],
+          "subSubtasks": []
+        },
+        {
+          "id": 3007,
+          "text": "Welche Aussage über ein Rechteck ist stets wahr?",
+          "points": 1,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [
+            {
+              "id": "mod-3008",
+              "type": "mcq",
+              "data": {
+                "options": [
+                  { "id": 3010, "text": "Alle vier Seiten sind immer gleich lang." },
+                  { "id": 3011, "text": "Die Diagonalen halbieren die Innenwinkel." },
+                  { "id": 3012, "text": "Jedes Rechteck ist auch ein Quadrat." },
+                  { "id": 3009, "text": "Alle Innenwinkel betragen 90°." }
+                ]
+              }
+            }
+          ],
+          "subSubtasks": []
+        },
+        {
+          "id": 3013,
+          "text": "Welche Eigenschaft besitzt eine Raute (Rhombus) immer?",
+          "points": 1,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [
+            {
+              "id": "mod-3014",
+              "type": "mcq",
+              "data": {
+                "options": [
+                  { "id": 3016, "text": "Alle Innenwinkel sind rechtwinklig." },
+                  { "id": 3017, "text": "Es gibt keine parallelen Seiten." },
+                  { "id": 3015, "text": "Alle vier Seiten sind gleich lang." },
+                  { "id": 3018, "text": "Die Diagonalen sind gleich lang." }
+                ]
+              }
+            }
+          ],
+          "subSubtasks": []
+        },
+        {
+          "id": 3019,
+          "text": "In der Hierarchie der Vierecke gilt für ein Quadrat:",
+          "points": 1,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [
+            {
+              "id": "mod-3020",
+              "type": "mcq",
+              "data": {
+                "options": [
+                  { "id": 3021, "text": "Es ist sowohl ein Rechteck als auch eine Raute." },
+                  { "id": 3022, "text": "Es ist ein Trapez, aber kein Parallelogramm." },
+                  { "id": 3023, "text": "Seine Diagonalen stehen niemals senkrecht aufeinander." },
+                  { "id": 3024, "text": "Es besitzt keine Symmetrieachsen." }
+                ]
+              }
+            }
+          ],
+          "subSubtasks": []
+        },
+        {
+          "id": 3025,
+          "text": "Welche Aussage über ein Trapez ist immer wahr?",
+          "points": 1,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [
+            {
+              "id": "mod-3026",
+              "type": "mcq",
+              "data": {
+                "options": [
+                  { "id": 3028, "text": "Alle gegenüberliegenden Winkel sind immer gleich groß." },
+                  { "id": 3027, "text": "Es hat mindestens ein Paar paralleler gegenüberliegender Seiten." },
+                  { "id": 3029, "text": "Die Diagonalen stehen immer senkrecht aufeinander." },
+                  { "id": 3030, "text": "Es hat genau zwei Paare paralleler Seiten." }
+                ]
+              }
+            }
+          ],
+          "subSubtasks": []
+        },
+        {
+          "id": 3031,
+          "text": "Wann wird ein Parallelogramm zu einer Raute?",
+          "points": 1,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [
+            {
+              "id": "mod-3032",
+              "type": "mcq",
+              "data": {
+                "options": [
+                  { "id": 3034, "text": "Wenn alle Winkel rechte Winkel sind." },
+                  { "id": 3035, "text": "Wenn gegenüberliegende Seiten gleich lang sind." },
+                  { "id": 3036, "text": "Wenn die Diagonalen ungleich lang sind und sich schneiden." },
+                  { "id": 3033, "text": "Wenn zwei benachbarte Seiten gleich lang sind." }
+                ]
+              }
+            }
+          ],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 3100,
+      "type": "task",
+      "context": "Berechne jeweils den Flächeninhalt $A$ der beschriebenen Figuren. Notiere deinen Rechenweg und die genutzten Formeln!",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 3101,
+          "text": "Ein Parallelogramm hat die Grundseite $a = 9\\,\\text{cm}$ und die zugehörige Höhe $h_a = 5\\,\\text{cm}$.",
+          "points": 2,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 3102,
+          "text": "Ein rechtwinkliges Dreieck besitzt die beiden Katheten $a = 6\\,\\text{cm}$ und $b = 8\\,\\text{cm}$.",
+          "points": 2,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 3103,
+          "text": "Ein Quadrat hat eine Seitenlänge von $a = 8\\,\\text{m}$.",
+          "points": 2,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 3200,
+      "type": "task",
+      "context": "Berechne jeweils den Flächeninhalt $A$ der abgebildeten Figuren. Bestimme selbstständig die notwendige Formel und notiere deinen Rechenweg!",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 3104,
+          "text": "",
+          "points": 3,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [
+            {
+              "id": "mod-3105",
+              "type": "geometry",
+              "data": {
+                "settings": {
+                  "axis": false,
+                  "grid": false,
+                  "xMin": 0.5,
+                  "xMax": 7.5,
+                  "yMin": 0.5,
+                  "yMax": 5.5,
+                  "width": 7.0,
+                  "height": 4.0,
+                  "keepaspectratio": true
+                },
+                "elements": [],
+                "code": "var p1 = board.create('point', [2.0, 2.0], {name: '', visible: false});\nvar p2 = board.create('point', [6.0, 2.0], {name: '', visible: false});\nvar p3 = board.create('point', [3.5, 4.5], {name: '', visible: false});\nvar poly = board.create('polygon', [p1, p2, p3], {\n    fillColor: '#bfdbfe',\n    fillOpacity: 0.1,\n    strokeColor: '#2563eb',\n    strokeWidth: 2,\n    vertices: {visible: false},\n    borders: {strokeColor: '#2563eb', strokeWidth: 2}\n});\nvar h_foot = board.create('point', [3.5, 2.0], {name: '', visible: false});\nboard.create('segment', [p3, h_foot], {\n    strokeColor: '#ef4444',\n    strokeWidth: 1.5,\n    dash: 2\n});\nboard.create('text', [4.0, 1.6, '8 cm'], {anchorX: 'middle', anchorY: 'top', fontSize: 13});\nboard.create('text', [3.3, 3.25, '5 cm'], {anchorX: 'right', anchorY: 'middle', fontSize: 13, strokeColor: '#ef4444'});\nboard.create('text', [2.4, 3.5, '7 cm'], {anchorX: 'right', anchorY: 'bottom', fontSize: 13});\nboard.create('text', [5.1, 3.5, '6 cm'], {anchorX: 'left', anchorY: 'bottom', fontSize: 13});"
+                }
+              }
+          ],
+          "subSubtasks": []
+        },
+        {
+          "id": 3106,
+          "text": "",
+          "points": 3,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [
+            {
+              "id": "mod-3107",
+              "type": "geometry",
+              "data": {
+                "settings": {
+                  "axis": false,
+                  "grid": false,
+                  "xMin": 0.5,
+                  "xMax": 8.0,
+                  "yMin": 0.5,
+                  "yMax": 5.8,
+                  "width": 7.5,
+                  "height": 4.5,
+                  "keepaspectratio": true
+                },
+                "elements": [],
+                "code": "var p1 = board.create('point', [2.0, 2.0], {name: '', visible: false});\nvar p2 = board.create('point', [5.5, 2.0], {name: '', visible: false});\nvar p3 = board.create('point', [7.0, 4.8], {name: '', visible: false});\nvar p4 = board.create('point', [3.5, 4.8], {name: '', visible: false});\nvar poly = board.create('polygon', [p1, p2, p3, p4], {\n    fillColor: '#bfdbfe',\n    fillOpacity: 0.1,\n    strokeColor: '#2563eb',\n    strokeWidth: 2,\n    vertices: {visible: false},\n    borders: {strokeColor: '#2563eb', strokeWidth: 2}\n});\nvar h_foot = board.create('point', [3.5, 2.0], {name: '', visible: false});\nboard.create('segment', [p4, h_foot], {\n    strokeColor: '#ef4444',\n    strokeWidth: 1.5,\n    dash: 2\n});\nboard.create('text', [3.75, 1.6, '5 cm'], {anchorX: 'middle', anchorY: 'top', fontSize: 13});\nboard.create('text', [3.3, 3.4, '4 cm'], {anchorX: 'right', anchorY: 'middle', fontSize: 13, strokeColor: '#ef4444'});"
+              }
+            }
+          ],
+          "subSubtasks": []
+        },
+        {
+          "id": 3108,
+          "text": "",
+          "points": 4,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [
+            {
+              "id": "mod-3109",
+              "type": "geometry",
+              "data": {
+                "settings": {
+                  "axis": false,
+                  "grid": false,
+                  "xMin": 0.5,
+                  "xMax": 7.5,
+                  "yMin": 0.5,
+                  "yMax": 4.5,
+                  "width": 7.0,
+                  "height": 4.0,
+                  "keepaspectratio": true
+                },
+                "elements": [],
+                "code": "var p1 = board.create('point', [1.5, 1.5], {name: '', visible: false});\nvar p2 = board.create('point', [6.5, 1.5], {name: '', visible: false});\nvar p3 = board.create('point', [5.5, 3.5], {name: '', visible: false});\nvar p4 = board.create('point', [2.5, 3.5], {name: '', visible: false});\nvar poly = board.create('polygon', [p1, p2, p3, p4], {\n    fillColor: '#bfdbfe',\n    fillOpacity: 0.1,\n    strokeColor: '#2563eb',\n    strokeWidth: 2,\n    vertices: {visible: false},\n    borders: {strokeColor: '#2563eb', strokeWidth: 2}\n});\nvar h_foot = board.create('point', [2.5, 1.5], {name: '', visible: false});\nboard.create('segment', [p4, h_foot], {\n    strokeColor: '#ef4444',\n    strokeWidth: 1.5,\n    dash: 2\n});\nboard.create('text', [4.0, 1.1, '10 cm'], {anchorX: 'middle', anchorY: 'top', fontSize: 13});\nboard.create('text', [4.0, 3.7, '6 cm'], {anchorX: 'middle', anchorY: 'bottom', fontSize: 13});\nboard.create('text', [2.3, 2.5, '4 cm'], {anchorX: 'right', anchorY: 'middle', fontSize: 13, strokeColor: '#ef4444'});\nboard.create('text', [1.7, 2.7, '5 cm'], {anchorX: 'right', anchorY: 'bottom', fontSize: 13});\nboard.create('text', [6.3, 2.7, '5 cm'], {anchorX: 'left', anchorY: 'bottom', fontSize: 13});"
+              }
+            }
+          ],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 3300,
+      "type": "task",
+      "context": "Die Vorderseite eines modernen Gewächshauses besteht aus einem symmetrischen, trapezförmigen unteren Teil und einem aufgesetzten dreieckigen Dachbereich (siehe Skizze). Um das Gewächshaus zu reinigen, soll der Flächeninhalt der gesamten Vorderseite berechnet werden.",
+      "subtaskColumns": 1,
+      "modules": [
+        {
+          "id": "mod-3301",
+          "type": "geometry",
+          "data": {
+            "settings": {
+              "axis": false,
+              "grid": false,
+              "xMin": 0.5,
+              "xMax": 7.5,
+              "yMin": 0.5,
+              "yMax": 6.5,
+              "width": 7,
+              "height": 6,
+              "keepaspectratio": true
+            },
+            "elements": [],
+            "code": "var pA = board.create('point', [1.5, 1.5], {name: '', visible: false});\nvar pB = board.create('point', [6.5, 1.5], {name: '', visible: false});\nvar pC = board.create('point', [5.5, 3.5], {name: '', visible: false});\nvar pD = board.create('point', [2.5, 3.5], {name: '', visible: false});\nvar pE = board.create('point', [4.0, 5.5], {name: '', visible: false});\n\nvar poly = board.create('polygon', [pA, pB, pC, pE, pD], {\n    fillColor: '#bfdbfe',\n    fillOpacity: 0.15,\n    strokeColor: '#2563eb',\n    strokeWidth: 2,\n    vertices: {visible: false},\n    borders: {strokeColor: '#2563eb', strokeWidth: 2}\n});\n\n// Deckenlinie des Trapezes\nboard.create('segment', [pD, pC], {\n    strokeColor: '#94a3b8',\n    strokeWidth: 1.5,\n    dash: 2\n});\n\n// Hoehe des Trapezes (rot gestrichelt)\nvar pD_foot = board.create('point', [2.5, 1.5], {name: '', visible: false});\nboard.create('segment', [pD, pD_foot], {\n    strokeColor: '#ef4444',\n    strokeWidth: 1.5,\n    dash: 2\n});\n\n// Hoehe des Dreiecks (rot gestrichelt)\nvar pE_foot = board.create('point', [4.0, 3.5], {name: '', visible: false});\nboard.create('segment', [pE, pE_foot], {\n    strokeColor: '#ef4444',\n    strokeWidth: 1.5,\n    dash: 2\n});\n\n// Bemaszung\nboard.create('text', [4.0, 1.1, '10 m'], {anchorX: 'middle', anchorY: 'top', fontSize: 13});\nboard.create('text', [4.0, 3.7, '6 m'], {anchorX: 'middle', anchorY: 'bottom', fontSize: 13});\nboard.create('text', [1.7, 2.7, '5 m'], {anchorX: 'right', anchorY: 'bottom', fontSize: 13});\nboard.create('text', [6.3, 2.7, '5 m'], {anchorX: 'left', anchorY: 'bottom', fontSize: 13});\nboard.create('text', [3.0, 4.7, '5 m'], {anchorX: 'right', anchorY: 'bottom', fontSize: 13});\nboard.create('text', [5.0, 4.7, '5 m'], {anchorX: 'left', anchorY: 'bottom', fontSize: 13});\nboard.create('text', [2.3, 2.5, 'h1 = 4 m'], {anchorX: 'right', anchorY: 'middle', fontSize: 12, strokeColor: '#ef4444'});\nboard.create('text', [4.2, 4.5, 'h2 = 4 m'], {anchorX: 'left', anchorY: 'middle', fontSize: 12, strokeColor: '#ef4444'});"
+          }
+        }
+      ],
+      "subtasks": [
+        {
+          "id": 3302,
+          "text": "Berechne den gesamten Flächeninhalt der Vorderseite des Gewächshauses.",
+          "points": 8,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 3400,
+      "type": "task",
+      "context": "Gegeben ist das folgende lineare Gleichungssystem mit zwei Unbekannten:<br>I) $y = 3x - 2$<br>II) $2x + y = 13$",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 3401,
+          "text": "Löse das lineare Gleichungssystem rechnerisch mit dem Einsetzungsverfahren. Dokumentiere deinen Rechenweg ausführlich und gib die Lösungsmenge $\\mathbb{L}$ an.",
+          "points": 5,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 3500,
+      "type": "task",
+      "context": "Stelle für die folgenden Beschreibungen jeweils nur das zugehörige lineare Gleichungssystem mit zwei Variablen auf. Eine Lösung des Systems ist nicht erforderlich!",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 3501,
+          "text": "Zahlenrätsel: Die Summe zweier rationaler Zahlen $x$ und $y$ ist genau 24. Das Dreifache der ersten Zahl ($x$) ist um 4 größer als das Doppelte der zweiten Zahl ($y$).",
+          "points": 2,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 3502,
+          "text": "Im Freizeitpark: Familie Müller (2 Erwachsene, 3 Kinder) zahlt für den Eintritt in einen Erlebnispark insgesamt 34 €. Familie Schmidt (1 Erwachsener, 4 Kinder) zahlt für denselben Park 27 €. Definiere zuerst sinnvolle Abkürzungen für die Unbekannten und stelle das LGS auf.",
+          "points": 3,
+          "spaceType": "none",
+          "spaceHeight": 0,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    }
+  ]
+}

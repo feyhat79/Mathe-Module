@@ -1,0 +1,973 @@
+{
+  "fileType": "math-builder-collection",
+  "version": "1.2",
+  "meta": {
+    "docType": "worksheet",
+    "art": "Aufgabensammlung",
+    "nr": "8",
+    "titel": "Mathe-Power: Aufgabensammlung Klasse 8",
+    "fach": "Mathematik",
+    "klasse": "Klasse 8",
+    "datum": "2026-05-30",
+    "hinweise": "Diese premium Aufgabensammlung für die 8. Klasse demonstriert die volle Leistungsfähigkeit unseres AufgabenBuilders, inklusive dynamischer LGS, farbcodierter Baumdiagramme, glänzender 3D-Urnenkugeln und dem eingefärbten Koordinatensystem für iPad-Klassen."
+  },
+  "tasks": [
+    {
+      "id": 1000,
+      "type": "section",
+      "title": "1. Terme und Gleichungen",
+      "subtitle": "Grundlagen der Algebra: Termvereinfachungen, Äquivalenzumformungen und Sachaufgaben",
+      "subtasks": []
+    },
+    {
+      "id": 1001,
+      "type": "task",
+      "context": "Vereinfache die folgenden algebraischen Ausdrücke so weit wie möglich. Nutze dafür die bekannten Rechengesetze (Distributivgesetz, Assoziativgesetz).",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1002,
+          "text": "Multipliziere aus und fasse zusammen: $3x \\cdot (2y - 4) + 5x - 6xy$",
+          "points": 2,
+          "spaceType": "karo",
+          "spaceHeight": 3,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1003,
+          "text": "Wende die binomischen Formeln an und vereinfache: $(2a + 3b)^2 - (2a - 3b)^2$",
+          "points": 3,
+          "spaceType": "karo",
+          "spaceHeight": 3,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Algebra: Terme vereinfachen"
+    },
+    {
+      "id": 1004,
+      "type": "task",
+      "context": "Bestimme die Lösungsmenge $\\mathbb{L}$ der folgenden linearen Gleichungen über der Grundmenge $\\mathbb{G} = \\mathbb{Q}$.",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1005,
+          "text": "Löse nach $x$ auf: $4 \\cdot (x - 3) + 2x = 3 \\cdot (x + 2)$",
+          "points": 3,
+          "spaceType": "karo",
+          "spaceHeight": 4,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1006,
+          "text": "Löse nach $x$ auf: $\\frac{2}{3}x - 5 = \\frac{1}{2}x + 1$",
+          "points": 3,
+          "spaceType": "karo",
+          "spaceHeight": 4,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Algebra: Lineare Gleichungen"
+    },
+    {
+      "id": 1007,
+      "type": "task",
+      "context": "**Altersrätsel**: Ein Vater ist aktuell genau viermal so alt wie sein Sohn. In 5 Jahren wird er nur noch dreimal so alt sein wie sein Sohn.",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1008,
+          "text": "Stelle eine lineare Gleichung auf, wobei $x$ das aktuelle Alter des Sohnes beschreibt.",
+          "points": 2,
+          "spaceType": "line",
+          "spaceHeight": 2,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1009,
+          "text": "Berechne das aktuelle Alter von Vater und Sohn rechnerisch.",
+          "points": 3,
+          "spaceType": "karo",
+          "spaceHeight": 4,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Algebra: Altersrätsel (Sachaufgabe)"
+    },
+    {
+      "id": 1010,
+      "type": "task",
+      "context": "Welcher der folgenden Terme entspricht dem ausmultiplizierten Ausdruck $(x - 4)^2$?",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1011,
+          "text": "Wähle die mathematisch korrekte Antwort aus:",
+          "points": 1,
+          "spaceType": "none",
+          "spaceHeight": 5,
+          "modules": [
+            {
+              "id": "mod-1012",
+              "type": "mcq",
+              "data": {
+                "options": [
+                  {
+                    "id": 1013,
+                    "text": "x² - 8x + 16 (Zweite binomische Formel)"
+                  },
+                  {
+                    "id": 1014,
+                    "text": "x² - 16"
+                  },
+                  {
+                    "id": 1015,
+                    "text": "x² - 4x + 16"
+                  },
+                  {
+                    "id": 1016,
+                    "text": "x² + 8x - 16"
+                  }
+                ]
+              }
+            }
+          ],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Algebra: Binomische Formeln (MCQ)"
+    },
+    {
+      "id": 1017,
+      "type": "task",
+      "context": "Ordne die mathematischen Terme den entsprechenden umgangssprachlichen Formulierungen zu.",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1018,
+          "text": "Verbinde die passenden Paare miteinander:",
+          "points": 4,
+          "spaceType": "none",
+          "spaceHeight": 5,
+          "modules": [
+            {
+              "id": "mod-1019",
+              "type": "matching",
+              "data": {
+                "leftItems": [
+                  {
+                    "id": 1020,
+                    "text": "2x + 5"
+                  },
+                  {
+                    "id": 1021,
+                    "text": "2 * (x + 5)"
+                  },
+                  {
+                    "id": 1022,
+                    "text": "x² + 5"
+                  },
+                  {
+                    "id": 1023,
+                    "text": "x - 5"
+                  }
+                ],
+                "rightItems": [
+                  {
+                    "id": 1024,
+                    "text": "Das Doppelte einer Zahl vermehrt um 5"
+                  },
+                  {
+                    "id": 1025,
+                    "text": "Das Doppelte der Summe aus einer Zahl und 5"
+                  },
+                  {
+                    "id": 1026,
+                    "text": "Das Quadrat einer Zahl vermehrt um 5"
+                  },
+                  {
+                    "id": 1027,
+                    "text": "Eine Zahl vermindert um 5"
+                  }
+                ]
+              }
+            }
+          ],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Algebra: Term-Zuordnung (Matching)"
+    },
+    {
+      "id": 1028,
+      "type": "section",
+      "title": "2. Lineare Gleichungssysteme (LGS)",
+      "subtitle": "Verfahren zur Lösung von zwei Gleichungen mit zwei Variablen und deren Lösbarkeitsfälle",
+      "subtasks": []
+    },
+    {
+      "id": 1029,
+      "type": "task",
+      "context": "Gegeben ist das folgende lineare Gleichungssystem mit zwei Unbekannten:<br>I) $y = 2x + 1$<br>II) $3x + 2y = 16$",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1030,
+          "text": "Löse das LGS rechnerisch mit dem Einsetzungs- oder Gleichsetzungsverfahren.",
+          "points": 4,
+          "spaceType": "karo",
+          "spaceHeight": 6,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "LGS: Rechnerische Lösung"
+    },
+    {
+      "id": 1031,
+      "type": "task",
+      "context": "**Zahlenrätsel**: Die Summe zweier reeller Zahlen beträgt genau 45. Zieht man die kleinere Zahl von der größeren ab, so erhält man als Differenz 9.",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1032,
+          "text": "Stelle ein passendes lineares Gleichungssystem auf.",
+          "points": 2,
+          "spaceType": "karo",
+          "spaceHeight": 3,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1033,
+          "text": "Berechne die beiden gesuchten Zahlen.",
+          "points": 3,
+          "spaceType": "karo",
+          "spaceHeight": 4,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "LGS: Zahlenrätsel (Sachaufgabe)"
+    },
+    {
+      "id": 1034,
+      "type": "task",
+      "context": "Bestimme die Lösungsmenge des LGS. Es hat eine eindeutige Lösung:",
+      "subtaskColumns": 1,
+      "modules": [
+        {
+          "id": "mod-1035",
+          "type": "lgs",
+          "data": {
+            "dimension": 2,
+            "mode": "generate",
+            "variablesRaw": "x, y",
+            "manualCoefficients": [
+              [
+                "",
+                "",
+                ""
+              ],
+              [
+                "",
+                "",
+                ""
+              ]
+            ],
+            "targetSolutions": [
+              "4",
+              "2"
+            ],
+            "generatedCoefficients": [
+              [
+                2,
+                3,
+                14
+              ],
+              [
+                1,
+                -1,
+                2
+              ]
+            ]
+          }
+        }
+      ],
+      "subtasks": [
+        {
+          "id": 1036,
+          "text": "Löse das oben dargestellte Gleichungssystem und gib die Lösungsmenge $\\mathbb{L}$ an.",
+          "points": 4,
+          "spaceType": "karo",
+          "spaceHeight": 6,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "LGS: Dynamisches Gleichungssystem"
+    },
+    {
+      "id": 1037,
+      "type": "task",
+      "context": "Wann besitzt ein lineares Gleichungssystem mit zwei Variablen grafisch gesehen **keine** Lösung?",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1038,
+          "text": "Wähle die zutreffende geometrische Erklärung:",
+          "points": 1,
+          "spaceType": "none",
+          "spaceHeight": 5,
+          "modules": [
+            {
+              "id": "mod-1039",
+              "type": "mcq",
+              "data": {
+                "options": [
+                  {
+                    "id": 1040,
+                    "text": "Wenn die beiden Geraden parallel verlaufen und keinen Schnittpunkt besitzen."
+                  },
+                  {
+                    "id": 1041,
+                    "text": "Wenn die beiden Geraden aufeinander liegen (identisch sind)."
+                  },
+                  {
+                    "id": 1042,
+                    "text": "Wenn sich die Geraden in genau einem Punkt schneiden."
+                  },
+                  {
+                    "id": 1043,
+                    "text": "Wenn eine der Geraden senkrecht steht."
+                  }
+                ]
+              }
+            }
+          ],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "LGS: Grafische Lösbarkeit (MCQ)"
+    },
+    {
+      "id": 1044,
+      "type": "task",
+      "context": "**Kinokarten**: Für eine Kinovorstellung zahlen 2 Erwachsene und 3 Kinder zusammen 38 €. Eine andere Gruppe aus 3 Erwachsenen und 2 Kindern zahlt für dieselben Plätze 42 €.",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1045,
+          "text": "Berechne den Ticketpreis für einen Erwachsenen ($x$) und für ein Kind ($y$). Stelle dazu zuerst ein LGS auf.",
+          "points": 5,
+          "spaceType": "karo",
+          "spaceHeight": 6,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "LGS: Kinokarten (Sachaufgabe)"
+    },
+    {
+      "id": 1046,
+      "type": "section",
+      "title": "3. Vierecke und Dreiecke (Geometrie)",
+      "subtitle": "Figuren im Koordinatensystem, Flächenberechnungen und der Strahlensatz",
+      "subtasks": []
+    },
+    {
+      "id": 1047,
+      "type": "task",
+      "context": "Gegeben ist ein Parallelogramm $ABCD$ im Koordinatensystem. Drei der vier Eckpunkte sind bekannt: $A(1|1)$, $B(5|1)$ und $D(2|4)$.",
+      "subtaskColumns": 1,
+      "modules": [
+        {
+          "id": "mod-1048",
+          "type": "koordinatensystem",
+          "data": {
+            "xMin": 0,
+            "xMax": 7,
+            "yMin": 0,
+            "yMax": 5,
+            "xStep": 1,
+            "yStep": 1,
+            "showGrid": true,
+            "connectPoints": true,
+            "closeShape": true,
+            "mode": "show",
+            "height": 6,
+            "width": 8,
+            "points": [
+              {
+                "label": "A",
+                "x": 1,
+                "y": 1
+              },
+              {
+                "label": "B",
+                "x": 5,
+                "y": 1
+              },
+              {
+                "label": "C",
+                "x": 6,
+                "y": 4
+              },
+              {
+                "label": "D",
+                "x": 2,
+                "y": 4
+              }
+            ],
+            "colorShape": true
+          }
+        }
+      ],
+      "subtasks": [
+        {
+          "id": 1049,
+          "text": "Lies die Koordinaten des fehlenden Eckpunkts $C$ aus der Zeichnung ab und notiere sie.",
+          "points": 2,
+          "spaceType": "line",
+          "spaceHeight": 1.5,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1050,
+          "text": "Berechne den Flächeninhalt des Parallelogramms $ABCD$. (Tipp: $A = g \\cdot h$)",
+          "points": 3,
+          "spaceType": "karo",
+          "spaceHeight": 3,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Geometrie: Parallelogramm (Farb-Shape)"
+    },
+    {
+      "id": 1051,
+      "type": "task",
+      "context": "An der abgebildeten V-Figur des Strahlensatzes gelten die Längen: $SA = 3\\,\\text{cm}$, $AB = 6\\,\\text{cm}$ und $AA' = 2\\,\\text{cm}$. Die Strahlen und Parallelen sind farblich hervorgehoben.",
+      "subtaskColumns": 1,
+      "modules": [
+        {
+          "id": "mod-1052",
+          "type": "strahlensatz",
+          "data": {
+            "type": "v-figur",
+            "showPoints": true,
+            "showLabels": true,
+            "vertexLabel": "S",
+            "ptALabel": "A",
+            "ptBLabel": "B",
+            "ptAprimeLabel": "A'",
+            "ptBprimeLabel": "B'",
+            "labelSA": "3",
+            "labelAB": "6",
+            "labelSAprime": "4",
+            "labelAprimeBprime": "y",
+            "labelAAprime": "2",
+            "labelBBprime": "x",
+            "height": 6,
+            "colorSegments": true
+          }
+        }
+      ],
+      "subtasks": [
+        {
+          "id": 1053,
+          "text": "Berechne die Länge der Strecke $BB' = x$ mit dem ersten oder zweiten Strahlensatz.",
+          "points": 3,
+          "spaceType": "karo",
+          "spaceHeight": 4,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Geometrie: Strahlensatz (Farb-Segmente)"
+    },
+    {
+      "id": 1054,
+      "type": "task",
+      "context": "Ein rechtwinkliges Dreieck $ABC$ hat die beiden Kathetenlängen $a = 6\\,\\text{cm}$ und $b = 8\\,\\text{cm}$. Der rechte Winkel liegt bei $C$.",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1055,
+          "text": "Berechne den Flächeninhalt des Dreiecks.",
+          "points": 2,
+          "spaceType": "karo",
+          "spaceHeight": 3,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1056,
+          "text": "Berechne die Länge der Hypotenuse $c$ mithilfe des Satzes von Pythagoras.",
+          "points": 3,
+          "spaceType": "karo",
+          "spaceHeight": 4,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Geometrie: Dreiecksfläche & Pythagoras"
+    },
+    {
+      "id": 1057,
+      "type": "task",
+      "context": "Welche der folgenden Aussagen beschreibt die Eigenschaften eines **Rhombus (Raute)** mathematisch korrekt?",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1058,
+          "text": "Wähle die richtige Eigenschaft aus:",
+          "points": 1,
+          "spaceType": "none",
+          "spaceHeight": 5,
+          "modules": [
+            {
+              "id": "mod-1059",
+              "type": "mcq",
+              "data": {
+                "options": [
+                  {
+                    "id": 1060,
+                    "text": "Alle vier Seiten sind gleich lang und die Diagonalen stehen senkrecht aufeinander."
+                  },
+                  {
+                    "id": 1061,
+                    "text": "Alle Winkel sind genau 90° groß und die gegenüberliegenden Seiten sind parallel."
+                  },
+                  {
+                    "id": 1062,
+                    "text": "Es gibt genau zwei parallele Seiten und zwei gleich lange Diagonalen."
+                  },
+                  {
+                    "id": 1063,
+                    "text": "Die Diagonalen sind gleich lang und halbieren sich."
+                  }
+                ]
+              }
+            }
+          ],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Geometrie: Eigenschaften von Vierecken (MCQ)"
+    },
+    {
+      "id": 1064,
+      "type": "task",
+      "context": "Gegeben ist ein Dreieck $ABC$ mit den Eckpunkten $A(1|1)$, $B(4|2)$ und $C(2|4)$.",
+      "subtaskColumns": 1,
+      "modules": [
+        {
+          "id": "mod-1065",
+          "type": "koordinatensystem",
+          "data": {
+            "xMin": -1,
+            "xMax": 6,
+            "yMin": -5,
+            "yMax": 5,
+            "xStep": 1,
+            "yStep": 1,
+            "showGrid": true,
+            "connectPoints": true,
+            "closeShape": true,
+            "mode": "draw",
+            "height": 6,
+            "width": 6,
+            "points": [
+              {
+                "label": "A",
+                "x": 1,
+                "y": 1
+              },
+              {
+                "label": "B",
+                "x": 4,
+                "y": 2
+              },
+              {
+                "label": "C",
+                "x": 2,
+                "y": 4
+              }
+            ],
+            "colorShape": true
+          }
+        }
+      ],
+      "subtasks": [
+        {
+          "id": 1066,
+          "text": "Spiegele das Dreieck $ABC$ an der x-Achse und zeichne das gespiegelte Dreieck $A'B'C'$ in das Koordinatensystem ein.",
+          "points": 4,
+          "spaceType": "none",
+          "spaceHeight": 5,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Geometrie: Spiegelung (Draw-Mode)"
+    },
+    {
+      "id": 1067,
+      "type": "section",
+      "title": "4. Stochastik (Wahrscheinlichkeitsrechnung)",
+      "subtitle": "Mehrstufige Zufallsexperimente, Urnenmodelle, Baumdiagramme und Vierfeldertafeln",
+      "subtasks": []
+    },
+    {
+      "id": 1068,
+      "type": "task",
+      "context": "In einer Urne befinden sich insgesamt 10 Kugeln verschiedener Farben: 2 Rote, 2 Blaue, 2 Grüne, 2 Schwarze und 2 Graue Kugeln.",
+      "subtaskColumns": 1,
+      "modules": [
+        {
+          "id": "mod-1069",
+          "type": "urne",
+          "data": {
+            "height": 4.5,
+            "kugeln": [
+              {
+                "id": 1070,
+                "type": "red",
+                "label": "R"
+              },
+              {
+                "id": 1071,
+                "type": "red",
+                "label": "R"
+              },
+              {
+                "id": 1072,
+                "type": "blue",
+                "label": "B"
+              },
+              {
+                "id": 1073,
+                "type": "blue",
+                "label": "B"
+              },
+              {
+                "id": 1074,
+                "type": "green",
+                "label": "G"
+              },
+              {
+                "id": 1075,
+                "type": "green",
+                "label": "G"
+              },
+              {
+                "id": 1076,
+                "type": "black",
+                "label": "S"
+              },
+              {
+                "id": 1077,
+                "type": "black",
+                "label": "S"
+              },
+              {
+                "id": 1078,
+                "type": "grey",
+                "label": "Gr"
+              },
+              {
+                "id": 1079,
+                "type": "grey",
+                "label": "Gr"
+              }
+            ]
+          }
+        }
+      ],
+      "subtasks": [
+        {
+          "id": 1080,
+          "text": "Ein Kugel wird zufällig gezogen. Wie groß ist die Wahrscheinlichkeit, eine rote oder eine blaue Kugel zu erhalten?",
+          "points": 2,
+          "spaceType": "line",
+          "spaceHeight": 2,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1081,
+          "text": "Es werden nacheinander zwei Kugeln **ohne Zurücklegen** gezogen. Berechne die Wahrscheinlichkeit, zuerst eine grüne und dann eine schwarze Kugel zu ziehen.",
+          "points": 3,
+          "spaceType": "karo",
+          "spaceHeight": 4,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Stochastik: Urnenmodell (3D-Kugeln)"
+    },
+    {
+      "id": 1082,
+      "type": "task",
+      "context": "Ein zweistufiges Zufallsexperiment wird durchgeführt. In der Abbildung sind die Ergebnisse farbcodiert dargestellt (Stufe 1 = Blau, Stufe 2 = Grün).",
+      "subtaskColumns": 1,
+      "modules": [
+        {
+          "id": "mod-1083",
+          "type": "baum",
+          "data": {
+            "height": 6,
+            "depth": 2,
+            "branches": 2,
+            "nodes": [
+              {
+                "id": "1",
+                "level": 1,
+                "prob": "0.6",
+                "label": "R",
+                "isNegated": false
+              },
+              {
+                "id": "2",
+                "level": 1,
+                "prob": "0.4",
+                "label": "B",
+                "isNegated": false
+              },
+              {
+                "id": "1-1",
+                "level": 2,
+                "prob": "0.6",
+                "label": "R",
+                "isNegated": false
+              },
+              {
+                "id": "1-2",
+                "level": 2,
+                "prob": "0.4",
+                "label": "B",
+                "isNegated": false
+              },
+              {
+                "id": "2-1",
+                "level": 2,
+                "prob": "0.6",
+                "label": "R",
+                "isNegated": false
+              },
+              {
+                "id": "2-2",
+                "level": 2,
+                "prob": "0.4",
+                "label": "B",
+                "isNegated": false
+              }
+            ],
+            "colorNodes": true
+          }
+        }
+      ],
+      "subtasks": [
+        {
+          "id": 1084,
+          "text": "Ergänze die fehlenden Pfadwahrscheinlichkeiten am Baumdiagramm und berechne nach der Pfadmultiplikationsregel die Gesamtwahrscheinlichkeit für $P(R, R)$.",
+          "points": 3,
+          "spaceType": "karo",
+          "spaceHeight": 3,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Stochastik: Zweistufiger Baum (Farb-Nodes)"
+    },
+    {
+      "id": 1085,
+      "type": "task",
+      "context": "Ein dreifarbiges Glücksrad mit ungleichen Sektoren wird gedreht. Die Sektoren sind Rot (Gewichtung 3), Blau (Gewichtung 2) und Grün (Gewichtung 1) eingefärbt.",
+      "subtaskColumns": 1,
+      "modules": [
+        {
+          "id": "mod-1086",
+          "type": "gluecksrad",
+          "data": {
+            "height": 5,
+            "showPointer": true,
+            "sektoren": [
+              {
+                "id": 1087,
+                "type": "red",
+                "label": "Rot",
+                "weight": 3
+              },
+              {
+                "id": 1088,
+                "type": "blue",
+                "label": "Blau",
+                "weight": 2
+              },
+              {
+                "id": 1089,
+                "type": "green",
+                "label": "Grün",
+                "weight": 1
+              }
+            ]
+          }
+        }
+      ],
+      "subtasks": [
+        {
+          "id": 1090,
+          "text": "Berechne die Wahrscheinlichkeit dafür, dass der Zeiger beim einmaligen Drehen auf dem **blauen** Sektor stehen bleibt.",
+          "points": 3,
+          "spaceType": "karo",
+          "spaceHeight": 3,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Stochastik: Glücksrad (Farb-Sektoren)"
+    },
+    {
+      "id": 1091,
+      "type": "task",
+      "context": "Ein Schüler zeichnet einen Balken, um einen mathematischen Anteil darzustellen.",
+      "subtaskColumns": 1,
+      "modules": [
+        {
+          "id": "mod-1092",
+          "type": "bruch",
+          "data": {
+            "type": "balken",
+            "numerator": 3,
+            "denominator": 5,
+            "mode": "determine",
+            "height": 2,
+            "width": 12,
+            "fillType": "green",
+            "showFractionText": false,
+            "shapeType": "circle"
+          }
+        }
+      ],
+      "subtasks": [
+        {
+          "id": 1093,
+          "text": "Bestimme den dargestellten Bruchteil der gefärbten Fläche und trage ihn in das Lösungsfeld ein.",
+          "points": 2,
+          "spaceType": "none",
+          "spaceHeight": 5,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Stochastik: Bruchteile (Grüner Balken)"
+    },
+    {
+      "id": 1094,
+      "type": "task",
+      "context": "In einer Klasse mit 30 Schülern besitzen 18 ein Haustier ($H$). Davon haben 12 einen Hund ($D$). Insgesamt gibt es in der Klasse 15 Hundebesitzer.",
+      "subtaskColumns": 1,
+      "modules": [
+        {
+          "id": "mod-1095",
+          "type": "vierfeldertafel",
+          "data": {
+            "labels": {
+              "top1": "D",
+              "top2": "\\bar{D}",
+              "left1": "H",
+              "left2": "\\bar{H}"
+            },
+            "rawLabels": {
+              "top1": "D",
+              "top2": "D",
+              "left1": "H",
+              "left2": "H"
+            },
+            "negated": {
+              "top1": false,
+              "top2": true,
+              "left1": false,
+              "left2": true
+            },
+            "data": [
+              [
+                "12",
+                "6",
+                "18"
+              ],
+              [
+                "3",
+                "9",
+                "12"
+              ],
+              [
+                "15",
+                "15",
+                "30"
+              ]
+            ],
+            "printVisibility": [
+              [
+                true,
+                false,
+                true
+              ],
+              [
+                false,
+                true,
+                false
+              ],
+              [
+                true,
+                false,
+                true
+              ]
+            ]
+          }
+        }
+      ],
+      "subtasks": [
+        {
+          "id": 1096,
+          "text": "Vervollständige die fehlenden Felder in der Vierfeldertafel.",
+          "points": 3,
+          "spaceType": "none",
+          "spaceHeight": 5,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1097,
+          "text": "Berechne die Wahrscheinlichkeit, dass ein zufällig ausgewählter Schüler der Klasse kein Haustier und keinen Hund besitzt.",
+          "points": 2,
+          "spaceType": "line",
+          "spaceHeight": 2,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ],
+      "collectionTitle": "Stochastik: Vierfeldertafel (Haustiere)"
+    }
+  ]
+}

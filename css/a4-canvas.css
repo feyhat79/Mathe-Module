@@ -1,0 +1,2888 @@
+.canvas-area {
+    /* Lock variables to Light Mode values for the A4 sheet and canvas background */
+    --bg-canvas: #e2e8f0;
+    --bg-paper: #ffffff;
+    --text-dark: #000000;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border: #cbd5e1;
+    --bg-sidebar: #f8fafc;
+    --shadow-paper: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+
+    flex: 1;
+    height: calc(100vh - 60px);
+    margin-top: 60px;
+    background-color: var(--bg-canvas);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1.75rem 3.5rem 1.75rem 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.a4-page {
+    background-color: transparent;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 15mm 20mm 20mm 20mm !important;
+    color: var(--text-dark);
+    box-shadow: none;
+    position: relative;
+    z-index: 0;
+    isolation: isolate;
+    font-family: var(--font-sans), sans-serif;
+
+    & > *:not(#page-breaks-overlay) {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+#page-breaks-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.virtual-a4-page {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1122px;
+    background-color: var(--bg-paper);
+    box-shadow: var(--shadow-paper);
+    border: 1px solid var(--border);
+}
+
+/* =========================================
+   MODERNISIERTER HEADER 
+   ========================================= */
+
+.print-header-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 20px 0 !important;
+    font-family: var(--font-sans), sans-serif;
+    font-size: 11pt;
+
+    & td,
+    & th {
+        border: 1px solid var(--text-muted);
+        padding: 10px 14px;
+        vertical-align: middle;
+    }
+
+    & th.title-cell {
+        text-align: left;
+        font-size: 14pt;
+        font-weight: 700;
+        background-color: var(--bg-sidebar);
+        color: var(--text-main);
+    }
+}
+
+.info-table {
+    & .logo-cell {
+        width: 30%;
+        text-align: center;
+        padding: 15px;
+        background-color: var(--bg-paper);
+
+        & img {
+            max-width: 160px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+    }
+
+    & .compact-cell {
+        width: 1%;
+        white-space: nowrap;
+        padding-right: 25px;
+        background-color: var(--bg-sidebar);
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+}
+
+.empty-write-area {
+    height: 45px;
+}
+
+/* --- Noten-Tabelle (Unterer Teil) --- */
+.grading-table {
+    margin-top: 12px !important;
+    margin-bottom: 12px !important;
+
+    & td {
+        height: 36px;
+
+        &:first-child {
+            width: 45%;
+            background-color: var(--bg-sidebar);
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+    }
+
+    & .center-text {
+        text-align: center;
+        font-weight: 700;
+        font-size: 12pt;
+    }
+}
+
+.grading-combined-cell {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+}
+
+.grading-label-small {
+    font-weight: 600;
+    font-size: 10pt;
+    color: var(--text-muted);
+    margin-right: 8px;
+}
+
+.grading-sep {
+    width: 1px;
+    height: 24px;
+    background-color: var(--border);
+    margin: 0 10px;
+}
+
+.points-write-area {
+    display: inline-block;
+    width: 60px;
+    border-bottom: 1px dotted var(--text-muted);
+    margin-right: 6px;
+    font-size: 13pt;
+}
+
+.note-write-area {
+    display: inline-block;
+    width: 80px;
+    border-bottom: 1px dotted var(--text-muted);
+    margin-right: 6px;
+    font-size: 13pt;
+}
+
+.karo-papier {
+    position: relative;
+    width: 170mm;
+    max-width: 170mm;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border: 1px solid var(--text-muted);
+    background-color: var(--bg-paper);
+    background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 5mm 5mm;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 5cm;
+        border-right: 1px dashed var(--text-muted);
+        z-index: 1;
+        pointer-events: none;
+    }
+}
+
+.print-hinweise {
+    margin-top: 0;
+    margin-bottom: 0.85rem !important;
+    font-size: 11pt;
+    font-style: italic;
+    white-space: normal;
+    color: var(--text-muted);
+    padding: 0;
+    line-height: 1.45;
+    text-align: left;
+}
+
+.hinweise-text-content {
+    white-space: pre-wrap;
+    display: block;
+}
+
+/* =========================================
+   Tasks Layout & Korrekturrand (GRID ARCHITEKTUR)
+   ========================================= */
+
+.tasks-container {
+    position: relative;
+    min-height: 100px;
+    margin-top: 0.5rem;
+}
+
+/* SECTION DIVIDER STYLES */
+.section-divider-print {
+    margin: 2.5rem 0 1.5rem 0;
+    text-align: center;
+    page-break-inside: avoid;
+    position: relative;
+
+    & .section-title {
+        font-size: 16pt;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+        color: var(--text-dark);
+    }
+
+    & .section-subtitle {
+        font-size: 11pt;
+        font-style: italic;
+        color: var(--text-muted);
+    }
+
+    &::before,
+    &::after {
+        content: "";
+        display: block;
+        height: 2px;
+        background: var(--text-dark);
+        width: 30%;
+        position: absolute;
+        top: 50%;
+    }
+
+    &::before {
+        left: 0;
+    }
+
+    &::after {
+        right: 0;
+    }
+}
+
+.task-item-wrapper {
+    position: relative;
+}
+
+.task-item {
+    margin-bottom: 1.1rem;
+}
+
+.task-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    width: 100%;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 2;
+
+    &.header-row {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 4px;
+        margin-bottom: 10px;
+
+        & .task-margin {
+            font-weight: bold;
+        }
+    }
+}
+
+/* ATOMIC BLOCKS: Unzertrennliche Einheiten */
+.atomic-block {
+    break-inside: avoid;
+    margin-bottom: 10px;
+}
+
+.atomic-block.is-page-pushed {
+    margin-top: var(--page-push, 0px) !important;
+}
+
+.task-row.header-row.atomic-block {
+    margin-bottom: 6px;
+}
+
+.task-context.atomic-block {
+    margin-bottom: 8px;
+}
+
+.subtask-container.atomic-block,
+.subtask-container {
+    margin-bottom: 12px;
+}
+
+.subtask-item-wrapper:last-child > .subtask-container {
+    margin-bottom: 4px;
+}
+
+.subtask-container > .task-row:last-child {
+    margin-bottom: 0;
+}
+
+.sub-subtask-render-wrapper.atomic-block {
+    margin-bottom: 6px;
+}
+
+.task-row.header-row.atomic-block,
+.task-context.atomic-block,
+.subtask-container.atomic-block,
+.sub-subtask-render-wrapper.atomic-block,
+.print-header-table,
+.math-table,
+.math-board,
+.section-divider-print.atomic-block {
+    break-inside: avoid;
+}
+
+/* =========================================
+   WORKSHEET SPACER (LEERZEILEN-STEUERUNG)
+   ========================================= */
+.worksheet-spacer {
+    position: relative;
+    width: 100%;
+    border: 1px dashed #cbd5e1;
+    background-color: rgba(241, 245, 249, 0.4);
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    transition: background-color 0.15s, border-color 0.15s;
+    box-sizing: border-box;
+}
+
+.worksheet-spacer:hover {
+    background-color: rgba(226, 232, 240, 0.7);
+    border-color: #94a3b8;
+}
+
+/* =========================================
+   LINE INSERTION SLOT (WORD-STYLE INTERACTION)
+   ========================================= */
+.line-insertion-slot {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+    cursor: text;
+    user-select: none;
+    background: transparent;
+    border: none;
+}
+
+/* Wenn keine Leerzeilen: 0px Layout-Höhe, aber 12px Klickzone über ::before */
+.line-insertion-slot.is-collapsed {
+    height: 0;
+    margin: 0;
+    z-index: 5;
+}
+
+.line-insertion-slot.is-collapsed::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    bottom: -6px;
+    left: 0;
+    right: 0;
+}
+
+/* Wenn Leerzeilen vorhanden sind: Reiner, natürlicher Weißraum, bei Hover dezent sichtbar */
+.line-insertion-slot.has-spacing {
+    background: transparent;
+    border: none;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.line-insertion-slot.has-spacing:hover,
+.line-insertion-slot.has-spacing.is-focused {
+    background: rgba(99, 102, 241, 0.035);
+    box-shadow: inset 0 1px 0 rgba(99, 102, 241, 0.22), inset 0 -1px 0 rgba(99, 102, 241, 0.22);
+}
+
+.slot-spacing-indicator {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    color: #4338ca;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    line-height: 1.3;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.14s ease;
+    z-index: 15;
+}
+
+.line-insertion-slot.has-spacing:hover .slot-spacing-indicator,
+.line-insertion-slot.has-spacing.is-focused .slot-spacing-indicator {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.slot-spacing-reset {
+    background: none;
+    border: none;
+    color: #6366f1;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0 1px;
+    cursor: pointer;
+}
+
+.slot-spacing-reset:hover {
+    color: #dc2626;
+}
+
+/* Aktiver Fokus-Zustand: Kein Rahmen/Hintergrund, nur Tastatur aktiv */
+.line-insertion-slot:focus,
+.line-insertion-slot.is-focused {
+    outline: none;
+    border: none;
+    background: transparent;
+}
+
+/* Blinkender Word-Cursor */
+.slot-caret {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 18px;
+    background-color: #2563eb;
+    pointer-events: none;
+    animation: blink-caret 1s steps(1) infinite;
+}
+
+.line-insertion-slot:focus .slot-caret,
+.line-insertion-slot.is-focused .slot-caret {
+    display: block;
+}
+
+@keyframes blink-caret {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.spacer-lines-1 { height: 0.8cm; }
+.spacer-lines-2 { height: 1.6cm; }
+.spacer-lines-3 { height: 2.4cm; }
+.spacer-lines-4 { height: 3.2cm; }
+.spacer-lines-5 { height: 4.0cm; }
+.spacer-lines-6 { height: 4.8cm; }
+.spacer-lines-7 { height: 5.6cm; }
+.spacer-lines-8 { height: 6.4cm; }
+.spacer-lines-9 { height: 7.2cm; }
+.spacer-lines-10 { height: 8.0cm; }
+.spacer-lines-11 { height: 8.8cm; }
+.spacer-lines-12 { height: 9.6cm; }
+.spacer-lines-13 { height: 10.4cm; }
+.spacer-lines-14 { height: 11.2cm; }
+.spacer-lines-15 { height: 12.0cm; }
+
+/* Manuell erzwungener Seitenumbruch Indicator (0px Layout-Höhe dank position: absolute) */
+.manual-page-break-badge {
+    position: absolute;
+    top: -22px;
+    left: 0;
+    z-index: 20;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #4338ca;
+    background: #e0e7ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin: 0;
+}
+
+.header-row:focus {
+    outline: none;
+}
+
+.task-main-header {
+    font-weight: bold;
+    font-size: 13pt;
+    margin: 0;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+}
+
+.task-content {
+    flex: 1;
+    min-width: 0;
+    padding-right: 20px;
+    box-sizing: border-box;
+}
+
+.task-margin {
+    width: auto;
+    flex-shrink: 0;
+    text-align: right;
+    padding-left: 0;
+    font-weight: normal;
+    font-family: sans-serif;
+    font-size: 11pt;
+    box-sizing: border-box;
+}
+
+.grading-line {
+    display: inline-block;
+    width: 30px;
+    border-bottom: 1px solid var(--text-dark);
+    margin-right: 4px;
+}
+
+.task-context {
+    position: relative;
+    font-style: normal;
+    margin-bottom: 8px;
+    padding-left: 0;
+    padding-right: 20px;
+    color: var(--text-main);
+}
+
+.subtasks-list {
+    display: block;
+
+    &.cols-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem 2.5rem;
+    }
+
+    &.cols-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem 1.75rem;
+    }
+
+    &.cols-2 > .subtask-item-wrapper,
+    &.cols-3 > .subtask-item-wrapper,
+    &.cols-2 > .subtask-container,
+    &.cols-3 > .subtask-container {
+        break-inside: avoid;
+    }
+
+    &.cols-2 .subtask-container,
+    &.cols-3 .subtask-container {
+        margin-bottom: 0;
+    }
+
+    /* Layout-Wechsel: Punkte UNTER den Text statt daneben */
+    &.cols-2 .task-row,
+    &.cols-3 .task-row {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+        grid-template-columns: none;
+    }
+
+    &.cols-2 .task-content,
+    &.cols-3 .task-content {
+        width: 100%;
+        padding-right: 0;
+    }
+
+    &.cols-2 .task-margin,
+    &.cols-3 .task-margin {
+        font-size: 9pt;
+        color: var(--text-muted);
+        margin-top: 2px;
+        padding-bottom: 5px;
+    }
+
+    &.cols-2 .grading-line,
+    &.cols-3 .grading-line {
+        width: 20px;
+    }
+
+    /* Karo-Feld in Spalten: Nicht volle Breite & Margin-Fix */
+    &.cols-2 .karo-papier,
+    &.cols-3 .karo-papier {
+        width: 92%;
+        max-width: none;
+        margin-left: 2rem;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    /* Gestichelte Linie im Karo-Feld entfernen, wenn mehrspaltig */
+    &.cols-2 .karo-papier::after,
+    &.cols-3 .karo-papier::after {
+        display: none;
+    }
+
+    &.cols-2 .subtask-container.has-karo .task-margin,
+    &.cols-3 .subtask-container.has-karo .task-margin {
+        display: none;
+    }
+}
+
+.subtask-item-wrapper {
+    display: block;
+    position: relative;
+    width: 100%;
+}
+
+.subtask-container {
+    position: relative;
+
+    &.has-letter {
+        & .vierfelder-table,
+        & .math-board,
+        & .math-table,
+        & .mcq-print-list,
+        & .tf-print-block,
+        & .matching-print-layout,
+        & .subtask-zusatz,
+        & .sub-subtasks-list {
+            margin-left: 1.95rem;
+        }
+    }
+}
+
+.subtask-item {
+    display: flex;
+    gap: 0.75rem;
+    padding-right: 20px;
+}
+
+.subtask-letter {
+    font-weight: bold;
+    min-width: 1.2rem;
+    cursor: pointer;
+}
+
+.subtask-text {
+    flex: 1;
+    font-style: italic;
+
+    & strong {
+        font-weight: bold;
+        font-style: italic;
+    }
+}
+
+.sub-subtasks-list {
+    position: relative;
+    margin-top: 4px;
+    display: block;
+}
+
+.sub-subtask-item-wrapper {
+    display: block;
+    position: relative;
+    width: 100%;
+}
+
+.sub-subtask-render-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.sub-subtask-item {
+    display: flex;
+    gap: 0.75rem;
+    padding-right: 20px;
+}
+
+.sub-subtask-number {
+    font-weight: bold;
+    min-width: 1.2rem;
+}
+
+.sub-subtask-text {
+    flex: 1;
+    font-style: italic;
+
+    & strong {
+        font-weight: bold;
+        font-style: italic;
+    }
+}
+
+.subtask-zusatz {
+    margin-top: 4px;
+    font-size: 0.9em;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+
+.mcq-print-list {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2.5rem;
+    padding: 0;
+    list-style: none;
+}
+
+.mcq-print-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mcq-checkbox {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--text-dark);
+    flex-shrink: 0;
+}
+
+.mcq-option-text {
+    flex: 1;
+    font-size: 11pt;
+    line-height: 1.4;
+}
+
+.tf-print-block {
+    margin-top: 10px;
+    padding-left: 0;
+}
+
+.tf-checkbox-row {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 8px;
+}
+
+.tf-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 11pt;
+}
+
+.tf-reason-label {
+    font-style: italic;
+    font-size: 0.9em;
+    margin-bottom: 4px;
+    color: var(--text-muted);
+}
+
+.true-false-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+
+    & th, 
+    & td {
+        border: 1px solid var(--text-dark);
+        padding: 8px;
+        text-align: left;
+    }
+
+    & th {
+        background-color: var(--bg-sidebar);
+        font-size: 10pt;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+}
+
+.tf-col {
+    width: 60px;
+    text-align: center !important;
+}
+
+.tf-statement-cell {
+    min-height: 2cm;
+}
+
+.tf-box-cell {
+    & div {
+        width: 18px;
+        height: 18px;
+        border: 1px solid var(--text-dark);
+        margin: 0 auto;
+    }
+}
+
+.tf-justification-cell {
+    font-size: 9pt;
+    color: var(--text-muted);
+    border-top: 1px dashed var(--border) !important;
+    vertical-align: top;
+    padding: 8px;
+    font-style: italic;
+}
+
+.matching-print-layout {
+    display: flex;
+    justify-content: space-between;
+    gap: 4rem;
+    margin-top: 1.5rem;
+    padding: 0 1rem;
+}
+
+.matching-print-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 40%;
+}
+
+.matching-ellipse {
+    border: 1px solid var(--text-dark);
+    border-radius: 50px;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    background-color: var(--bg-paper);
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11pt;
+}
+
+.cloze-word {
+    background-color: #fef9c3;
+    border-bottom: 1px dashed var(--text-muted);
+    padding: 0 1.25rem;
+}
+
+/* Math Tables */
+.math-table {
+    width: auto;
+    border-collapse: collapse;
+    margin: 15px 0;
+    font-family: sans-serif;
+    font-size: 10pt;
+    white-space: nowrap;
+
+    & th,
+    & td {
+        border: 1px solid var(--text-dark);
+        padding: 6px 14px;
+        text-align: center;
+        min-width: 35px;
+    }
+
+    & th {
+        background-color: var(--bg-sidebar);
+        font-weight: bold;
+        text-align: left;
+    }
+}
+
+/* Image Rendering */
+.task-image-wrapper {
+    margin: 15px 0;
+    display: flex;
+    justify-content: flex-start;
+}
+
+/* Image Grid Layout */
+.task-image-grid {
+    display: grid;
+    gap: 10px;
+    margin: 15px 0;
+    align-items: center;
+}
+
+.grid-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px;
+    box-sizing: border-box;
+    width: 100%;
+    overflow: hidden;
+}
+
+.task-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    border-radius: 2px;
+}
+
+/* Geometry Boards */
+.math-board {
+    margin: 20px 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background-color: var(--bg-paper);
+    overflow: hidden;
+}
+
+.canvas-wheel-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+    border: none;
+    background: transparent;
+    margin: 10px 0;
+}
+
+.canvas-wheel-container svg {
+    height: 100%;
+    max-width: 100%;
+    overflow: visible;
+}
+
+
+/* Ensure JSXGraph labels look good in print */
+.jxgbox {
+    background-color: var(--bg-paper) !important;
+}
+
+.jxg-vector-label {
+    background-color: transparent !important;
+    position: relative;
+    display: inline-block;
+    font-style: italic;
+    font-family: 'Times New Roman', Times, serif;
+    color: #000000;
+    transform: translateY(-12px);
+}
+
+.jxg-vector-label::before {
+    content: "→";
+    position: absolute;
+    top: -0.55em;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.65em;
+    font-style: normal;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.empty-state-msg {
+    text-align: center;
+    color: var(--text-muted);
+    margin-top: 5rem;
+    font-family: sans-serif;
+}
+
+/* =========================================
+   VIERFELDERTAFEL (4-Felder-Tafel)
+   ========================================= */
+
+.vierfelder-table {
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-family: sans-serif;
+    font-size: 11pt;
+    width: auto;
+
+    & th,
+    & td {
+        border: 1px solid var(--text-dark);
+        padding: 8px 14px;
+        text-align: center;
+        min-width: 50px;
+        min-height: 30px;
+    }
+
+    & thead th {
+        background-color: var(--bg-sidebar);
+        font-weight: bold;
+    }
+
+    & tbody th {
+        background-color: var(--bg-sidebar);
+        font-weight: bold;
+        text-align: left;
+    }
+
+    & thead th:first-child {
+        background: transparent;
+        border: none;
+    }
+
+    & td.vf-data-cell {
+        text-align: center;
+        vertical-align: middle;
+        position: relative;
+    }
+
+    & td.vf-total-cell {
+        font-weight: bold;
+        background-color: var(--bg-canvas);
+        border: 2px solid var(--text-muted);
+    }
+}
+
+.inline-points {
+    font-size: 0.85em;
+    font-style: italic;
+    color: var(--text-muted);
+    margin-left: 6px;
+    white-space: nowrap;
+}
+
+.inline-subtask-points {
+    font-weight: normal;
+    font-size: 0.9em;
+    color: var(--text-muted);
+    margin-left: 4px;
+    white-space: nowrap;
+}
+
+.hide-subtask-points .inline-subtask-points {
+    display: none !important;
+}
+
+/* =========================================
+   MATHEMATISCHE HILFSRASTER
+   ========================================= */
+
+/* --- Schreiblinien --- */
+.schreib-linien {
+    position: relative;
+    width: 170mm;
+    max-width: 170mm;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border: 1px solid var(--text-muted);
+    background-color: var(--bg-paper);
+    /* 8mm Linienabstand: 5pt Linie, Rest transparent */
+    background-image: linear-gradient(
+        to bottom,
+        transparent calc(8mm - 1px),
+        #b0c4de calc(8mm - 1px),
+        #b0c4de 8mm,
+        transparent 8mm
+    );
+    background-size: 100% 8mm;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 5cm;
+        border-right: 1px dashed #e0a0a0;
+        z-index: 1;
+        pointer-events: none;
+    }
+}
+
+/* --- Millimeterpapier --- */
+.millimeter-papier {
+    position: relative;
+    width: 170mm;
+    max-width: 170mm;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border: 1px solid var(--text-muted);
+    background-color: var(--bg-paper);
+    /* Doppelgradient: 1mm feine Linien + 10mm starke Linien */
+    background-image:
+        /* 10mm-Raster (dunkel, horizontal) */
+        linear-gradient(to bottom, transparent calc(10mm - 1px), #c8763c calc(10mm - 1px), #c8763c 10mm, transparent 10mm),
+        /* 10mm-Raster (dunkel, vertikal) */
+        linear-gradient(to right, transparent calc(10mm - 1px), #c8763c calc(10mm - 1px), #c8763c 10mm, transparent 10mm),
+        /* 1mm-Raster (hell, horizontal) */
+        linear-gradient(to bottom, transparent calc(1mm - 0.4px), #f0c8a0 calc(1mm - 0.4px), #f0c8a0 1mm, transparent 1mm),
+        /* 1mm-Raster (hell, vertikal) */
+        linear-gradient(to right, transparent calc(1mm - 0.4px), #f0c8a0 calc(1mm - 0.4px), #f0c8a0 1mm, transparent 1mm);
+    background-size: 10mm 10mm, 10mm 10mm, 1mm 1mm, 1mm 1mm;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 5cm;
+        border-right: 1px dashed #e0a0a0;
+        z-index: 1;
+        pointer-events: none;
+    }
+}
+
+/* --- Zahlenstrahl-Container --- */
+.zahlenstrahl-container {
+    position: relative;
+    width: 170mm;
+    max-width: 170mm;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dark);
+
+    & svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+        overflow: visible;
+    }
+}
+
+/* --- Glücksrad-Container --- */
+.gluecksrad-container {
+    position: relative;
+    width: 170mm;
+    max-width: 170mm;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dark);
+    break-inside: avoid;
+
+    & svg {
+        height: 100%;
+        display: block;
+        overflow: visible;
+    }
+}
+
+
+
+/* =========================================
+   MEHRSPALTEN-ANPASSUNGEN für alle Rastertypen
+   ========================================= */
+.subtasks-list {
+    /* Alle Rastertypen in Spalten: schmalere Breite, kein Korrekturrand */
+    &.cols-2 .schreib-linien,
+    &.cols-3 .schreib-linien,
+    &.cols-2 .millimeter-papier,
+    &.cols-3 .millimeter-papier,
+    &.cols-2 .zahlenstrahl-container,
+    &.cols-3 .zahlenstrahl-container,
+    &.cols-2 .gluecksrad-container,
+    &.cols-3 .gluecksrad-container {
+        width: 92%;
+        max-width: none;
+        margin-left: 2rem;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    /* Korrekturrand bei Schreiblinien und Millimeterpapier in Spalten ausblenden */
+    &.cols-2 .schreib-linien::after,
+    &.cols-3 .schreib-linien::after,
+    &.cols-2 .millimeter-papier::after,
+    &.cols-3 .millimeter-papier::after {
+        display: none;
+    }
+}
+
+/* =========================================
+   ZUSÄTZLICHE PRINT-LAYOUT-KLASSEN
+   ========================================= */
+
+.vierfelder-container-print {
+    border: 1px solid #ddd;
+    background: #fff;
+    padding: 10px;
+    margin: 10px 0;
+    break-inside: avoid;
+}
+
+.vierfelder-print-title {
+    font-size: 8pt;
+    color: #999;
+    margin-bottom: 5px;
+}
+
+/* ==========================================================================
+   LGS PRINT BLOCK
+   ========================================================================== */
+.lgs-print-block {
+    margin: 12px 0;
+    padding: 8px 0;
+    background: transparent;
+    display: block;
+    width: 100%;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.lgs-print-block .katex-display {
+    text-align: left;
+    margin: 8px 0;
+}
+
+.lgs-print-block .katex-display > .katex {
+    text-align: left;
+    padding-left: 2rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Dreisatz-Modul – Druckansicht
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.dreisatz-print-block {
+    margin: 10px 0;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.dreisatz-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 9pt;
+    font-family: 'Outfit', 'Inter', sans-serif;
+
+    th {
+        background: color-mix(in srgb, currentColor 8%, white);
+        border: 1.5px solid currentColor;
+        padding: 5px 10px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 8.5pt;
+    }
+
+    td.dreisatz-cell {
+        border: 1.5px solid currentColor;
+        padding: 6px 12px;
+        text-align: center;
+        min-width: 2.5cm;
+        min-height: 0.8cm;
+        height: 0.9cm;
+    }
+}
+
+.dreisatz-blank {
+    display: inline-block;
+    width: 2.5cm;
+    min-height: 0.6cm;
+    border-bottom: 1px solid currentColor;
+}
+
+/* =========================================
+   BRUCHTEILE (Fractions Module)
+   ========================================= */
+
+.bruch-render-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 15px 0;
+    break-inside: avoid;
+}
+
+.bruch-svg-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    overflow: visible;
+}
+
+.bruch-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    color: var(--text-dark, #000000);
+}
+
+/* SVG Fill & Stroke Classes */
+.bruch-unfilled {
+    fill: #ffffff;
+}
+
+.bruch-fill-grey {
+    fill: #cbd5e1; /* slate-300 */
+}
+
+.bruch-fill-black {
+    fill: #0f172a; /* slate-900 / dark */
+}
+
+.bruch-fill-primary {
+    fill: #3b82f6; /* blue-500 */
+}
+
+.bruch-fill-striped {
+    fill: url(#striped-pattern-bruch);
+}
+
+.bruch-stripe-line {
+    stroke: var(--text-dark, #000000);
+}
+
+.bruch-slice, .bruch-bar-segment, .bruch-symbol {
+    stroke: var(--text-dark, #000000);
+    transition: fill 0.2s ease;
+}
+
+.bruch-outline {
+    stroke: var(--text-dark, #000000);
+    fill: none;
+}
+
+.bruch-outline-overlay {
+    stroke: var(--text-dark, #000000);
+    fill: none;
+    pointer-events: none;
+}
+
+/* Answer Space */
+.bruch-answer-box {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+    break-inside: avoid;
+}
+
+.fraction-line-wrapper {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    width: 32px;
+    gap: 2px;
+}
+
+.fraction-placeholder {
+    width: 24px;
+    height: 20px;
+    border: 1px dotted var(--text-muted, #64748b);
+    border-radius: 3px;
+    background-color: var(--bg-paper, #ffffff);
+}
+
+.fraction-line {
+    width: 100%;
+    border: none;
+    border-top: 2.2px solid var(--text-dark, #000000);
+    margin: 2px 0;
+}
+
+.bruch-label-text {
+    margin-top: 8px;
+    font-size: 14pt;
+    text-align: center;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Diagramm-Modul – Print & Layout Styles
+   ───────────────────────────────────────────────────────────────────────────── */
+.diag-svg-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    break-inside: avoid;
+}
+
+.diag-svg {
+    max-width: 100%;
+    height: auto;
+    color: var(--text-dark, #000000);
+}
+
+.diag-axis {
+    stroke: var(--text-dark, #000000);
+}
+
+.diag-tick {
+    stroke: var(--text-dark, #000000);
+}
+
+.diag-title {
+    fill: var(--text-dark, #000000);
+    font-size: 14pt;
+    font-weight: 700;
+}
+
+.diag-axis-label {
+    fill: var(--text-dark, #000000);
+    font-size: 10pt;
+    font-weight: 600;
+}
+
+.diag-label {
+    fill: var(--text-dark, #000000);
+    font-size: 10pt;
+}
+
+.diag-grid-line {
+    stroke: #cbd5e1;
+}
+
+/* Fills & Füllmuster */
+.diag-stripe-line {
+    stroke: var(--text-dark, #000000);
+}
+
+.diag-unfilled {
+    fill: none;
+    stroke: var(--text-dark, #000000);
+}
+
+.diag-fill-grey {
+    fill: #e2e8f0;
+}
+
+.diag-fill-striped {
+    fill: url(#striped-pattern-diag);
+}
+
+.diag-fill-black {
+    fill: #000000;
+}
+
+.diag-fill-primary {
+    fill: var(--accent, #4f46e5);
+}
+
+/* Säulen, Stäbe, Linien */
+.diag-bar {
+    stroke: var(--text-dark, #000000);
+    transition: fill 0.2s ease;
+}
+
+.diag-stick {
+    stroke: var(--text-dark, #000000);
+}
+
+.diag-stick-circle {
+    stroke: var(--text-dark, #000000);
+    transition: fill 0.2s ease;
+}
+
+.diag-point {
+    stroke: var(--text-dark, #000000);
+    transition: fill 0.2s ease;
+}
+
+.diag-line {
+    stroke: var(--text-dark, #000000);
+}
+
+/* Didaktischer ablese-Modus: Antwortschablonen */
+.diag-answer-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    break-inside: avoid;
+}
+
+.diag-answer-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.diag-answer-label {
+    font-size: 11pt;
+    font-weight: 600;
+    color: var(--text-dark, #000000);
+}
+
+.diag-answer-box-placeholder {
+    width: 36px;
+    height: 24px;
+    border: 1px dotted var(--text-muted, #64748b);
+    border-radius: 4px;
+    background-color: var(--bg-paper, #ffffff);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Koordinatensystem-Modul – Styles
+   ───────────────────────────────────────────────────────────────────────────── */
+.koord-render-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    break-inside: avoid;
+}
+
+.koord-svg-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-paper, #ffffff);
+    border: none;
+    max-width: 100%;
+}
+
+.koord-svg {
+    width: 100%;
+    height: 100%;
+    color: var(--text-dark, #000000);
+}
+
+.koord-grid-line {
+    stroke: #cbd5e1;
+    stroke-dasharray: 2 2;
+    stroke-width: 0.8;
+}
+
+.koord-axis {
+    stroke: var(--text-dark, #000000);
+    stroke-width: 1.8;
+}
+
+.koord-axis-label {
+    fill: var(--text-dark, #000000);
+    font-family: 'Outfit', 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    font-style: italic;
+}
+
+.koord-tick {
+    stroke: var(--text-dark, #000000);
+    stroke-width: 1.5;
+}
+
+.koord-label {
+    fill: var(--text-dark, #000000);
+    font-family: 'Outfit', 'Inter', sans-serif;
+    font-size: 10px;
+}
+
+.koord-origin-label {
+    font-weight: 500;
+}
+
+.koord-point {
+    fill: var(--text-dark, #000000);
+    stroke: var(--text-dark, #000000);
+    stroke-width: 1.5;
+}
+
+.koord-point-label {
+    fill: var(--text-dark, #000000);
+    font-family: 'Outfit', 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.koord-line {
+    stroke: var(--text-dark, #000000);
+    stroke-width: 2;
+    fill: none;
+}
+
+/* Didaktischer ablese-Modus: Antwortboxen */
+.koord-answer-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    break-inside: avoid;
+}
+
+.koord-answer-box {
+    display: flex;
+    align-items: center;
+    font-size: 11pt;
+    font-weight: 600;
+    color: var(--text-dark, #000000);
+}
+
+.koord-answer-label {
+    margin-right: 4px;
+}
+
+.koord-paren {
+    font-weight: 400;
+    color: var(--text-dark, #000000);
+}
+
+.koord-divider {
+    margin: 0 4px;
+    font-weight: 400;
+    color: var(--text-muted, #64748b);
+}
+
+.koord-dotted-fill {
+    border-bottom: 1px dotted var(--text-muted, #64748b);
+    width: 25px;
+    display: inline-block;
+    text-align: center;
+}
+
+/* ==========================================================================
+   STECKBRIEFAUFGABEN (FUNCTION RECONSTRUCTION) CANVAS & PRINT LAYOUT
+   ========================================================================== */
+.steckbrief-print-block {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 6px;
+    margin-bottom: 12px;
+    width: 100%;
+}
+
+.steckbrief-textual-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.steckbrief-intro {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-dark, #000000);
+}
+
+.steckbrief-conditions-print {
+    list-style-type: square;
+    padding-left: 20px;
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.steckbrief-conditions-print li {
+    font-size: 0.92rem;
+    line-height: 1.4;
+    color: var(--text-dark, #000000);
+}
+
+.steckbrief-conditions-print strong {
+    font-weight: 600;
+}
+
+/* LGS Student Entry Template styling */
+.steckbrief-lgs-template {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
+    background-color: transparent;
+}
+
+.lgs-template-heading {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted, #64748b);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+.lgs-rows-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px 0;
+}
+
+.lgs-row-template {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+}
+
+.lgs-num-roman {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--text-dark, #000000);
+    min-width: 32px;
+}
+
+.lgs-dotted-line {
+    flex-grow: 1;
+    border-bottom: 1px dotted var(--text-muted, #64748b);
+    height: 18px;
+}
+
+/* ==========================================================================
+   ABLEITUNGSPUZZLE (DERIVATIVE MATCHING PUZZLE) CANVAS & PRINT LAYOUT
+   ========================================================================== */
+.puzzle-print-block {
+    margin: 0.8cm 0;
+    width: 100%;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.puzzle-intro {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-dark, #000000);
+    margin-bottom: 0.4cm;
+}
+
+.puzzle-cols-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1.2cm;
+    margin-bottom: 0.8cm;
+}
+
+.puzzle-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.puzzle-col-heading {
+    font-size: 10.5pt;
+    font-weight: 700;
+    border-bottom: 1.5px solid #cbd5e1;
+    padding-bottom: 0.15cm;
+    margin-top: 0;
+    margin-bottom: 0.35cm;
+    color: var(--text-dark, #0f172a);
+}
+
+.puzzle-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4cm;
+}
+
+.puzzle-item-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.4cm;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.25cm 0.35cm;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    min-height: 1.6cm;
+}
+
+.puzzle-item-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.puzzle-item-content {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1cm;
+}
+
+.puzzle-formula {
+    font-size: 14px;
+    text-align: center;
+    width: 100%;
+}
+
+.puzzle-board {
+    width: 100%;
+    height: 110px;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 4px;
+    background: #ffffff;
+    overflow: hidden;
+    position: relative;
+}
+
+.puzzle-bottom-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4cm;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-top: 0.4cm;
+}
+
+.puzzle-table-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2cm;
+}
+
+.puzzle-print-table {
+    border-collapse: collapse;
+    width: 100%;
+    border: 1.5px solid #94a3b8;
+}
+
+.puzzle-print-table th {
+    background: #f1f5f9;
+    border: 1.5px solid #94a3b8;
+    padding: 6px 12px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 9.5pt;
+    color: #0f172a;
+    width: 3.2cm;
+}
+
+.puzzle-print-table td {
+    border: 1.5px solid #94a3b8;
+    padding: 6px 12px;
+    text-align: center;
+    font-size: 10pt;
+}
+
+.puzzle-answer-box {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border: 1.5px dashed #64748b;
+    border-radius: 4px;
+    vertical-align: middle;
+}
+
+.puzzle-answer-filled {
+    font-weight: bold;
+    font-size: 11pt;
+    color: #0f172a;
+}
+
+.puzzle-justification-area {
+    display: block;
+    width: 100%;
+    margin-top: 0.2cm;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background-color: var(--bg-paper, #ffffff);
+    padding: 0.3cm 0.4cm;
+    box-sizing: border-box;
+    /* Dotted lines background */
+    background-image: linear-gradient(
+        to bottom,
+        transparent calc(8mm - 1px),
+        #cbd5e1 calc(8mm - 1px),
+        #cbd5e1 8mm,
+        transparent 8mm
+    );
+    background-size: 100% 8mm;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    position: relative;
+}
+
+.justification-heading {
+    margin: 0;
+    font-size: 9pt;
+    font-weight: 600;
+    color: var(--text-muted, #64748b);
+    position: absolute;
+    top: 2px;
+    left: 8px;
+    background-color: var(--bg-paper, #ffffff);
+    padding: 0 4px;
+}
+
+.puzzle-reason-cell {
+    padding: 4px 6px !important;
+    vertical-align: top;
+    background: #ffffff;
+}
+
+.puzzle-table-reason-lines {
+    height: 100%;
+    width: 100%;
+    /* 3 dotted/solid lines inside the cell */
+    background-image: linear-gradient(
+        to bottom,
+        transparent calc(5mm - 1px),
+        #cbd5e1 calc(5mm - 1px),
+        #cbd5e1 5mm,
+        transparent 5mm
+    );
+    background-size: 100% 5mm;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* ── Wahrscheinlichkeitsverteilungen (verteilung) ── */
+.verteilung-render-wrapper {
+    margin: 12px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.canvas-verteilung-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 100%;
+}
+
+.verteilung-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+}
+
+.verteilung-axis {
+    stroke: #0f172a;
+    stroke-width: 1.5;
+    stroke-linecap: square;
+}
+
+.verteilung-axis-arrow {
+    fill: #0f172a;
+}
+
+.verteilung-grid-line {
+    stroke: #e2e8f0;
+    stroke-width: 1;
+    stroke-dasharray: 4 3;
+}
+
+.verteilung-tick-line {
+    stroke: #0f172a;
+    stroke-width: 1;
+}
+
+.verteilung-tick-text {
+    font-family: inherit;
+    font-size: 11px;
+    fill: #475569;
+    user-select: none;
+}
+
+.verteilung-axis-label {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    font-style: italic;
+    fill: #0f172a;
+    user-select: none;
+}
+
+.verteilung-title-text {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    fill: #0f172a;
+}
+
+.verteilung-sub-text {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    fill: #475569;
+}
+
+.verteilung-marked-text {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    fill: #4338ca;
+}
+
+.verteilung-sigma-label {
+    font-family: inherit;
+    font-size: 9px;
+    font-style: italic;
+    fill: #64748b;
+    user-select: none;
+}
+
+/* Binomial Bars */
+.verteilung-bar {
+    transition: fill 0.15s ease, opacity 0.15s ease;
+}
+
+.verteilung-bar-unmarked {
+    fill: #cbd5e1;
+    stroke: #64748b;
+    stroke-width: 0.8;
+}
+
+.verteilung-bar-marked {
+    fill: #4338ca;
+    stroke: #312e81;
+    stroke-width: 1;
+}
+
+/* Normal Distribution Curve & Area */
+.verteilung-normal-curve {
+    fill: none;
+    stroke: #0f172a;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.verteilung-normal-integral {
+    fill: rgba(79, 70, 229, 0.25);
+    stroke: none;
+}
+
+.verteilung-inflection-line {
+    stroke: #94a3b8;
+    stroke-width: 1;
+    stroke-dasharray: 4 3;
+}
+
+.verteilung-boundary-line {
+    stroke: #4338ca;
+    stroke-width: 1.5;
+    stroke-dasharray: 3 3;
+}
+
+/* ==========================================================================
+   INLINE CANVAS EDITING SYSTEM (DIREKTES ARBEITEN AUF DEM A4-BLATT)
+   ========================================================================== */
+
+/* Clickable Header Table Cells */
+.inline-editable-cell {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.inline-editable-cell:hover {
+    background-color: #eef2ff !important;
+}
+
+.inline-cell-display {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.inline-edit-hint-icon {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    font-size: 0.85rem;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+}
+
+.inline-editable-cell:hover .inline-edit-hint-icon {
+    opacity: 0.65;
+}
+
+.inline-meta-header-editor {
+    width: 100%;
+}
+
+.inline-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.inline-doctype-pill {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.inline-doctype-pill.active {
+    background: #4f46e5;
+    color: #ffffff;
+    border-color: #4f46e5;
+}
+
+.inline-header-input {
+    border: 1px solid #94a3b8;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: #0f172a;
+    background: #ffffff;
+}
+
+.inline-header-input:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);
+}
+
+.inline-header-input.input-art { width: 135px; }
+.inline-header-input.input-nr { width: 48px; text-align: center; }
+.inline-header-input.input-fach { width: 115px; }
+.inline-header-input.input-klasse { width: 68px; }
+
+.btn-inline-done {
+    background: #4f46e5;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-inline-done:hover {
+    background: #4338ca;
+}
+
+/* Inline Editable Section Divider */
+.inline-editable-section {
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background-color 0.15s ease;
+}
+
+.inline-editable-section:hover {
+    background-color: rgba(79, 70, 229, 0.05);
+}
+
+.inline-section-editor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: #f8fafc;
+    border: 1px solid #c7d2fe;
+    border-radius: 8px;
+    padding: 10px 14px;
+    max-width: 75%;
+    margin: 0 auto;
+    position: relative;
+    z-index: 5;
+}
+
+.inline-section-input {
+    width: 100%;
+    text-align: center;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-family: inherit;
+    background: #ffffff;
+}
+
+.inline-section-input.title-input {
+    font-size: 13pt;
+    font-weight: 700;
+}
+
+.inline-section-input.subtitle-input {
+    font-size: 10pt;
+    font-style: italic;
+}
+
+/* Clickable Text Areas on Canvas (Context, Subtask, SubSubtask, Hinweise) */
+.inline-editable-text {
+    cursor: text;
+    border-radius: 4px;
+    padding: 0;
+    margin: 0;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+    display: inline;
+}
+
+.context-editable-area,
+.print-hinweise .inline-editable-text {
+    display: block;
+    width: 100%;
+}
+
+.inline-editable-text:hover {
+    background-color: rgba(79, 70, 229, 0.055);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);
+}
+
+.inline-empty-placeholder {
+    display: inline-block;
+    min-width: 120px;
+    color: #94a3b8;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.92em;
+    user-select: none;
+}
+
+/* Collapse empty Sachkontext & Hinweise so they take 0px layout space (100% print parity) */
+.task-context.is-empty-print-hide {
+    margin-bottom: 0;
+}
+
+.task-context.is-empty-print-hide .context-placeholder {
+    opacity: 0;
+    font-size: 0.85rem;
+    padding: 1px 0;
+    transition: opacity 0.15s ease;
+}
+
+.task-item-wrapper:hover .task-context.is-empty-print-hide .context-placeholder {
+    opacity: 1;
+}
+
+.print-hinweise.is-empty-print-hide {
+    position: relative;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible;
+}
+
+.print-hinweise.is-empty-print-hide .hinweise-editable-box {
+    position: absolute;
+    right: 0;
+    top: -16px;
+    width: auto;
+    z-index: 15;
+}
+
+.print-hinweise.is-empty-print-hide .inline-empty-placeholder {
+    opacity: 0.45;
+    font-size: 0.78rem;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 999px;
+    padding: 1px 10px;
+    transition: opacity 0.15s ease, border-color 0.15s ease;
+}
+
+.print-hinweise.is-empty-print-hide:hover .inline-empty-placeholder {
+    opacity: 1;
+    border-color: #6366f1;
+    color: #4f46e5;
+}
+
+/* Inline Editor Box (Clean inline textarea without floating toolbar) */
+.inline-editor-box {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background: #ffffff;
+    border: 1.5px solid #4f46e5;
+    border-radius: 6px;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    margin: 0;
+    overflow: hidden;
+    font-style: normal;
+}
+
+.inline-editor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 8px;
+    background: #eef2ff;
+    border-bottom: 1px solid #c7d2fe;
+}
+
+.inline-toolbar-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #4338ca;
+}
+
+.inline-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.inline-tool-btn {
+    background: #ffffff;
+    border: 1px solid #c7d2fe;
+    color: #312e81;
+    font-size: 0.74rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+}
+
+.inline-tool-btn:hover {
+    background: #e0e7ff;
+    border-color: #818cf8;
+}
+
+.inline-tool-btn.btn-done {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+}
+
+.inline-tool-btn.btn-done:hover {
+    background: #4338ca;
+}
+
+.inline-canvas-textarea {
+    width: 100%;
+    min-height: 44px;
+    border: none;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 11pt;
+    line-height: 1.45;
+    color: #0f172a;
+    background: #ffffff;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.inline-canvas-textarea:focus {
+    outline: none;
+}
+
+/* Inline Clickable Points Badge */
+.inline-points-wrapper {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 4px;
+    font-style: normal;
+}
+
+.clickable-points {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0 4px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.clickable-points:hover {
+    background-color: #eef2ff;
+    color: #4338ca;
+}
+
+.clickable-points.is-zero-points {
+    opacity: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6366f1;
+    background: #eef2ff;
+    border: 1px dashed #a5b4fc;
+    border-radius: 4px;
+    padding: 1px 6px;
+}
+
+.subtask-container:hover .clickable-points.is-zero-points,
+.sub-subtask-render-wrapper:hover .clickable-points.is-zero-points {
+    opacity: 1;
+}
+
+.inline-points-editor {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: #eef2ff;
+    border: 1px solid #818cf8;
+    border-radius: 5px;
+    padding: 1px 5px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #312e81;
+}
+
+.inline-points-input {
+    width: 46px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 1px 4px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-align: center;
+    color: #0f172a;
+    background: #ffffff;
+}
+
+.inline-points-input:focus {
+    outline: none;
+    border-color: #4f46e5;
+}
+
+/* Task Header Quick Controls & Column Switcher (0px layout height via position: absolute) */
+.task-header-flex {
+    position: relative;
+    display: block;
+}
+
+.task-canvas-actions {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.96);
+    padding-left: 8px;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.task-item-wrapper:hover .task-canvas-actions {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.inline-cols-group {
+    display: inline-flex;
+    align-items: center;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 1px;
+    margin-right: 4px;
+}
+
+.inline-col-btn {
+    border: none;
+    background: transparent;
+    color: #475569;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+}
+
+.inline-col-btn:hover {
+    color: #0f172a;
+}
+
+.inline-col-btn.active {
+    background: #ffffff;
+    color: #4f46e5;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.subtask-action-btn.active-space {
+    background: #eef2ff !important;
+    border-color: #818cf8 !important;
+    color: #4338ca !important;
+    font-weight: 700;
+}
+
+.subtask-action-btn.btn-danger-hover:hover {
+    background: #fef2f2 !important;
+    border-color: #fca5a5 !important;
+    color: #dc2626 !important;
+}
+
+.action-sep {
+    width: 1px;
+    height: 14px;
+    background: #cbd5e1;
+    margin: 0 2px;
+}
+
+/* Inline Module Pills on Canvas (0px layout height via position: absolute) */
+.inline-module-pills {
+    position: absolute;
+    right: 0;
+    top: 2px;
+    z-index: 25;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 2px 4px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 999px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.task-context:hover > .inline-module-pills,
+.subtask-container:hover > .inline-module-pills,
+.sub-subtask-render-wrapper:hover > .inline-module-pills {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.inline-module-pill {
+    display: inline-flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    overflow: hidden;
+    font-size: 0.72rem;
+    font-style: normal;
+}
+
+.inline-pill-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    padding: 2px 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+}
+
+.inline-pill-edit:hover {
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+.inline-pill-del {
+    border: none;
+    border-left: 1px solid #e2e8f0;
+    background: transparent;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+.inline-pill-del:hover {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+/* Drag-to-Resize Handle for Answer Spaces (Karo / Linien / Millimeter) */
+.resizable-space {
+    position: relative;
+}
+
+.space-resize-handle {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: ns-resize;
+    background: linear-gradient(to top, rgba(79, 70, 229, 0.14), transparent);
+    border-bottom: 2px solid transparent;
+    opacity: 0;
+    transition: opacity 0.15s ease, border-color 0.15s ease;
+    z-index: 4;
+    user-select: none;
+}
+
+.resizable-space:hover .space-resize-handle {
+    opacity: 1;
+    border-bottom-color: #6366f1;
+}
+
+.resize-grip-lines {
+    width: 32px;
+    height: 4px;
+    border-top: 1.5px solid #6366f1;
+    border-bottom: 1.5px solid #6366f1;
+}
+
+.resize-height-badge {
+    background: #4f46e5;
+    color: #ffffff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    font-style: normal;
+    padding: 1px 6px;
+    border-radius: 999px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.space-remove-btn {
+    border: none;
+    background: #ffffff;
+    color: #64748b;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.space-remove-btn:hover {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+/* Bottom Add Subtask / Add SubSubtask / Add Task Bars on Canvas (0px layout height via position: absolute) */
+.task-bottom-add-bar {
+    position: absolute;
+    left: 0;
+    bottom: -24px;
+    z-index: 25;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.task-item-wrapper:hover .task-bottom-add-bar {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.btn-inline-add-subtask,
+.btn-inline-add-subsub {
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px dashed #818cf8;
+    color: #4f46e5;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.1);
+    transition: all 0.15s ease;
+}
+
+.btn-inline-add-subtask:hover,
+.btn-inline-add-subsub:hover {
+    background: #eef2ff;
+    border-color: #6366f1;
+    color: #3730a3;
+}
+
+.sub-subtasks-add-row {
+    position: absolute;
+    left: 0;
+    bottom: -22px;
+    z-index: 25;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.subtask-container:hover .sub-subtasks-add-row {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.canvas-bottom-add-bar {
+    margin-top: 2rem;
+    padding: 14px;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(248, 250, 252, 0.7);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.canvas-bottom-add-bar:hover {
+    border-color: #818cf8;
+    background: rgba(238, 242, 255, 0.5);
+}
+
+.btn-canvas-add-task {
+    background: #4f46e5;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+    transition: all 0.15s ease;
+}
+
+.btn-canvas-add-task:hover {
+    background: #4338ca;
+    transform: translateY(-1px);
+}
+
+.btn-canvas-add-section {
+    background: #ffffff;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+}
+
+.btn-canvas-add-section:hover {
+    border-color: #6366f1;
+    color: #4f46e5;
+    background: #f8fafc;
+}
+
+/* Subtle Selection Indicators on A4 Canvas (0px layout height impact) */
+.task-item-wrapper.is-selected-task > .task-item,
+.task-item-wrapper.is-selected-task > .section-divider-print {
+    box-shadow: -3px 0 0 0 rgba(79, 70, 229, 0.35);
+}
+
+.task-context.is-selected-area,
+.subtask-container.is-selected-subtask,
+.sub-subtask-render-wrapper.is-selected-subsubtask {
+    background-color: rgba(79, 70, 229, 0.035);
+    border-radius: 4px;
+}
+
+/* ==========================================================================
+   RIGHT-SIDE GUTTER ACTIONS ON A4 CANVAS (ADD / MOVE UP / DOWN / DELETE)
+   ========================================================================== */
+.section-divider-print,
+.task-row.header-row,
+.subtask-container,
+.sub-subtask-render-wrapper {
+    position: relative;
+}
+
+.canvas-gutter-actions {
+    position: absolute;
+    left: 100%;
+    right: auto;
+    top: -2px;
+    padding-left: 10px;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    white-space: nowrap;
+    gap: 3px;
+    z-index: 30;
+    user-select: none;
+    font-style: normal;
+}
+
+.section-divider-print.is-selected-section > .canvas-gutter-actions,
+.task-row.header-row.is-selected-header > .canvas-gutter-actions,
+.subtask-container.is-selected-subtask > .canvas-gutter-actions,
+.sub-subtask-render-wrapper.is-selected-subsubtask > .canvas-gutter-actions {
+    display: inline-flex;
+}
+
+/* In 2- or 3-column subtask grids, place subtask actions at top-right of the column cell */
+.subtasks-list.cols-2 .subtask-container > .canvas-gutter-actions,
+.subtasks-list.cols-3 .subtask-container > .canvas-gutter-actions {
+    left: auto;
+    right: 0;
+    top: -2px;
+    flex-direction: row;
+    padding-left: 0;
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 5px;
+}
+
+.gutter-btn {
+    min-width: 50px;
+    height: 24px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155;
+    border-radius: 5px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s ease;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.gutter-btn-add {
+    color: #4f46e5;
+    border-color: #c7d2fe;
+    background: #eef2ff;
+    padding: 0 6px;
+    font-size: 0.74rem;
+}
+
+.gutter-btn-add:hover:not(:disabled) {
+    background: #eef2ff;
+    border-color: #818cf8;
+    color: #3730a3;
+}
+
+.gutter-btn:hover:not(:disabled) {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+.gutter-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.gutter-btn-del:hover:not(:disabled) {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #dc2626;
+}

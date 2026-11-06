@@ -1,0 +1,226 @@
+{
+  "fileType": "math-builder-collection",
+  "version": "1.2",
+  "meta": {
+    "docType": "test",
+    "art": "1. Test",
+    "nr": "1",
+    "titel": "1. Informatik-Test: Tastatur & Sichere Passwörter",
+    "fach": "Informatik",
+    "klasse": "Klasse 5",
+    "datum": "2026-11-03",
+    "hinweise": "Bearbeitungszeit: ca. 30 Minuten. Hilfsmittel: Keine. Löse alle Aufgaben sorgfältig direkt auf diesem Bogen.",
+    "hideSubtaskPoints": true
+  },
+  "tasks": [
+    {
+      "id": 100,
+      "type": "section",
+      "title": "TEIL A: Die Tastatur & Sonderzeichen",
+      "subtitle": "13 Punkte • QWERTZ-Layout, Drei Ebenen und wichtige Funktionstasten",
+      "context": "",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": []
+    },
+    {
+      "id": 110,
+      "type": "task",
+      "context": "Betrachte im Schaubild oben die Taste mit der Ziffer 7 auf der deutschen QWERTZ-Tastatur. Auf ihr sind drei Zeichen aufgedruckt: /, { und 7.",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1101,
+          "text": "Welches Zeichen erscheint, wenn du die Taste einfach direkt drückst? (Ebene 1: Normale Ebene)",
+          "points": 1,
+          "spaceType": "linien",
+          "spaceHeight": 1.5,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1102,
+          "text": "Welches Zeichen erscheint, wenn du Shift gedrückt hältst und die Taste 7 tippst? (Ebene 2: Shift-Ebene)",
+          "points": 1,
+          "spaceType": "linien",
+          "spaceHeight": 1.5,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1103,
+          "text": "Welches Zeichen erscheint, wenn du AltGr gedrückt hältst und die Taste 7 tippst? (Ebene 3: AltGr-Ebene)",
+          "points": 1,
+          "spaceType": "linien",
+          "spaceHeight": 1.5,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 120,
+      "type": "task",
+      "context": "Tastenkombinationen mit Shift und AltGr ermöglichen das Schreiben aller Sonderzeichen.",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1201,
+          "text": "Welches Zeichen entsteht bei der Tastenkombination?\na) Shift + 1 = ______\nb) AltGr + E = ______\nc) AltGr + Q = ______\nd) AltGr + ß = ______",
+          "points": 4,
+          "spaceType": "linien",
+          "spaceHeight": 2.5,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1202,
+          "text": "Welche Tasten musst du drücken, um folgende Zeichen zu tippen?\na) Fragezeichen (?) -> ____________________\nb) Doppelpunkt (:) -> ____________________",
+          "points": 2,
+          "spaceType": "linien",
+          "spaceHeight": 2.0,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 130,
+      "type": "task",
+      "context": "Auf der Tastatur gibt es wichtige Sondertasten mit speziellen Aufgaben beim Schreiben von Texten.",
+      "subtaskColumns": 2,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 1301,
+          "text": "Taste mit Symbol [ ⌫ ]:\nName: ____________________\nAufgabe: Löscht ________________________________________",
+          "points": 1,
+          "spaceType": "linien",
+          "spaceHeight": 2.0,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1302,
+          "text": "Taste mit Symbol [ ↵ ]:\nName: ____________________\nAufgabe: Fängt eine ________________________________________ an.",
+          "points": 1,
+          "spaceType": "linien",
+          "spaceHeight": 2.0,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1303,
+          "text": "Taste mit Symbol [ ⇪ ]:\nName: ____________________\nAufgabe: Schaltet ________________________________________ dauerhaft ein.",
+          "points": 1,
+          "spaceType": "linien",
+          "spaceHeight": 2.0,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 1304,
+          "text": "Längste Taste der Tastatur:\nName: ____________________\nAufgabe: Fügt ein ________________________________________ zwischen Wörtern ein.",
+          "points": 1,
+          "spaceType": "linien",
+          "spaceHeight": 2.0,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 200,
+      "type": "section",
+      "title": "TEIL B: Sichere Passwörter & Schutzregeln",
+      "subtitle": "13 Punkte • Kriterien, Passwort-Check, Merksatz-Methode und Schutzregeln",
+      "context": "",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": []
+    },
+    {
+      "id": 210,
+      "type": "task",
+      "context": "Computerprogramme können kurze oder einfache Passwörter in Sekundenschnelle knacken.",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 2101,
+          "text": "Nenne drei verschiedene Kriterien bzw. Regeln, die ein Passwort sicher und stark gegen Knackprogramme machen:\n1. ___________________________________________________________________\n2. ___________________________________________________________________\n3. ___________________________________________________________________",
+          "points": 3,
+          "spaceType": "linien",
+          "spaceHeight": 3.0,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 220,
+      "type": "task",
+      "context": "Beurteile die folgenden zwei Passwörter anhand der gelernten Kriterien.",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 2201,
+          "text": "Passwort 1: Sommer2026\n• Urteil: [  ] sicher     [  ] unsicher\n• Begründung (Warum sicher bzw. was fehlt?):",
+          "points": 2,
+          "spaceType": "linien",
+          "spaceHeight": 2.5,
+          "modules": [],
+          "subSubtasks": []
+        },
+        {
+          "id": 2202,
+          "text": "Passwort 2: P!4mK#8z\n• Urteil: [  ] sicher     [  ] unsicher\n• Begründung (Warum sicher bzw. was fehlt?):",
+          "points": 2,
+          "spaceType": "linien",
+          "spaceHeight": 2.5,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 230,
+      "type": "task",
+      "context": "Gegeben ist der folgende Merksatz:\n„Meine Katze Mimi schläft fast den ganzen Tag.“",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 2301,
+          "text": "Wende die Merksatz-Methode an, um daraus ein sicheres Passwort zu erstellen.\nSchreibe deine Zwischenschritte auf und notiere am Ende dein fertiges Passwort:",
+          "points": 4,
+          "spaceType": "linien",
+          "spaceHeight": 4.5,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    },
+    {
+      "id": 240,
+      "type": "task",
+      "context": "Im Computerraum hat dein bester Freund sein Passwort vergessen. Er fragt dich:\n„Kannst du mir schnell dein Passwort verraten, damit ich mich einloggen kann?“",
+      "subtaskColumns": 1,
+      "modules": [],
+      "subtasks": [
+        {
+          "id": 2401,
+          "text": "Wie reagierst du und welche wichtige Schutzregel (z. B. Zahnbürsten-Regel) gilt hier? Erkläre kurz:",
+          "points": 2,
+          "spaceType": "linien",
+          "spaceHeight": 3.0,
+          "modules": [],
+          "subSubtasks": []
+        }
+      ]
+    }
+  ]
+}

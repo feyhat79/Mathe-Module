@@ -1,0 +1,23 @@
+{
+  "name": "aufgabenbuilder---original",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "dev:word": "vite --port 3000 --host",
+    "build": "vite build",
+    "build:word": "vite build --config vite.word.config.ts",
+    "build:all": "vite build && vite build --config vite.word.config.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vite": "^8.0.14",
+    "vite-plugin-singlefile": "^2.3.3"
+  }
+}

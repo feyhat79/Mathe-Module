@@ -1,0 +1,1514 @@
+<div x-data="moduleStudio">
+    <template x-if="isStudioOpen">
+        <div class="modal-overlay" @click.self="cancelAndClose()">
+            <div class="modal-content module-studio-modal wysiwyg-studio-modal">
+                <!-- Modal Header -->
+                <header class="modal-header module-studio-header">
+                    <div class="module-studio-title-group">
+                        <span class="module-studio-icon" x-text="getModuleIcon()"></span>
+                        <div>
+                            <h2 x-text="(isNewModule ? 'Neues Modul: ' : 'Modul konfigurieren: ') + getModuleTitle()"></h2>
+                            <span class="module-studio-badge" :class="'badge-' + getModuleCategory()" x-text="getModuleCategory()"></span>
+                        </div>
+                    </div>
+                    <button class="btn-secondary btn-close-modal" @click="cancelAndClose()" title="Schließen">&times;</button>
+                </header>
+
+                <!-- Modal Body: WYSIWYG Studio -->
+                <div class="modal-body module-studio-body wysiwyg-studio-body">
+                    
+                    <!-- ── PILOT: Baumdiagramm WYSIWYG Editor ── -->
+                    <template x-if="workingModule && workingModule.type === 'baum'">
+                        <div class="studio-wysiwyg-layout">
+                            
+                            <!-- Top Toolbar -->
+                            <div class="studio-top-toolbar">
+                                <!-- Struktur-Gruppe -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Struktur:</span>
+                                    <div class="studio-segmented-control">
+                                        <span class="segmented-label">Stufen:</span>
+                                        <button type="button" 
+                                                class="segmented-btn" 
+                                                :class="{ 'active': workingModule.data.depth == 1 }" 
+                                                @click="workingModule.data.depth = 1; applyTreeStructure()">1</button>
+                                        <button type="button" 
+                                                class="segmented-btn" 
+                                                :class="{ 'active': workingModule.data.depth == 2 }" 
+                                                @click="workingModule.data.depth = 2; applyTreeStructure()">2</button>
+                                        <button type="button" 
+                                                class="segmented-btn" 
+                                                :class="{ 'active': workingModule.data.depth == 3 }" 
+                                                @click="workingModule.data.depth = 3; applyTreeStructure()">3</button>
+                                    </div>
+
+                                    <div class="studio-segmented-control">
+                                        <span class="segmented-label">Äste:</span>
+                                        <button type="button" 
+                                                class="segmented-btn" 
+                                                :class="{ 'active': workingModule.data.branches == 2 }" 
+                                                @click="workingModule.data.branches = 2; applyTreeStructure()">2</button>
+                                        <button type="button" 
+                                                class="segmented-btn" 
+                                                :class="{ 'active': workingModule.data.branches == 3 }" 
+                                                @click="workingModule.data.branches = 3; applyTreeStructure()">3</button>
+                                    </div>
+                                </div>
+
+                                <!-- Größe-Gruppe -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Größe:</span>
+                                    <div class="studio-height-stepper">
+                                        <button type="button" 
+                                                class="btn-stepper-step" 
+                                                @click="workingModule.data.height = Math.max(2, Math.round(((parseFloat(workingModule.data.height) || 7) - 0.5) * 10) / 10); touchRender()" 
+                                                title="Druckhöhe verkleinern (−0.5 cm)">−</button>
+                                        <div class="stepper-input-wrap">
+                                            <input type="number" 
+                                                   class="studio-stepper-input" 
+                                                   x-model.number="workingModule.data.height" 
+                                                   step="0.5" 
+                                                   min="2" 
+                                                   max="25" 
+                                                   @input="touchRender()">
+                                            <span class="stepper-unit">cm</span>
+                                        </div>
+                                        <button type="button" 
+                                                class="btn-stepper-step" 
+                                                @click="workingModule.data.height = Math.min(25, Math.round(((parseFloat(workingModule.data.height) || 7) + 0.5) * 10) / 10); touchRender()" 
+                                                title="Druckhöhe vergrößern (+0.5 cm)">+</button>
+                                    </div>
+                                    <div class="studio-size-presets">
+                                        <button type="button" 
+                                                class="studio-preset-pill" 
+                                                :class="{ 'active': workingModule.data.height == 5 }" 
+                                                @click="workingModule.data.height = 5; touchRender()" 
+                                                title="Kompakt (5 cm)">S</button>
+                                        <button type="button" 
+                                                class="studio-preset-pill" 
+                                                :class="{ 'active': workingModule.data.height == 7 || (!workingModule.data.height && 7) }" 
+                                                @click="workingModule.data.height = 7; touchRender()" 
+                                                title="Standard (7 cm)">M</button>
+                                        <button type="button" 
+                                                class="studio-preset-pill" 
+                                                :class="{ 'active': workingModule.data.height == 10 }" 
+                                                @click="workingModule.data.height = 10; touchRender()" 
+                                                title="Groß (10 cm)">L</button>
+                                        <button type="button" 
+                                                class="studio-preset-pill" 
+                                                :class="{ 'active': workingModule.data.height == 13 }" 
+                                                @click="workingModule.data.height = 13; touchRender()" 
+                                                title="Sehr groß (13 cm)">XL</button>
+                                    </div>
+                                </div>
+
+                                <!-- Optionen-Gruppe -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Optionen:</span>
+                                    <label class="checkbox-label studio-toolbar-checkbox">
+                                        <input type="checkbox" x-model="workingModule.data.colorNodes" @change="touchRender()">
+                                        <span>Farben</span>
+                                    </label>
+                                    <label class="checkbox-label studio-toolbar-checkbox">
+                                        <input type="checkbox" x-model="workingModule.data.showPathProbabilities" @change="touchRender()">
+                                        <span>Pfad-Ergebnisse</span>
+                                    </label>
+                                </div>
+
+                                <!-- Aktionen-Gruppe -->
+                                <div class="studio-toolbar-group studio-toolbar-actions">
+                                    <template x-if="workingModule.data.depth > 1">
+                                        <button type="button" 
+                                                class="btn-secondary btn-small studio-action-pill-btn"
+                                                @click="applyLevelDefaults(2); touchRender()"
+                                                title="Überträgt die Werte der 1. Verzweigung auf alle weiteren Verzweigungen">
+                                            ⚡ Werte übertragen
+                                        </button>
+                                    </template>
+                                    <template x-if="workingModule.data.showPathProbabilities">
+                                        <button type="button" 
+                                                class="btn-secondary btn-small studio-action-pill-btn"
+                                                @click="calculatePathProbabilities(); touchRender()"
+                                                title="Multipliziert die Wahrscheinlichkeiten entlang der Pfade automatisch">
+                                            🪄 Pfade berechnen
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Haupt-Arbeitsfläche mit interaktivem Diagramm -->
+                            <div class="studio-wysiwyg-canvas-area">
+                                <div class="studio-wysiwyg-container" 
+                                     @click="handleSvgClick($event)">
+                                    
+                                    <!-- Druckgrößen-Hinweis Badge -->
+                                    <div class="studio-canvas-dimension-badge">
+                                        <span>Druckhöhe: </span>
+                                        <strong x-text="(workingModule.data.height || 7) + ' cm'"></strong>
+                                    </div>
+
+                                    <!-- Interaktives SVG -->
+                                    <svg viewBox="0 0 1000 600" 
+                                         class="studio-wysiwyg-svg" 
+                                         preserveAspectRatio="xMidYMid meet" 
+                                         x-html="getTreePreviewSvg()"></svg>
+
+                                    <!-- Schwebendes Popover für direkte In-Place-Bearbeitung -->
+                                    <div id="studio-canvas-popover" 
+                                         class="studio-canvas-popover" 
+                                         x-show="activeTarget" 
+                                         x-cloak 
+                                         @click.stop>
+                                        
+                                        <!-- Ast-Bearbeitung (Wahrscheinlichkeit) -->
+                                        <template x-if="activeTarget && activeTarget.type === 'edge' && getActiveNode()">
+                                            <div class="studio-popover-content">
+                                                <div class="studio-popover-header">
+                                                    <span class="studio-popover-title">Ast-Wahrscheinlichkeit</span>
+                                                    <span class="studio-popover-hint">Enter: Fertig | Tab: Weiter</span>
+                                                </div>
+                                                <div class="studio-popover-row">
+                                                    <input type="text" 
+                                                           x-model="getActiveNode().prob" 
+                                                           @input="touchRender()" 
+                                                           @keydown.enter="closePopover()" 
+                                                           @keydown.escape="closePopover()" 
+                                                           @keydown.tab.prevent="selectNextItem()" 
+                                                           class="matching-input studio-popover-input" 
+                                                           :class="{ 'input-is-placeholder': getActiveNode().isProbPlaceholder }"
+                                                           :disabled="getActiveNode().isProbPlaceholder" 
+                                                           placeholder="z.B. 1/2 oder 0.5">
+                                                    <button type="button" 
+                                                            class="btn-placeholder-toggle" 
+                                                            :class="{ 'active': getActiveNode().isProbPlaceholder }" 
+                                                            @click="toggleEdgePlaceholder()" 
+                                                            title="Als Schüler-Lücke formatieren">
+                                                        <span class="placeholder-icon">🔲</span>
+                                                        <span>Lücke</span>
+                                                    </button>
+                                                    <button type="button" 
+                                                            class="studio-popover-close-btn" 
+                                                            @click="closePopover()" 
+                                                            title="Schließen">&times;</button>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Knoten-Bearbeitung (Label, Negierung, Lücke) -->
+                                        <template x-if="activeTarget && activeTarget.type === 'node' && getActiveNode()">
+                                            <div class="studio-popover-content">
+                                                <div class="studio-popover-header">
+                                                    <span class="studio-popover-title">Knoten / Ereignis</span>
+                                                    <span class="studio-popover-hint">Enter: Fertig | Tab: Weiter</span>
+                                                </div>
+                                                <div class="studio-popover-row">
+                                                    <input type="text" 
+                                                           x-model="getActiveNode().label" 
+                                                           @input="touchRender()" 
+                                                           @keydown.enter="closePopover()" 
+                                                           @keydown.escape="closePopover()" 
+                                                           @keydown.tab.prevent="selectNextItem()" 
+                                                           class="matching-input studio-popover-input" 
+                                                           :class="{ 'input-is-placeholder': getActiveNode().isLabelPlaceholder }"
+                                                           :disabled="getActiveNode().isLabelPlaceholder" 
+                                                           placeholder="z.B. A oder Rot">
+                                                    <button type="button" 
+                                                            class="btn-icon-small btn-negate-toggle" 
+                                                            :class="{ 'active': getActiveNode().isNegated }" 
+                                                            :disabled="getActiveNode().isLabelPlaceholder" 
+                                                            @click="toggleNodeNegation()" 
+                                                            title="Gegenereignis / Negationsstrich (z.B. Ā)">
+                                                        <span class="negate-char">Ā</span>
+                                                    </button>
+                                                    <button type="button" 
+                                                            class="btn-placeholder-toggle" 
+                                                            :class="{ 'active': getActiveNode().isLabelPlaceholder }" 
+                                                            @click="toggleNodePlaceholder()" 
+                                                            title="Als Schüler-Lücke formatieren">
+                                                        <span class="placeholder-icon">🔲</span>
+                                                        <span>Lücke</span>
+                                                    </button>
+                                                    <button type="button" 
+                                                            class="studio-popover-close-btn" 
+                                                            @click="closePopover()" 
+                                                            title="Schließen">&times;</button>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Pfadende-Bearbeitung (Pfadwahrscheinlichkeit) -->
+                                        <template x-if="activeTarget && activeTarget.type === 'path' && getActiveNode()">
+                                            <div class="studio-popover-content">
+                                                <div class="studio-popover-header">
+                                                    <span class="studio-popover-title">Pfad-Ergebnis</span>
+                                                    <span class="studio-popover-hint">Enter: Fertig | Tab: Weiter</span>
+                                                </div>
+                                                <div class="studio-popover-row">
+                                                    <input type="text" 
+                                                           x-model="getActiveNode().pathProb" 
+                                                           @input="touchRender()" 
+                                                           @keydown.enter="closePopover()" 
+                                                           @keydown.escape="closePopover()" 
+                                                           @keydown.tab.prevent="selectNextItem()" 
+                                                           class="matching-input studio-popover-input" 
+                                                           :class="{ 'input-is-placeholder': getActiveNode().isPathProbPlaceholder }"
+                                                           :disabled="getActiveNode().isPathProbPlaceholder" 
+                                                           placeholder="z.B. 1/4 oder 0.25">
+                                                    <button type="button" 
+                                                            class="btn-secondary btn-small btn-popover-action" 
+                                                            @click="calcSinglePath(activeTarget.id)" 
+                                                            title="Diesen Pfad berechnen">
+                                                        🪄 Berechnen
+                                                    </button>
+                                                    <button type="button" 
+                                                            class="btn-placeholder-toggle" 
+                                                            :class="{ 'active': getActiveNode().isPathProbPlaceholder }" 
+                                                            @click="togglePathPlaceholder()" 
+                                                            title="Als Schüler-Lücke formatieren">
+                                                        <span class="placeholder-icon">🔲</span>
+                                                        <span>Lücke</span>
+                                                    </button>
+                                                    <button type="button" 
+                                                            class="studio-popover-close-btn" 
+                                                            @click="closePopover()" 
+                                                            title="Schließen">&times;</button>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- ── 4-Feldertafel WYSIWYG Editor ── -->
+                    <template x-if="workingModule && workingModule.type === 'vierfeldertafel'">
+                        <div class="studio-wysiwyg-layout">
+                            
+                            <!-- Top Toolbar -->
+                            <div class="studio-top-toolbar">
+                                <!-- Didaktik-Aktionen -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Werkzeuge:</span>
+                                    <button type="button" 
+                                            class="btn-secondary btn-small studio-action-pill-btn"
+                                            @click="autofillVf()"
+                                            title="Berechnet fehlende Summen und Werte automatisch aus den eingetragenen Zahlen">
+                                        🪄 Auto-Fill
+                                    </button>
+                                    <button type="button" 
+                                            class="btn-secondary btn-small studio-action-pill-btn"
+                                            @click="generateVfPuzzle()"
+                                            title="Erzeugt aus den vorhandenen Zahlen ein eindeutig lösbares Rätsel für Schüler (setzt 5 Lücken)">
+                                        🎲 Rätsel erzeugen
+                                    </button>
+                                </div>
+
+                                <!-- Druckfelder-Modi -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Druckfelder:</span>
+                                    <button type="button" 
+                                            class="btn-secondary btn-small studio-subtle-btn"
+                                            @click="setAllVfVisible(true)"
+                                            title="Alle Werte für den Druck sichtbar machen">
+                                        👁️ Alle sichtbar
+                                    </button>
+                                    <button type="button" 
+                                            class="btn-secondary btn-small studio-subtle-btn"
+                                            @click="setAllVfVisible(false)"
+                                            title="Alle Felder als leere Schreibkästen für Schüler drucken">
+                                        🔲 Leere Tabelle
+                                    </button>
+                                </div>
+
+                                <!-- Optionen -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Optionen:</span>
+                                    <label class="checkbox-label studio-toolbar-checkbox" title="Automatisches Negieren des Gegenereignisses (z.B. A und A-Quer)">
+                                        <input type="checkbox" x-model="vfAutoPair">
+                                        <span>Gegenereignis auto-koppeln</span>
+                                    </label>
+                                </div>
+
+                                <!-- Tabellen-Skalierung -->
+                                <div class="studio-toolbar-group studio-toolbar-actions">
+                                    <span class="studio-group-label">Größe:</span>
+                                    <div class="studio-size-presets">
+                                        <button type="button" 
+                                                class="studio-preset-pill" 
+                                                :class="{ 'active': (workingModule.data.scale || 'normal') === 'compact' }" 
+                                                @click="setVfScale('compact')" 
+                                                title="Kompakte Tabelle">S</button>
+                                        <button type="button" 
+                                                class="studio-preset-pill" 
+                                                :class="{ 'active': (workingModule.data.scale || 'normal') === 'normal' }" 
+                                                @click="setVfScale('normal')" 
+                                                title="Standard Tabelle">M</button>
+                                        <button type="button" 
+                                                class="studio-preset-pill" 
+                                                :class="{ 'active': (workingModule.data.scale || 'normal') === 'large' }" 
+                                                @click="setVfScale('large')" 
+                                                title="Große Tabelle">L</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Haupt-Arbeitsfläche mit interaktiver 4-Feldertafel -->
+                            <div class="studio-wysiwyg-canvas-area" @click="handleVfCanvasClick($event)">
+                                <div class="studio-wysiwyg-container studio-vf-container" 
+                                     :class="'scale-' + (workingModule.data.scale || 'normal')">
+                                    
+                                    <!-- Status-Badge -->
+                                    <div class="studio-canvas-dimension-badge">
+                                        <span>Status: </span>
+                                        <strong x-text="getVfStudioStatusText()"></strong>
+                                    </div>
+
+                                    <!-- Interaktive 4-Feldertafel -->
+                                    <table class="studio-vf-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="studio-vf-corner-th"></th>
+                                                <th class="studio-vf-label-th" 
+                                                    :class="{ 'is-active-target': activeVfTarget && activeVfTarget.type === 'label' && activeVfTarget.key === 'top1' }"
+                                                    data-vf-label="top1"
+                                                    @click="selectVfLabel('top1', $event)"
+                                                    title="Spalte 1 Beschriftung bearbeiten">
+                                                    <span class="studio-vf-label-math" x-html="renderMath(workingModule.data.labels?.top1 || '$A$')"></span>
+                                                    <span class="studio-vf-edit-indicator">✏️</span>
+                                                </th>
+                                                <th class="studio-vf-label-th" 
+                                                    :class="{ 'is-active-target': activeVfTarget && activeVfTarget.type === 'label' && activeVfTarget.key === 'top2' }"
+                                                    data-vf-label="top2"
+                                                    @click="selectVfLabel('top2', $event)"
+                                                    title="Spalte 2 Beschriftung bearbeiten">
+                                                    <span class="studio-vf-label-math" x-html="renderMath(workingModule.data.labels?.top2 || '$\\overline{A}$')"></span>
+                                                    <span class="studio-vf-edit-indicator">✏️</span>
+                                                </th>
+                                                <th class="studio-vf-sum-th">Summe</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Zeile 1: left1 -->
+                                            <tr>
+                                                <th class="studio-vf-label-th studio-vf-left-th"
+                                                    :class="{ 'is-active-target': activeVfTarget && activeVfTarget.type === 'label' && activeVfTarget.key === 'left1' }"
+                                                    data-vf-label="left1"
+                                                    @click="selectVfLabel('left1', $event)"
+                                                    title="Zeile 1 Beschriftung bearbeiten">
+                                                    <span class="studio-vf-label-math" x-html="renderMath(workingModule.data.labels?.left1 || '$B$')"></span>
+                                                    <span class="studio-vf-edit-indicator">✏️</span>
+                                                </th>
+                                                <!-- Zelle (0, 0) -->
+                                                <td class="studio-vf-cell-interactive"
+                                                    :class="{ 
+                                                        'is-active-cell': activeVfTarget && activeVfTarget.type === 'cell' && activeVfTarget.r === 0 && activeVfTarget.c === 0,
+                                                        'is-blank-cell': !workingModule.data.printVisibility[0][0]
+                                                    }"
+                                                    data-vf-row="0" data-vf-col="0"
+                                                    @click="selectVfCell(0, 0, $event)">
+                                                    <div class="studio-vf-cell-content">
+                                                        <span class="studio-vf-cell-val" x-text="workingModule.data.data[0][0] || '—'"></span>
+                                                        <span class="studio-vf-tag" :class="workingModule.data.printVisibility[0][0] ? 'tag-visible' : 'tag-blank'" x-text="workingModule.data.printVisibility[0][0] ? 'Sichtbar' : 'Lücke'"></span>
+                                                    </div>
+                                                </td>
+                                                <!-- Zelle (0, 1) -->
+                                                <td class="studio-vf-cell-interactive"
+                                                    :class="{ 
+                                                        'is-active-cell': activeVfTarget && activeVfTarget.type === 'cell' && activeVfTarget.r === 0 && activeVfTarget.c === 1,
+                                                        'is-blank-cell': !workingModule.data.printVisibility[0][1]
+                                                    }"
+                                                    data-vf-row="0" data-vf-col="1"
+                                                    @click="selectVfCell(0, 1, $event)">
+                                                    <div class="studio-vf-cell-content">
+                                                        <span class="studio-vf-cell-val" x-text="workingModule.data.data[0][1] || '—'"></span>
+                                                        <span class="studio-vf-tag" :class="workingModule.data.printVisibility[0][1] ? 'tag-visible' : 'tag-blank'" x-text="workingModule.data.printVisibility[0][1] ? 'Sichtbar' : 'Lücke'"></span>
+                                                    </div>
+                                                </td>
+                                                <!-- Zeilensumme (0, 2) -->
+                                                <td class="studio-vf-cell-interactive studio-vf-sum-cell"
+                                                    :class="{ 
+                                                        'is-active-cell': activeVfTarget && activeVfTarget.type === 'cell' && activeVfTarget.r === 0 && activeVfTarget.c === 2,
+                                                        'is-blank-cell': !workingModule.data.printVisibility[0][2]
+                                                    }"
+                                                    data-vf-row="0" data-vf-col="2"
+                                                    @click="selectVfCell(0, 2, $event)">
+                                                    <div class="studio-vf-cell-content">
+                                                        <span class="studio-vf-cell-val" x-text="workingModule.data.data[0][2] || '—'"></span>
+                                                        <span class="studio-vf-tag" :class="workingModule.data.printVisibility[0][2] ? 'tag-visible' : 'tag-blank'" x-text="workingModule.data.printVisibility[0][2] ? 'Sichtbar' : 'Lücke'"></span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Zeile 2: left2 -->
+                                            <tr>
+                                                <th class="studio-vf-label-th studio-vf-left-th"
+                                                    :class="{ 'is-active-target': activeVfTarget && activeVfTarget.type === 'label' && activeVfTarget.key === 'left2' }"
+                                                    data-vf-label="left2"
+                                                    @click="selectVfLabel('left2', $event)"
+                                                    title="Zeile 2 Beschriftung bearbeiten">
+                                                    <span class="studio-vf-label-math" x-html="renderMath(workingModule.data.labels?.left2 || '$\\overline{B}$')"></span>
+                                                    <span class="studio-vf-edit-indicator">✏️</span>
+                                                </th>
+                                                <!-- Zelle (1, 0) -->
+                                                <td class="studio-vf-cell-interactive"
+                                                    :class="{ 
+                                                        'is-active-cell': activeVfTarget && activeVfTarget.type === 'cell' && activeVfTarget.r === 1 && activeVfTarget.c === 0,
+                                                        'is-blank-cell': !workingModule.data.printVisibility[1][0]
+                                                    }"
+                                                    data-vf-row="1" data-vf-col="0"
+                                                    @click="selectVfCell(1, 0, $event)">
+                                                    <div class="studio-vf-cell-content">
+                                                        <span class="studio-vf-cell-val" x-text="workingModule.data.data[1][0] || '—'"></span>
+                                                        <span class="studio-vf-tag" :class="workingModule.data.printVisibility[1][0] ? 'tag-visible' : 'tag-blank'" x-text="workingModule.data.printVisibility[1][0] ? 'Sichtbar' : 'Lücke'"></span>
+                                                    </div>
+                                                </td>
+                                                <!-- Zelle (1, 1) -->
+                                                <td class="studio-vf-cell-interactive"
+                                                    :class="{ 
+                                                        'is-active-cell': activeVfTarget && activeVfTarget.type === 'cell' && activeVfTarget.r === 1 && activeVfTarget.c === 1,
+                                                        'is-blank-cell': !workingModule.data.printVisibility[1][1]
+                                                    }"
+                                                    data-vf-row="1" data-vf-col="1"
+                                                    @click="selectVfCell(1, 1, $event)">
+                                                    <div class="studio-vf-cell-content">
+                                                        <span class="studio-vf-cell-val" x-text="workingModule.data.data[1][1] || '—'"></span>
+                                                        <span class="studio-vf-tag" :class="workingModule.data.printVisibility[1][1] ? 'tag-visible' : 'tag-blank'" x-text="workingModule.data.printVisibility[1][1] ? 'Sichtbar' : 'Lücke'"></span>
+                                                    </div>
+                                                </td>
+                                                <!-- Zeilensumme (1, 2) -->
+                                                <td class="studio-vf-cell-interactive studio-vf-sum-cell"
+                                                    :class="{ 
+                                                        'is-active-cell': activeVfTarget && activeVfTarget.type === 'cell' && activeVfTarget.r === 1 && activeVfTarget.c === 2,
+                                                        'is-blank-cell': !workingModule.data.printVisibility[1][2]
+                                                    }"
+                                                    data-vf-row="1" data-vf-col="2"
+                                                    @click="selectVfCell(1, 2, $event)">
+                                                    <div class="studio-vf-cell-content">
+                                                        <span class="studio-vf-cell-val" x-text="workingModule.data.data[1][2] || '—'"></span>
+                                                        <span class="studio-vf-tag" :class="workingModule.data.printVisibility[1][2] ? 'tag-visible' : 'tag-blank'" x-text="workingModule.data.printVisibility[1][2] ? 'Sichtbar' : 'Lücke'"></span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Zeile 3: Spaltensummen & Gesamtsumme -->
+                                            <tr class="studio-vf-sum-row">
+                                                <th class="studio-vf-sum-th">Summe</th>
+                                                <!-- Spaltensumme (2, 0) -->
+                                                <td class="studio-vf-cell-interactive studio-vf-sum-cell"
+                                                    :class="{ 
+                                                        'is-active-cell': activeVfTarget && activeVfTarget.type === 'cell' && activeVfTarget.r === 2 && activeVfTarget.c === 0,
+                                                        'is-blank-cell': !workingModule.data.printVisibility[2][0]
+                                                    }"
+                                                    data-vf-row="2" data-vf-col="0"
+                                                    @click="selectVfCell(2, 0, $event)">
+                                                    <div class="studio-vf-cell-content">
+                                                        <span class="studio-vf-cell-val" x-text="workingModule.data.data[2][0] || '—'"></span>
+                                                        <span class="studio-vf-tag" :class="workingModule.data.printVisibility[2][0] ? 'tag-visible' : 'tag-blank'" x-text="workingModule.data.printVisibility[2][0] ? 'Sichtbar' : 'Lücke'"></span>
+                                                    </div>
+                                                </td>
+                                                <!-- Spaltensumme (2, 1) -->
+                                                <td class="studio-vf-cell-interactive studio-vf-sum-cell"
+                                                    :class="{ 
+                                                        'is-active-cell': activeVfTarget && activeVfTarget.type === 'cell' && activeVfTarget.r === 2 && activeVfTarget.c === 1,
+                                                        'is-blank-cell': !workingModule.data.printVisibility[2][1]
+                                                    }"
+                                                    data-vf-row="2" data-vf-col="1"
+                                                    @click="selectVfCell(2, 1, $event)">
+                                                    <div class="studio-vf-cell-content">
+                                                        <span class="studio-vf-cell-val" x-text="workingModule.data.data[2][1] || '—'"></span>
+                                                        <span class="studio-vf-tag" :class="workingModule.data.printVisibility[2][1] ? 'tag-visible' : 'tag-blank'" x-text="workingModule.data.printVisibility[2][1] ? 'Sichtbar' : 'Lücke'"></span>
+                                                    </div>
+                                                </td>
+                                                <!-- Gesamtsumme Omega (2, 2) -->
+                                                <td class="studio-vf-cell-interactive studio-vf-total-cell"
+                                                    :class="{ 
+                                                        'is-active-cell': activeVfTarget && activeVfTarget.type === 'cell' && activeVfTarget.r === 2 && activeVfTarget.c === 2,
+                                                        'is-blank-cell': !workingModule.data.printVisibility[2][2]
+                                                    }"
+                                                    data-vf-row="2" data-vf-col="2"
+                                                    @click="selectVfCell(2, 2, $event)">
+                                                    <div class="studio-vf-cell-content">
+                                                        <span class="studio-vf-cell-val studio-vf-total-val" x-text="workingModule.data.data[2][2] || '—'"></span>
+                                                        <span class="studio-vf-tag" :class="workingModule.data.printVisibility[2][2] ? 'tag-visible' : 'tag-blank'" x-text="workingModule.data.printVisibility[2][2] ? 'Sichtbar' : 'Lücke'"></span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <!-- Schwebendes Popover für In-Place-Bearbeitung -->
+                                    <div id="studio-vf-popover" 
+                                         class="studio-canvas-popover studio-vf-popover" 
+                                         x-show="activeVfTarget" 
+                                         @click.stop>
+                                        
+                                        <!-- Fall 1: Zelle bearbeiten -->
+                                        <template x-if="activeVfTarget && activeVfTarget.type === 'cell'">
+                                            <div class="studio-popover-content">
+                                                <div class="studio-popover-header">
+                                                    <span class="studio-popover-title" x-text="getVfCellTitle()"></span>
+                                                    <button type="button" class="studio-popover-close-btn" @click="closeVfPopover()">&times;</button>
+                                                </div>
+                                                <div class="studio-popover-row">
+                                                    <input type="text" 
+                                                           id="studio-vf-cell-input"
+                                                           class="matching-input studio-popover-input" 
+                                                           x-model="workingModule.data.data[activeVfTarget.r][activeVfTarget.c]" 
+                                                           @keydown.enter.prevent="selectNextVfCell()"
+                                                           @keydown.tab.prevent="$event.shiftKey ? selectPrevVfCell() : selectNextVfCell()"
+                                                           @keydown.escape="closeVfPopover()"
+                                                           placeholder="Wert eintragen...">
+                                                    <button type="button" 
+                                                            class="btn-placeholder-toggle" 
+                                                            :class="{ 'active': !workingModule.data.printVisibility[activeVfTarget.r][activeVfTarget.c] }" 
+                                                            @click="toggleVfCellVisibility()"
+                                                            title="Zwischen Schüler-Lücke und sichtbarem Wert umschalten">
+                                                        <span class="placeholder-icon">🔲</span>
+                                                        <span x-text="workingModule.data.printVisibility[activeVfTarget.r][activeVfTarget.c] ? 'Als Lücke' : 'Lücke aktiv'"></span>
+                                                    </button>
+                                                </div>
+                                                <div class="studio-popover-nav-row">
+                                                    <button type="button" class="btn-popover-nav" @click="selectPrevVfCell()" title="Vorheriges Feld (Shift+Tab)">◀ Zurück</button>
+                                                    <span class="popover-hint">Tab / Enter</span>
+                                                    <button type="button" class="btn-popover-nav" @click="selectNextVfCell()" title="Nächstes Feld (Tab)">Weiter ▶</button>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Fall 2: Label bearbeiten -->
+                                        <template x-if="activeVfTarget && activeVfTarget.type === 'label'">
+                                            <div class="studio-popover-content">
+                                                <div class="studio-popover-header">
+                                                    <span class="studio-popover-title" x-text="getVfLabelTitle()"></span>
+                                                    <button type="button" class="studio-popover-close-btn" @click="closeVfPopover()">&times;</button>
+                                                </div>
+                                                <div class="studio-popover-row">
+                                                    <input type="text" 
+                                                           id="studio-vf-label-input"
+                                                           class="matching-input studio-popover-input" 
+                                                           x-model="workingModule.data.rawLabels[activeVfTarget.key]" 
+                                                           @input="onVfLabelInput(activeVfTarget.key)"
+                                                           @keydown.enter.prevent="closeVfPopover()"
+                                                           @keydown.escape="closeVfPopover()"
+                                                           placeholder="z. B. A oder Defekt">
+                                                    <button type="button" 
+                                                            class="btn-secondary btn-small btn-popover-action" 
+                                                            :class="{ 'active': workingModule.data.negated[activeVfTarget.key] }" 
+                                                            @click="toggleVfLabelNegation()"
+                                                            title="Querstrich über das Merkmal legen">
+                                                        <span class="vf-negate-preview-char">A̅</span>
+                                                        <span>Strich</span>
+                                                    </button>
+                                                </div>
+                                                <div class="studio-popover-footer">
+                                                    <span class="popover-preview-label">Vorschau:</span>
+                                                    <strong class="popover-preview-math" x-html="renderMath(workingModule.data.labels[activeVfTarget.key])"></strong>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- ── Urnenmodell WYSIWYG Editor ── -->
+                    <template x-if="workingModule && workingModule.type === 'urne'">
+                        <div class="studio-wysiwyg-layout">
+                            
+                            <!-- Top Toolbar -->
+                            <div class="studio-top-toolbar">
+                                <!-- Schnellbestückung: Kugeln einwerfen -->
+                                <div class="studio-toolbar-group studio-urne-quick-add">
+                                    <span class="studio-group-label">Einwerfen:</span>
+                                    <div class="studio-urne-count-controls">
+                                        <input type="number" 
+                                               class="studio-stepper-input studio-urne-count-input" 
+                                               x-model.number="quickKugelCount" 
+                                               min="1" 
+                                               max="50" 
+                                               title="Anzahl Kugeln">
+                                        <span class="studio-urne-unit-x">×</span>
+                                    </div>
+
+                                    <!-- Farbwahl Swatches -->
+                                    <div class="studio-urne-color-swatches" title="Kugelfarbe wählen">
+                                        <button type="button" class="studio-urne-swatch swatch-white" :class="{ 'active': quickKugelColor === 'white' }" @click="quickKugelColor = 'white'" title="Weiß">⚪</button>
+                                        <button type="button" class="studio-urne-swatch swatch-grey" :class="{ 'active': quickKugelColor === 'grey' }" @click="quickKugelColor = 'grey'" title="Grau">🔘</button>
+                                        <button type="button" class="studio-urne-swatch swatch-black" :class="{ 'active': quickKugelColor === 'black' }" @click="quickKugelColor = 'black'" title="Schwarz">⚫</button>
+                                        <button type="button" class="studio-urne-swatch swatch-red" :class="{ 'active': quickKugelColor === 'red' }" @click="quickKugelColor = 'red'" title="Rot">🔴</button>
+                                        <button type="button" class="studio-urne-swatch swatch-yellow" :class="{ 'active': quickKugelColor === 'yellow' }" @click="quickKugelColor = 'yellow'" title="Gelb">🟡</button>
+                                        <button type="button" class="studio-urne-swatch swatch-green" :class="{ 'active': quickKugelColor === 'green' }" @click="quickKugelColor = 'green'" title="Grün">🟢</button>
+                                        <button type="button" class="studio-urne-swatch swatch-blue" :class="{ 'active': quickKugelColor === 'blue' }" @click="quickKugelColor = 'blue'" title="Blau">🔵</button>
+                                    </div>
+
+                                    <!-- Optionale Beschriftung -->
+                                    <input type="text" 
+                                           class="matching-input studio-urne-label-input" 
+                                           x-model="quickKugelLabel" 
+                                           placeholder="Label (opt.)" 
+                                           maxlength="3" 
+                                           title="Optionale Beschriftung (z.B. 1, A, €)">
+
+                                    <button type="button" 
+                                            class="btn-primary btn-small studio-action-pill-btn" 
+                                            @click="addQuickKugeln(); quickKugelLabel = ''" 
+                                            title="Kugeln in die Urne einwerfen">
+                                        ➕ Einwerfen
+                                    </button>
+                                </div>
+
+                                <!-- Vorlagen / Presets -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Vorlagen:</span>
+                                    <button type="button" 
+                                            class="btn-secondary btn-small studio-subtle-btn" 
+                                            @click="applyUrnePreset('ampel')" 
+                                            title="4 Rot, 2 Gelb, 4 Grün">
+                                        🚦 Ampel
+                                    </button>
+                                    <button type="button" 
+                                            class="btn-secondary btn-small studio-subtle-btn" 
+                                            @click="applyUrnePreset('mono')" 
+                                            title="4 Weiß, 4 Grau, 4 Schwarz (ideal für SW-Druck)">
+                                        🏁 Schwarz/Weiß
+                                    </button>
+                                    <button type="button" 
+                                            class="btn-secondary btn-small studio-subtle-btn" 
+                                            @click="applyUrnePreset('numbered')" 
+                                            title="10 Kugeln nummeriert von 1 bis 10">
+                                        🔢 1–10
+                                    </button>
+                                </div>
+
+                                <!-- Aktionen: Mischen / Sortieren / Leeren -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Aktionen:</span>
+                                    <button type="button" 
+                                            class="btn-secondary btn-small studio-action-pill-btn" 
+                                            @click="shuffleUrneStudio()" 
+                                            title="Reihenfolge der Kugeln zufällig durchmischen">
+                                        🎲 Mischen
+                                    </button>
+                                    <button type="button" 
+                                            class="btn-secondary btn-small studio-action-pill-btn" 
+                                            @click="sortUrneStudio()" 
+                                            title="Kugeln nach Farbe und Beschriftung sortieren">
+                                        📶 Sortieren
+                                    </button>
+                                    <button type="button" 
+                                            class="btn-secondary btn-small studio-subtle-btn studio-btn-danger-subtle" 
+                                            @click="applyUrnePreset('clear')" 
+                                            title="Alle Kugeln entfernen">
+                                        🧹 Leeren
+                                    </button>
+                                </div>
+
+                                <!-- Druckhöhe -->
+                                <div class="studio-toolbar-group studio-toolbar-actions">
+                                    <span class="studio-group-label">Druckhöhe:</span>
+                                    <div class="studio-height-stepper">
+                                        <button type="button" 
+                                                class="btn-stepper-step" 
+                                                @click="setUrneHeight(Math.max(2, Math.round(((parseFloat(workingModule.data.height) || 4.5) - 0.5) * 10) / 10))" 
+                                                title="Verkleinern (−0.5 cm)">−</button>
+                                        <div class="stepper-input-wrap">
+                                            <input type="number" 
+                                                   class="studio-stepper-input" 
+                                                   x-model.number="workingModule.data.height" 
+                                                   step="0.5" 
+                                                   min="2" 
+                                                   max="15" 
+                                                   @input="touchRender()">
+                                            <span class="stepper-unit">cm</span>
+                                        </div>
+                                        <button type="button" 
+                                                class="btn-stepper-step" 
+                                                @click="setUrneHeight(Math.min(15, Math.round(((parseFloat(workingModule.data.height) || 4.5) + 0.5) * 10) / 10))" 
+                                                title="Vergrößern (+0.5 cm)">+</button>
+                                    </div>
+                                    <div class="studio-size-presets">
+                                        <button type="button" class="studio-preset-pill" :class="{ 'active': workingModule.data.height == 3.5 }" @click="setUrneHeight(3.5)" title="Klein (3.5 cm)">S</button>
+                                        <button type="button" class="studio-preset-pill" :class="{ 'active': workingModule.data.height == 5 }" @click="setUrneHeight(5)" title="Standard (5 cm)">M</button>
+                                        <button type="button" class="studio-preset-pill" :class="{ 'active': workingModule.data.height == 7 }" @click="setUrneHeight(7)" title="Groß (7 cm)">L</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Haupt-Arbeitsfläche mit interaktiver Urne -->
+                            <div class="studio-wysiwyg-canvas-area" @click="handleUrneCanvasClick($event)">
+                                <div class="studio-wysiwyg-container studio-urne-container">
+                                    
+                                    <!-- Status-Badge -->
+                                    <div class="studio-canvas-dimension-badge">
+                                        <span>Inhalt: </span>
+                                        <strong x-text="getUrneStudioStatusText()"></strong>
+                                        <span class="dimension-separator">|</span>
+                                        <span>Druckhöhe: </span>
+                                        <strong x-text="(workingModule.data.height || 4.5) + ' cm'"></strong>
+                                    </div>
+
+                                    <!-- Interaktives Urnen-SVG -->
+                                    <div class="studio-urne-svg-wrapper" x-html="getUrnePreviewSvg()"></div>
+
+                                    <!-- Schwebendes Popover für direkte In-Place-Kugelbearbeitung -->
+                                    <div id="studio-urne-popover" 
+                                         class="studio-canvas-popover studio-urne-popover" 
+                                         x-show="activeKugelId !== null && getActiveKugel()" 
+                                         @click.stop>
+                                        
+                                        <template x-if="getActiveKugel()">
+                                            <div class="studio-popover-content">
+                                                <div class="studio-popover-header">
+                                                    <span class="studio-popover-title">Kugel bearbeiten</span>
+                                                    <button type="button" class="studio-popover-close-btn" @click="closeUrnePopover()">&times;</button>
+                                                </div>
+
+                                                <!-- Farbauswahl in Popover -->
+                                                <div class="studio-popover-color-row">
+                                                    <span class="popover-color-label">Farbe:</span>
+                                                    <div class="studio-urne-popover-swatches">
+                                                        <button type="button" class="studio-urne-swatch swatch-white" :class="{ 'active': getActiveKugel().type === 'white' }" @click="setKugelColor('white')" title="Weiß">⚪</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-grey" :class="{ 'active': getActiveKugel().type === 'grey' }" @click="setKugelColor('grey')" title="Grau">🔘</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-black" :class="{ 'active': getActiveKugel().type === 'black' }" @click="setKugelColor('black')" title="Schwarz">⚫</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-red" :class="{ 'active': getActiveKugel().type === 'red' }" @click="setKugelColor('red')" title="Rot">🔴</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-yellow" :class="{ 'active': getActiveKugel().type === 'yellow' }" @click="setKugelColor('yellow')" title="Gelb">🟡</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-green" :class="{ 'active': getActiveKugel().type === 'green' }" @click="setKugelColor('green')" title="Grün">🟢</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-blue" :class="{ 'active': getActiveKugel().type === 'blue' }" @click="setKugelColor('blue')" title="Blau">🔵</button>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Beschriftung & Löschen -->
+                                                <div class="studio-popover-row">
+                                                    <input type="text" 
+                                                           id="studio-urne-label-input" 
+                                                           class="matching-input studio-popover-input" 
+                                                           x-model="getActiveKugel().label" 
+                                                           @input="touchRender()" 
+                                                           @keydown.enter.prevent="selectNextKugel()" 
+                                                           @keydown.tab.prevent="$event.shiftKey ? selectPrevKugel() : selectNextKugel()" 
+                                                           @keydown.escape="closeUrnePopover()" 
+                                                           placeholder="Beschriftung (z.B. 1, A, €)" 
+                                                           maxlength="3">
+                                                    
+                                                    <button type="button" 
+                                                            class="btn-secondary btn-small studio-btn-danger" 
+                                                            @click="removeActiveKugel()" 
+                                                            title="Diese Kugel aus der Urne entfernen">
+                                                        🗑️ Löschen
+                                                    </button>
+                                                </div>
+
+                                                <!-- Navigation -->
+                                                <div class="studio-popover-nav-row">
+                                                    <button type="button" class="btn-popover-nav" @click="selectPrevKugel()" title="Vorherige Kugel (Shift+Tab)">◀ Zurück</button>
+                                                    <span class="popover-hint">Tab / Enter</span>
+                                                    <button type="button" class="btn-popover-nav" @click="selectNextKugel()" title="Nächste Kugel (Tab)">Weiter ▶</button>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- ── Glücksrad WYSIWYG Editor ── -->
+                    <template x-if="workingModule && workingModule.type === 'gluecksrad'">
+                        <div class="studio-wysiwyg-layout">
+                            
+                            <!-- Top Toolbar -->
+                            <div class="studio-top-toolbar">
+                                <!-- Presets -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Presets:</span>
+                                    <div class="studio-toolbar-presets">
+                                        <button type="button" class="btn-preset-chip" @click="applyGluecksradStudioPreset('4_equal')" title="4 gleich große Sektoren (Viertel)">4er</button>
+                                        <button type="button" class="btn-preset-chip" @click="applyGluecksradStudioPreset('6_equal')" title="6 gleich große Sektoren (Würfel)">6er</button>
+                                        <button type="button" class="btn-preset-chip" @click="applyGluecksradStudioPreset('8_equal')" title="8 gleich große Sektoren (Achtel)">8er</button>
+                                        <button type="button" class="btn-preset-chip" @click="applyGluecksradStudioPreset('12_equal')" title="12 gleich große Sektoren (Uhr)">12er</button>
+                                        <button type="button" class="btn-preset-chip" @click="applyGluecksradStudioPreset('farben_4')" title="4 Farben (Rot, Gelb, Grün, Blau)">4 Farben</button>
+                                        <button type="button" class="btn-preset-chip" @click="applyGluecksradStudioPreset('unequal_half_quarter')" title="Ungleiche Sektoren: 1/2, 1/4, 1/8, 1/8">1/2 & 1/4</button>
+                                        <button type="button" class="btn-preset-chip" @click="applyGluecksradStudioPreset('gewinnspiel')" title="Gewinnspiel: 0€, 1€, 2€, 5€">Gewinnspiel</button>
+                                    </div>
+                                </div>
+
+                                <!-- Aktionen -->
+                                <div class="studio-toolbar-group">
+                                    <button type="button" 
+                                            class="studio-btn-action" 
+                                            @click="addSector()" 
+                                            title="Einen neuen Sektor hinzufügen">
+                                        ➕ Sektor
+                                    </button>
+                                    <button type="button" 
+                                            class="studio-btn-action" 
+                                            :class="{ 'active': workingModule.data && workingModule.data.showPointer }"
+                                            @click="toggleGluecksradPointer()" 
+                                            title="Pfeil / Zeiger oben umschalten">
+                                        🎯 Zeiger
+                                    </button>
+                                </div>
+
+                                <!-- Druckhöhe -->
+                                <div class="studio-toolbar-group studio-toolbar-group-right">
+                                    <span class="studio-group-label">Druckhöhe:</span>
+                                    <div class="studio-stepper-control">
+                                        <button type="button" class="btn-stepper" @click="setGluecksradHeight((workingModule.data.height || 4.5) - 0.5)">−</button>
+                                        <input type="number" 
+                                               class="studio-stepper-input" 
+                                               :value="workingModule.data.height || 4.5" 
+                                               @input="setGluecksradHeight($event.target.value)" 
+                                               step="0.5" 
+                                               min="2" 
+                                               max="25">
+                                        <button type="button" class="btn-stepper" @click="setGluecksradHeight((workingModule.data.height || 4.5) + 0.5)">+</button>
+                                    </div>
+                                    <span class="studio-unit-label">cm</span>
+                                </div>
+                            </div>
+
+                            <!-- Canvas Area mit Live-SVG und In-Place Popover -->
+                            <div class="studio-canvas-area" @click="handleGluecksradCanvasClick($event)">
+                                <div class="studio-wysiwyg-container studio-gluecksrad-container">
+                                    
+                                    <!-- Live Status Badge -->
+                                    <div class="studio-canvas-status-badge">
+                                        <span x-text="getGluecksradStudioStatusText()"></span>
+                                    </div>
+
+                                    <!-- SVG Wheel Display -->
+                                    <div class="studio-gluecksrad-svg-wrapper" x-html="getGluecksradPreviewSvg()"></div>
+
+                                    <!-- In-Place Popover für ausgewählten Sektor -->
+                                    <div id="studio-gluecksrad-popover" 
+                                         class="studio-canvas-popover studio-gluecksrad-popover" 
+                                         x-show="activeSectorId !== null && getActiveSector()" 
+                                         :style="`left: ${popoverPos.x}px; top: ${popoverPos.y}px;`" 
+                                         @click.stop>
+                                        
+                                        <template x-if="getActiveSector()">
+                                            <div>
+                                                <!-- Popover Header -->
+                                                <div class="studio-popover-header">
+                                                    <div class="studio-popover-title-row">
+                                                        <span class="studio-popover-badge">🎡 Sektor</span>
+                                                        <span class="studio-popover-badge studio-badge-secondary" x-text="getGluecksradSectorAngle(getActiveSector())"></span>
+                                                    </div>
+                                                    <button type="button" class="btn-icon-close" @click="closeGluecksradPopover()" title="Schließen">✕</button>
+                                                </div>
+
+                                                <!-- Farbwahl & Muster -->
+                                                <div class="studio-popover-color-row">
+                                                    <span class="popover-color-label">Farbe / Muster:</span>
+                                                    <div class="studio-gluecksrad-popover-swatches">
+                                                        <button type="button" class="studio-urne-swatch swatch-white" :class="{ 'active': getActiveSector().type === 'white' }" @click="setSectorColor('white')" title="Weiß">⚪</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-grey" :class="{ 'active': getActiveSector().type === 'grey' }" @click="setSectorColor('grey')" title="Grau">🔘</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-black" :class="{ 'active': getActiveSector().type === 'black' }" @click="setSectorColor('black')" title="Schwarz">⚫</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-striped" :class="{ 'active': getActiveSector().type === 'striped' }" @click="setSectorColor('striped')" title="Gestreift">🏁</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-red" :class="{ 'active': getActiveSector().type === 'red' }" @click="setSectorColor('red')" title="Rot">🔴</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-yellow" :class="{ 'active': getActiveSector().type === 'yellow' }" @click="setSectorColor('yellow')" title="Gelb">🟡</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-green" :class="{ 'active': getActiveSector().type === 'green' }" @click="setSectorColor('green')" title="Grün">🟢</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-blue" :class="{ 'active': getActiveSector().type === 'blue' }" @click="setSectorColor('blue')" title="Blau">🔵</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-orange" :class="{ 'active': getActiveSector().type === 'orange' }" @click="setSectorColor('orange')" title="Orange">🟠</button>
+                                                        <button type="button" class="studio-urne-swatch swatch-purple" :class="{ 'active': getActiveSector().type === 'purple' }" @click="setSectorColor('purple')" title="Lila">🟣</button>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Beschriftung Input -->
+                                                <div class="studio-popover-field">
+                                                    <label class="studio-popover-label">Beschriftung:</label>
+                                                    <input type="text" 
+                                                           id="studio-gluecksrad-label-input" 
+                                                           class="matching-input studio-popover-input" 
+                                                           x-model="getActiveSector().label" 
+                                                           @input="touchRender()" 
+                                                           placeholder="z. B. 1, Rot, 5 €">
+                                                </div>
+
+                                                <!-- Gewicht / Relative Größe -->
+                                                <div class="studio-popover-field">
+                                                    <div class="field-label-between">
+                                                        <label class="studio-popover-label">Gewicht / Anteil:</label>
+                                                        <span class="studio-popover-hint-inline" x-text="'Winkel: ' + getGluecksradSectorAngle(getActiveSector())"></span>
+                                                    </div>
+                                                    <div class="studio-popover-weight-controls">
+                                                        <input type="number" 
+                                                               class="matching-input studio-popover-input studio-weight-num-input" 
+                                                               x-model.number="getActiveSector().weight" 
+                                                               @input="touchRender()" 
+                                                               step="0.5" 
+                                                               min="0.1" 
+                                                               max="50">
+                                                        <div class="quick-weight-buttons">
+                                                            <button type="button" class="btn-weight-chip" :class="{ 'active': getActiveSector().weight === 1 }" @click="setSectorWeight(1)">1× (1 Sektor)</button>
+                                                            <button type="button" class="btn-weight-chip" :class="{ 'active': getActiveSector().weight === 2 }" @click="setSectorWeight(2)">2× (Doppelt)</button>
+                                                            <button type="button" class="btn-weight-chip" :class="{ 'active': getActiveSector().weight === 4 }" @click="setSectorWeight(4)">4× (Halbkreis)</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Aktionen: Löschen -->
+                                                <div class="studio-popover-field">
+                                                    <button type="button" 
+                                                            class="studio-btn-danger-subtle studio-btn-full" 
+                                                            @click="removeActiveSector()" 
+                                                            title="Diesen Sektor entfernen">
+                                                        🗑️ Sektor entfernen
+                                                    </button>
+                                                </div>
+
+                                                <!-- Navigation -->
+                                                <div class="studio-popover-nav-row">
+                                                    <button type="button" class="btn-popover-nav" @click="selectPrevSector()" title="Vorheriger Sektor">◀ Zurück</button>
+                                                    <span class="popover-hint">Sektor wechseln</span>
+                                                    <button type="button" class="btn-popover-nav" @click="selectNextSector()" title="Nächster Sektor">Weiter ▶</button>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- ── Statistik & Diagramme WYSIWYG Editor ── -->
+                    <template x-if="workingModule && workingModule.type === 'diagramm'">
+                        <div class="studio-wysiwyg-layout">
+                            <!-- Top Toolbar -->
+                            <div class="studio-top-toolbar">
+                                <!-- Typ-Auswahl Pills -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Typ:</span>
+                                    <div class="segmented-control">
+                                        <button type="button" 
+                                                :class="{ 'active': workingModule.data.type === 'saeule' }" 
+                                                @click="setDiagType('saeule')"
+                                                title="Vertikales Säulendiagramm">📊 Säule</button>
+                                        <button type="button" 
+                                                :class="{ 'active': workingModule.data.type === 'balken' }" 
+                                                @click="setDiagType('balken')"
+                                                title="Horizontales Balkendiagramm">📋 Balken</button>
+                                        <button type="button" 
+                                                :class="{ 'active': workingModule.data.type === 'stab' }" 
+                                                @click="setDiagType('stab')"
+                                                title="Stabdiagramm / Nadeldiagramm">📍 Stab</button>
+                                        <button type="button" 
+                                                :class="{ 'active': workingModule.data.type === 'linie' }" 
+                                                @click="setDiagType('linie')"
+                                                title="Liniendiagramm / Verlauf">📈 Linie</button>
+                                    </div>
+                                </div>
+
+                                <!-- Modus Pills -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Modus:</span>
+                                    <div class="segmented-control">
+                                        <button type="button" 
+                                                :class="{ 'active': workingModule.data.mode === 'show' }" 
+                                                @click="setDiagMode('show')"
+                                                title="Diagramm fertig anzeigen">👁️ Anzeigen</button>
+                                        <button type="button" 
+                                                :class="{ 'active': workingModule.data.mode === 'draw' }" 
+                                                @click="setDiagMode('draw')"
+                                                title="Achsen & Gitter für Schüler zum Selberzeichnen (Lösungsschablone)">✏️ Einzeichnen</button>
+                                        <button type="button" 
+                                                :class="{ 'active': workingModule.data.mode === 'read' }" 
+                                                @click="setDiagMode('read')"
+                                                title="Diagramm mit Ausfüllkästchen zum Ablesen">🔢 Ablesen</button>
+                                    </div>
+                                </div>
+
+                                <!-- Presets Dropdown -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Vorlagen:</span>
+                                    <select class="compact-select studio-preset-select" 
+                                            @change="applyDiagrammStudioPreset($event.target.value); $event.target.value = ''">
+                                        <option value="" disabled selected>✨ Vorlage wählen...</option>
+                                        <option value="notenspiegel">📝 Notenspiegel (1–6)</option>
+                                        <option value="wuerfel">🎲 Würfelwurf (1–6)</option>
+                                        <option value="wochentage">📅 Wochentage (Mo–Fr)</option>
+                                        <option value="haustiere">🐶 Haustiere (5 Kategorien)</option>
+                                        <option value="quartale">📊 Quartale (Q1–Q4)</option>
+                                        <option value="clear">🗑️ Alles leeren</option>
+                                    </select>
+                                </div>
+
+                                <!-- Achsen & Gitter -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Skala:</span>
+                                    <div class="studio-input-with-label">
+                                        <span class="studio-mini-label">Max:</span>
+                                        <input type="number" 
+                                               class="compact-input studio-num-input" 
+                                               x-model.number="workingModule.data.yMax" 
+                                               step="1" 
+                                               min="1"
+                                               @input="touchRender()" 
+                                               title="Maximalwert der Skala">
+                                    </div>
+                                    <div class="studio-input-with-label">
+                                        <span class="studio-mini-label">Schritt:</span>
+                                        <input type="number" 
+                                               class="compact-input studio-num-input" 
+                                               x-model.number="workingModule.data.yStep" 
+                                               step="0.5" 
+                                               min="0.1"
+                                               @input="touchRender()" 
+                                               title="Schrittweite der Achsenskalierung">
+                                    </div>
+                                    <button type="button"
+                                            class="btn-secondary btn-small studio-subtle-btn"
+                                            :class="{ 'active': workingModule.data.showGrid !== false }"
+                                            @click="toggleDiagGrid()"
+                                            title="Gitternetzlinien umschalten">
+                                        <span x-text="workingModule.data.showGrid !== false ? '▦ Gitter an' : '▢ Gitter aus'"></span>
+                                    </button>
+                                </div>
+
+                                <!-- Füllung -->
+                                <div class="studio-toolbar-group" x-show="workingModule.data.type === 'saeule' || workingModule.data.type === 'balken'">
+                                    <span class="studio-group-label">Muster:</span>
+                                    <div class="studio-diag-fill-swatches">
+                                        <button type="button" 
+                                                class="studio-diag-fill-btn fill-grey"
+                                                :class="{ 'active': (workingModule.data.fillType || 'grey') === 'grey' }"
+                                                @click="setDiagFillType('grey')"
+                                                title="Grau"></button>
+                                        <button type="button" 
+                                                class="studio-diag-fill-btn fill-striped"
+                                                :class="{ 'active': workingModule.data.fillType === 'striped' }"
+                                                @click="setDiagFillType('striped')"
+                                                title="Schraffiert"></button>
+                                        <button type="button" 
+                                                class="studio-diag-fill-btn fill-black"
+                                                :class="{ 'active': workingModule.data.fillType === 'black' }"
+                                                @click="setDiagFillType('black')"
+                                                title="Schwarz"></button>
+                                        <button type="button" 
+                                                class="studio-diag-fill-btn fill-accent"
+                                                :class="{ 'active': workingModule.data.fillType === 'primary' }"
+                                                @click="setDiagFillType('primary')"
+                                                title="Akzentfarbe"></button>
+                                    </div>
+                                </div>
+
+                                <!-- Blatt-Größe -->
+                                <div class="studio-toolbar-group studio-toolbar-actions">
+                                    <span class="studio-group-label">Druckgröße:</span>
+                                    <div class="studio-input-with-label">
+                                        <span class="studio-mini-label">B:</span>
+                                        <input type="number" 
+                                               class="compact-input studio-num-input" 
+                                               x-model.number="workingModule.data.width" 
+                                               step="0.5" 
+                                               min="4" 
+                                               max="18"
+                                               @input="touchRender()" 
+                                               title="Breite in cm auf A4">
+                                        <span class="studio-unit">cm</span>
+                                    </div>
+                                    <div class="studio-input-with-label">
+                                        <span class="studio-mini-label">H:</span>
+                                        <input type="number" 
+                                               class="compact-input studio-num-input" 
+                                               x-model.number="workingModule.data.height" 
+                                               step="0.5" 
+                                               min="3" 
+                                               max="15"
+                                               @input="touchRender()" 
+                                               title="Höhe in cm auf A4">
+                                        <span class="studio-unit">cm</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Beschriftungs-Leiste -->
+                            <div class="studio-secondary-toolbar">
+                                <div class="studio-input-row-flex">
+                                    <div class="studio-field-compact">
+                                        <label class="studio-field-label">Titel:</label>
+                                        <input type="text" 
+                                               class="compact-input studio-title-input" 
+                                               x-model="workingModule.data.title" 
+                                               placeholder="z. B. Klassenumfrage..." 
+                                               @input="touchRender()">
+                                    </div>
+                                    <div class="studio-field-compact">
+                                        <label class="studio-field-label">X-Achse:</label>
+                                        <input type="text" 
+                                               class="compact-input studio-axis-input" 
+                                               x-model="workingModule.data.xAxisLabel" 
+                                               placeholder="z. B. Note / Farbe" 
+                                               @input="touchRender()">
+                                    </div>
+                                    <div class="studio-field-compact">
+                                        <label class="studio-field-label">Y-Achse:</label>
+                                        <input type="text" 
+                                               class="compact-input studio-axis-input" 
+                                               x-model="workingModule.data.yAxisLabel" 
+                                               placeholder="z. B. Anzahl / Häufigkeit" 
+                                               @input="touchRender()">
+                                    </div>
+                                    <button type="button" 
+                                            class="btn-primary btn-small studio-action-pill-btn"
+                                            @click="addDiagItem()"
+                                            title="Neue Kategorie hinzufügen">
+                                        ➕ Kategorie
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Haupt-Arbeitsfläche mit Live-SVG & Popover -->
+                            <div class="studio-wysiwyg-canvas-area studio-diag-canvas-area" @click="handleDiagCanvasClick($event)">
+                                <div class="studio-wysiwyg-container studio-diag-container">
+                                    
+                                    <!-- Status-Badge -->
+                                    <div class="studio-canvas-dimension-badge">
+                                        <span>Status: </span>
+                                        <strong x-text="getDiagrammStudioStatusText()"></strong>
+                                    </div>
+
+                                    <!-- Interaktive SVG-Vorschau -->
+                                    <div class="studio-diag-svg-wrapper" x-html="getDiagrammPreviewSvg()"></div>
+
+                                    <!-- In-Place Popover für die ausgewählte Kategorie/Säule -->
+                                    <div id="studio-diag-popover" 
+                                         class="studio-canvas-popover studio-diag-popover" 
+                                         x-show="activeDiagItemIdx !== null && getActiveDiagItem()" 
+                                         @click.stop>
+                                        
+                                        <template x-if="getActiveDiagItem()">
+                                            <div class="studio-popover-card">
+                                                <!-- Popover Header -->
+                                                <div class="studio-popover-header">
+                                                    <span class="studio-popover-title">
+                                                        Kategorie <strong x-text="(activeDiagItemIdx + 1)"></strong>
+                                                    </span>
+                                                    <div class="studio-popover-actions">
+                                                        <button type="button" 
+                                                                class="studio-nav-btn" 
+                                                                @click="selectPrevDiagItem()" 
+                                                                title="Vorherige Kategorie">◀</button>
+                                                        <button type="button" 
+                                                                class="studio-nav-btn" 
+                                                                @click="selectNextDiagItem()" 
+                                                                title="Nächste Kategorie">▶</button>
+                                                        <button type="button" 
+                                                                class="studio-popover-close-btn" 
+                                                                @click="closeDiagPopover()" 
+                                                                title="Schließen">&times;</button>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Popover Content -->
+                                                <div class="studio-popover-body">
+                                                    <!-- Label input -->
+                                                    <div class="studio-popover-field">
+                                                        <label class="studio-field-label">Bezeichnung:</label>
+                                                        <input type="text" 
+                                                               class="compact-input studio-fullwidth-input" 
+                                                               x-model="getActiveDiagItem().label" 
+                                                               placeholder="Label..."
+                                                               @input="touchRender()">
+                                                    </div>
+
+                                                    <!-- Value stepper -->
+                                                    <div class="studio-popover-field">
+                                                        <label class="studio-field-label">Wert (Höhe):</label>
+                                                        <div class="studio-stepper-row">
+                                                            <button type="button" 
+                                                                    class="btn-secondary studio-stepper-btn"
+                                                                    @click="getActiveDiagItem().value = Math.max(0, (parseFloat(getActiveDiagItem().value) || 0) - (workingModule.data.yStep || 1)); touchRender()">-</button>
+                                                            <input type="number" 
+                                                                   class="compact-input studio-stepper-input" 
+                                                                   x-model.number="getActiveDiagItem().value" 
+                                                                   min="0"
+                                                                   :max="workingModule.data.yMax"
+                                                                   @input="touchRender()">
+                                                            <button type="button" 
+                                                                    class="btn-secondary studio-stepper-btn"
+                                                                    @click="getActiveDiagItem().value = Math.min(workingModule.data.yMax, (parseFloat(getActiveDiagItem().value) || 0) + (workingModule.data.yStep || 1)); touchRender()">+</button>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Delete button -->
+                                                    <div class="studio-popover-footer-row">
+                                                        <button type="button" 
+                                                                class="btn-danger btn-small studio-danger-text-btn"
+                                                                @click="removeActiveDiagItem()"
+                                                                title="Diese Kategorie löschen">
+                                                            🗑️ Löschen
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <!-- Datentabelle unter dem Diagramm für schnelle Tabellen-Übersicht -->
+                                <div class="studio-diag-data-table-container">
+                                    <div class="studio-table-header-row">
+                                        <span class="studio-group-label">Kategorien & Werte:</span>
+                                        <button type="button" 
+                                                class="btn-secondary btn-small studio-action-pill-btn"
+                                                @click="addDiagItem()">
+                                            ➕ Kategorie hinzufügen
+                                        </button>
+                                    </div>
+                                    <div class="studio-diag-chips-wrap">
+                                        <template x-for="(item, idx) in (workingModule.data.items || [])" :key="idx">
+                                            <div class="studio-diag-chip" 
+                                                 :class="{ 'active': activeDiagItemIdx === idx }"
+                                                 @click="selectDiagItem(idx, $event)">
+                                                <span class="chip-label" x-text="item.label || ('Kategorie ' + (idx + 1))"></span>
+                                                <span class="chip-badge" x-text="item.value"></span>
+                                                <button type="button" 
+                                                        class="chip-delete-btn" 
+                                                        @click.stop="removeDiagItemByIdx(idx)"
+                                                        title="Löschen">&times;</button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- ── Wahrscheinlichkeitsverteilungen WYSIWYG Editor ── -->
+                    <template x-if="workingModule && workingModule.type === 'verteilung'">
+                        <div class="studio-wysiwyg-layout">
+                            <!-- Top Toolbar -->
+                            <div class="studio-top-toolbar">
+                                <!-- Typ-Auswahl Pills -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Verteilung:</span>
+                                    <div class="segmented-control">
+                                        <button type="button" 
+                                                :class="{ 'active': workingModule.data.type === 'binomial' }" 
+                                                @click="setVerteilungType('binomial')"
+                                                title="Binomialverteilung B(n, p) - diskret mit Säulen">📊 Binomial B(n, p)</button>
+                                        <button type="button" 
+                                                :class="{ 'active': workingModule.data.type === 'normal' }" 
+                                                @click="setVerteilungType('normal')"
+                                                title="Normalverteilung N(μ, σ) - stetige Gauß-Glockenkurve">📈 Normal N(μ, σ)</button>
+                                    </div>
+                                </div>
+
+                                <!-- Didaktische Vorlagen -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Vorlagen:</span>
+                                    <select class="studio-select" @change="applyVerteilungStudioPreset($event.target.value); $event.target.value = ''">
+                                        <option value="" disabled selected>Beispiel wählen...</option>
+                                        <optgroup label="Binomialverteilung (Bernoulli)">
+                                            <option value="coin">🪙 Münzwurf (n=10, p=0.5)</option>
+                                            <option value="dice">🎲 Würfel '6' (n=30, p=0.17)</option>
+                                            <option value="mc">📝 Multiple Choice (n=20, p=0.25)</option>
+                                            <option value="defect">⚙️ Qualitätsprüfung (n=50, p=0.04)</option>
+                                            <option value="poll">🗳️ Wahlumfrage (n=100, p=0.40)</option>
+                                        </optgroup>
+                                        <optgroup label="Normalverteilung (Gauß)">
+                                            <option value="norm_std">📐 Standardnormal (μ=0, σ=1)</option>
+                                            <option value="norm_iq">🧠 Intelligenztest (μ=100, σ=15)</option>
+                                            <option value="norm_height">📏 Körpergröße (μ=175, σ=7)</option>
+                                            <option value="norm_fill">📦 Abfüllmenge (μ=500, σ=10)</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+
+                                <!-- Druckmaße -->
+                                <div class="studio-toolbar-group">
+                                    <span class="studio-group-label">Druckgröße:</span>
+                                    <div class="studio-inline-inputs">
+                                        <label class="studio-dim-label">B:</label>
+                                        <input type="number" 
+                                               class="studio-number-input studio-dim-input" 
+                                               x-model.number="workingModule.data.settings.width" 
+                                               @input="touchRender()" 
+                                               step="0.5" 
+                                               min="4" 
+                                               max="25"
+                                               title="Breite in cm">
+                                        <span class="studio-dim-unit">×</span>
+                                        <label class="studio-dim-label">H:</label>
+                                        <input type="number" 
+                                               class="studio-number-input studio-dim-input" 
+                                               x-model.number="workingModule.data.settings.height" 
+                                               @input="touchRender()" 
+                                               step="0.5" 
+                                               min="3" 
+                                               max="25"
+                                               title="Höhe in cm">
+                                        <span class="studio-dim-unit">cm</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Secondary Toolbar: Parameter & Intervall -->
+                            <div class="studio-secondary-toolbar">
+                                <!-- Parameter für Binomialverteilung -->
+                                <template x-if="workingModule.data.type === 'binomial'">
+                                    <div class="studio-toolbar-group">
+                                        <span class="studio-group-label">Parameter:</span>
+                                        <label class="studio-dim-label">n =</label>
+                                        <input type="number" 
+                                               class="studio-number-input studio-dim-input" 
+                                               :value="workingModule.data.n" 
+                                               @input="setVerteilungN($event.target.value)" 
+                                               step="1" 
+                                               min="1" 
+                                               max="250"
+                                               title="Anzahl der Versuche (n)">
+                                        <label class="studio-dim-label margin-left-xs">p =</label>
+                                        <input type="number" 
+                                               class="studio-number-input studio-dim-input" 
+                                               :value="workingModule.data.p" 
+                                               @input="setVerteilungP($event.target.value)" 
+                                               step="0.01" 
+                                               min="0" 
+                                               max="1"
+                                               title="Erfolgswahrscheinlichkeit (p)">
+                                        <!-- Kenngrößen Chip -->
+                                        <div class="studio-verteilung-metrics-chip" title="Erwartungswert μ und Standardabweichung σ">
+                                            <span>μ = <strong x-text="(workingModule.data.n * workingModule.data.p).toFixed(2)"></strong></span>
+                                            <span class="metrics-sep">|</span>
+                                            <span>σ = <strong x-text="Math.sqrt(workingModule.data.n * workingModule.data.p * (1 - workingModule.data.p)).toFixed(2)"></strong></span>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <!-- Parameter für Normalverteilung -->
+                                <template x-if="workingModule.data.type === 'normal'">
+                                    <div class="studio-toolbar-group">
+                                        <span class="studio-group-label">Parameter:</span>
+                                        <label class="studio-dim-label">μ =</label>
+                                        <input type="number" 
+                                               class="studio-number-input studio-dim-input" 
+                                               :value="workingModule.data.mu" 
+                                               @input="setVerteilungMu($event.target.value)" 
+                                               step="1" 
+                                               title="Erwartungswert (Mittelwert μ)">
+                                        <label class="studio-dim-label margin-left-xs">σ =</label>
+                                        <input type="number" 
+                                               class="studio-number-input studio-dim-input" 
+                                               :value="workingModule.data.sigma" 
+                                               @input="setVerteilungSigma($event.target.value)" 
+                                               step="0.5" 
+                                               min="0.01" 
+                                               title="Standardabweichung (σ)">
+                                        <!-- Kenngrößen Chip -->
+                                        <div class="studio-verteilung-metrics-chip" title="1σ-Intervall">
+                                            <span>1σ-Intervall: [<strong><span x-text="(Number(workingModule.data.mu) - Number(workingModule.data.sigma)).toFixed(1)"></span></strong> ; <strong><span x-text="(Number(workingModule.data.mu) + Number(workingModule.data.sigma)).toFixed(1)"></span></strong>]</span>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <!-- Bereich markieren P(a <= X <= b) -->
+                                <div class="studio-toolbar-group studio-grow-group">
+                                    <label class="studio-checkbox-label">
+                                        <input type="checkbox" 
+                                               :checked="workingModule.data.markArea && workingModule.data.markArea.show" 
+                                               @change="toggleVerteilungMarkArea()">
+                                        <span>Bereich markieren:</span>
+                                    </label>
+                                    <template x-if="workingModule.data.markArea && workingModule.data.markArea.show">
+                                        <div class="studio-inline-inputs">
+                                            <label class="studio-dim-label">von</label>
+                                            <input type="number" 
+                                                   class="studio-number-input studio-dim-input" 
+                                                   x-model.number="workingModule.data.markArea.min" 
+                                                   @input="touchRender()" 
+                                                   title="Untere Grenze">
+                                            <label class="studio-dim-label">bis</label>
+                                            <input type="number" 
+                                                   class="studio-number-input studio-dim-input" 
+                                                   x-model.number="workingModule.data.markArea.max" 
+                                                   @input="touchRender()" 
+                                                   title="Obere Grenze">
+
+                                            <!-- Schnell-Intervalle Pills -->
+                                            <template x-if="workingModule.data.type === 'binomial'">
+                                                <div class="studio-interval-pills">
+                                                    <button type="button" class="studio-mini-pill" @click="applyVerteilungIntervalPreset('links')" title="P(X ≤ μ)">P(X ≤ μ)</button>
+                                                    <button type="button" class="studio-mini-pill" @click="applyVerteilungIntervalPreset('rechts')" title="P(X ≥ μ)">P(X ≥ μ)</button>
+                                                    <button type="button" class="studio-mini-pill" @click="applyVerteilungIntervalPreset('sigma1')" title="1σ-Umgebung (ca. 68%)">±1σ</button>
+                                                    <button type="button" class="studio-mini-pill" @click="applyVerteilungIntervalPreset('sigma2')" title="2σ-Umgebung (ca. 95%)">±2σ</button>
+                                                </div>
+                                            </template>
+                                            <template x-if="workingModule.data.type === 'normal'">
+                                                <div class="studio-interval-pills">
+                                                    <button type="button" class="studio-mini-pill" @click="applyVerteilungIntervalPreset('sigma1')" title="1σ-Umgebung: 68.3%">±1σ (68%)</button>
+                                                    <button type="button" class="studio-mini-pill" @click="applyVerteilungIntervalPreset('95pct')" title="95%-Intervall: ±1.96σ">95%</button>
+                                                    <button type="button" class="studio-mini-pill" @click="applyVerteilungIntervalPreset('sigma2')" title="2σ-Umgebung: 95.4%">±2σ (95%)</button>
+                                                    <button type="button" class="studio-mini-pill" @click="applyVerteilungIntervalPreset('99pct')" title="99%-Intervall: ±2.58σ">99%</button>
+                                                </div>
+                                            </template>
+
+                                            <!-- Berechnete Wahrscheinlichkeit Badge -->
+                                            <span class="studio-prob-badge" x-text="getVerteilungCalculatedProb()"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Canvas Area: Live-Druckvorschau -->
+                            <div class="studio-verteilung-canvas-area" @click="handleVerteilungCanvasClick($event)">
+                                <div class="studio-preview-sheet">
+                                    <div class="studio-sheet-header">
+                                        <span class="studio-sheet-title" x-text="workingModule.data.type === 'normal' ? 'Normalverteilung' : 'Binomialverteilung'"></span>
+                                        <span class="studio-sheet-status" x-text="getVerteilungStatusText()"></span>
+                                    </div>
+                                    <div class="studio-verteilung-container">
+                                        <div class="verteilung-svg-box" x-html="getVerteilungPreviewSvg()"></div>
+                                    </div>
+                                    <div class="studio-sheet-footer">
+                                        <span class="studio-sheet-note">Vorschau entspricht 1:1 dem A4-Druckbild</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Fallback für Module ohne dediziertes Studio -->
+                    <template x-if="workingModule && workingModule.type !== 'baum' && workingModule.type !== 'vierfeldertafel' && workingModule.type !== 'urne' && workingModule.type !== 'gluecksrad' && workingModule.type !== 'diagramm' && workingModule.type !== 'verteilung'">
+                        <div class="studio-fallback-box">
+                            <p>Die Detail-Konfiguration für dieses Modul wird geladen...</p>
+                        </div>
+                    </template>
+
+                </div>
+
+                <!-- Modal Footer -->
+                <footer class="modal-footer module-studio-footer">
+                    <div class="module-studio-footer-hint">
+                        <template x-if="workingModule && workingModule.type === 'baum'">
+                            <span>💡 <strong>Direktbearbeitung:</strong> Klicke auf einen Ast oder Knoten, um ihn zu bearbeiten. Mit <strong>Tab</strong> springst du zum nächsten Element.</span>
+                        </template>
+                        <template x-if="workingModule && workingModule.type === 'vierfeldertafel'">
+                            <span>💡 <strong>Direktbearbeitung:</strong> Klicke auf ein Feld oder eine Beschriftung, um sie zu bearbeiten. Mit <strong>Tab / Enter</strong> springst du weiter.</span>
+                        </template>
+                        <template x-if="workingModule && workingModule.type === 'urne'">
+                            <span>💡 <strong>Direktbearbeitung:</strong> Klicke auf eine Kugel, um ihre Farbe oder Beschriftung zu ändern. Mit den Werkzeugen oben kannst du Kugeln hinzufügen oder mischen.</span>
+                        </template>
+                        <template x-if="workingModule && workingModule.type === 'gluecksrad'">
+                            <span>💡 <strong>Direktbearbeitung:</strong> Klicke auf einen Sektor, um Farbe, Text oder Größe (Gewicht) anzupassen. Das Gewicht steuert direkt den Mittelpunktswinkel.</span>
+                        </template>
+                        <template x-if="workingModule && workingModule.type === 'diagramm'">
+                            <span>💡 <strong>Direktbearbeitung:</strong> Klicke auf eine Säule oder einen Punkt im Diagramm, um Wert und Beschriftung direkt zu ändern. Im Modus <em>"Einzeichnen"</em> wird für Schüler ein leeres Achsengitter gedruckt.</span>
+                        </template>
+                        <template x-if="workingModule && workingModule.type === 'verteilung'">
+                            <span>💡 <strong>Didaktik-Tipp:</strong> Wähle zwischen diskreter Binomialverteilung (Säulen) und stetiger Normalverteilung (Gauß-Kurve). Über "Bereich markieren" hebst du Wahrscheinlichkeitsintervalle wie \(P(a \le X \le b)\) oder \(\sigma\)-Umgebungen für Schüler hervor.</span>
+                        </template>
+                    </div>
+                    <div class="module-studio-footer-actions">
+                        <button type="button" class="btn-secondary" @click="cancelAndClose()">Abbrechen</button>
+                        <button type="button" class="btn-primary btn-width-auto" @click="saveAndClose()">Übernehmen ✓</button>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </template>
+</div>
