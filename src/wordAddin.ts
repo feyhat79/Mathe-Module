@@ -88,23 +88,39 @@ export function wordAddinComponent() {
                 if (!d.height) d.height = 6.5;
                 if (!d.depth) d.depth = 2;
                 if (!d.branches) d.branches = 2;
+                if (!Array.isArray(d.nodes) || d.nodes.length === 0) {
+                    this.applyTreeStructure();
+                }
             } else if (mod.type === 'vierfeldertafel') {
-                if (!d.data) d.data = [['', '', ''], ['', '', ''], ['', '', '']];
+                if (!d.data || !Array.isArray(d.data)) d.data = [['10', '15', '25'], ['20', '35', '55'], ['30', '50', '80']];
                 if (!d.printVisibility) d.printVisibility = [[true, true, true], [true, true, true], [true, true, true]];
                 if (!d.labels) d.labels = { top1: 'A', top2: 'Ā', left1: 'B', left2: 'B̄' };
             } else if (mod.type === 'urne') {
-                if (!Array.isArray(d.kugeln)) d.kugeln = [];
                 if (!d.height) d.height = 4.5;
+                if (!Array.isArray(d.kugeln) || d.kugeln.length === 0) {
+                    this.applyUrnePreset('two_colors');
+                }
             } else if (mod.type === 'gluecksrad') {
                 if (!d.height) d.height = 4.5;
                 if (d.showPointer === undefined) d.showPointer = true;
+                if (!Array.isArray(d.sektoren) || d.sektoren.length === 0) {
+                    this.applyGluecksradPreset('farben_4');
+                }
+            } else if (mod.type === 'verteilung') {
+                if (!d.k) d.k = ['0', '1', '2', '3'];
+                if (!d.p) d.p = ['0.125', '0.375', '0.375', '0.125'];
+                if (!d.height) d.height = 4.5;
             } else if (mod.type === 'mcq') {
                 if (!Array.isArray(d.options) || d.options.length === 0) {
-                    d.options = [{ id: 1, text: 'Option 1' }, { id: 2, text: 'Option 2' }];
+                    d.options = [{ id: 1, text: 'Option A' }, { id: 2, text: 'Option B' }, { id: 3, text: 'Option C' }];
                 }
             } else if (mod.type === 'matching') {
-                if (!Array.isArray(d.leftItems)) d.leftItems = [{ id: 1, text: 'Begriff 1' }];
-                if (!Array.isArray(d.rightItems)) d.rightItems = [{ id: 2, text: 'Bedeutung 1' }];
+                if (!Array.isArray(d.leftItems) || d.leftItems.length === 0) {
+                    d.leftItems = [{ id: 1, text: 'Begriff 1' }, { id: 2, text: 'Begriff 2' }];
+                }
+                if (!Array.isArray(d.rightItems) || d.rightItems.length === 0) {
+                    d.rightItems = [{ id: 3, text: 'Bedeutung 1' }, { id: 4, text: 'Bedeutung 2' }];
+                }
             }
         },
 

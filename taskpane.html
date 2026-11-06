@@ -111,31 +111,55 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
 
-        .word-module-select-bar {
-            padding: 8px 12px;
+        .word-module-pills-bar {
+            padding: 8px 10px;
             background: #ffffff;
             border-bottom: 1px solid #e2e8f0;
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-wrap: wrap;
+            gap: 5px;
+            max-height: 110px;
+            overflow-y: auto;
             flex-shrink: 0;
         }
 
-        .word-module-select {
-            flex: 1;
-            padding: 6px 10px;
-            font-size: 0.8rem;
+        .word-mod-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 9px;
+            font-size: 0.74rem;
             font-weight: 600;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #e2e8f0;
             border-radius: 6px;
-            background: #ffffff;
-            color: #1e293b;
+            background: #f8fafc;
+            color: #334155;
             cursor: pointer;
-            outline: none;
+            transition: all 0.15s ease;
+            white-space: nowrap;
         }
 
-        .word-module-select:focus {
+        .word-mod-pill:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        .word-mod-pill.active {
+            background: #eef2ff;
             border-color: #6366f1;
+            color: #4f46e5;
+            font-weight: 700;
+            box-shadow: 0 1px 2px rgba(99, 102, 241, 0.12);
+        }
+
+        .word-mod-pill-icon {
+            font-size: 0.85rem;
+            line-height: 1;
+        }
+
+        .word-mod-pill-name {
+            font-size: 0.72rem;
         }
 
         .word-scroll-body {
@@ -264,13 +288,17 @@
         <button type="button" class="word-cat-btn" :class="{ 'active': activeCategory === 'layout' }" @click="selectCategory('layout')">📝 Layout</button>
     </nav>
 
-    <!-- Module Selector -->
-    <div class="word-module-select-bar">
-        <select class="word-module-select" :value="activeModuleType" @change="loadModuleType($event.target.value)">
-            <template x-for="m in getModulesForCategory(activeCategory)" :key="m.type">
-                <option :value="m.type" x-text="(m.icon || '▪') + ' ' + m.name"></option>
-            </template>
-        </select>
+    <!-- Module Selector (Pills) -->
+    <div class="word-module-pills-bar">
+        <template x-for="m in getModulesForCategory(activeCategory)" :key="m.type">
+            <button type="button" 
+                    class="word-mod-pill" 
+                    :class="{ 'active': activeModuleType === m.type }" 
+                    @click="loadModuleType(m.type)">
+                <span class="word-mod-pill-icon" x-text="m.icon || '▪'"></span>
+                <span class="word-mod-pill-name" x-text="m.name"></span>
+            </button>
+        </template>
     </div>
 
     <!-- Scrollable Body (Preview + Inspector) -->
