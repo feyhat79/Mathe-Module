@@ -342,4 +342,15 @@ export function wordAddinComponent() {
 
 if (typeof window !== 'undefined') {
     (window as any).wordAddinComponent = wordAddinComponent;
+    if ((window as any).Alpine) {
+        (window as any).Alpine.data('wordAddin', wordAddinComponent);
+    }
+}
+
+if (typeof document !== 'undefined') {
+    document.addEventListener('alpine:init', () => {
+        if (typeof (window as any).Alpine !== 'undefined') {
+            (window as any).Alpine.data('wordAddin', wordAddinComponent);
+        }
+    });
 }

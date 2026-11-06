@@ -28,9 +28,6 @@
     <!-- Word Addin Script -->
     <script type="module" src="/src/wordAddin.ts"></script>
 
-    <!-- Alpine.js CDN -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
     <style>
         body {
             margin: 0;
@@ -268,7 +265,7 @@
         }
     </style>
 </head>
-<body x-data="wordAddinComponent()">
+<body x-data="wordAddin">
 
     <!-- Header -->
     <header class="word-taskpane-header">
@@ -550,5 +547,7 @@
     <!-- Toast Feedback -->
     <div class="word-toast" x-show="showToast" x-text="toastMessage" style="display: none;"></div>
 
+    <!-- Alpine.js CDN -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 </html>
