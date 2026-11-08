@@ -56,7 +56,7 @@ export function isWordHost(): boolean {
 }
 
 /**
- * Parst Breite und Höhe (in cm) aus einem SVG-String oder nutzt übergebene Zielmaße.
+ * Parst Breite und Höhe (in cm) aus dem öffnenden <svg>-Tag oder nutzt übergebene Zielmaße.
  */
 function parseSvgPhysicalDimensions(
     svgString: string,
@@ -66,9 +66,12 @@ function parseSvgPhysicalDimensions(
     let wCm = targetWidthCm && targetWidthCm > 0 ? targetWidthCm : 0;
     let hCm = targetHeightCm && targetHeightCm > 0 ? targetHeightCm : 0;
 
+    const openTagMatch = svgString.match(/<svg\b[^>]*>/i);
+    const openTag = openTagMatch ? openTagMatch[0] : svgString;
+
     // Versuche viewBox auszulesen für das Seitenverhältnis
     let vbAspect = 4 / 3;
-    const vbMatch = svgString.match(/viewBox=["']\s*([-\d.]+)[,\s]+([-\d.]+)[,\s]+([-\d.]+)[,\s]+([-\d.]+)\s*["']/i);
+    const vbMatch = openTag.match(/viewBox=["']\s*([-\d.]+)[,\s]+([-\d.]+)[,\s]+([-\d.]+)[,\s]+([-\d.]+)\s*["']/i);
     if (vbMatch) {
         const vbW = parseFloat(vbMatch[3]);
         const vbH = parseFloat(vbMatch[4]);
@@ -78,20 +81,20 @@ function parseSvgPhysicalDimensions(
     }
 
     if (!wCm) {
-        const wCmMatch = svgString.match(/\bwidth=["']\s*([\d.]+)\s*cm\s*["']/i);
-        const wPxMatch = svgString.match(/\bwidth=["']\s*([\d.]+)\s*(?:px)?\s*["']/i);
+        const wCmMatch = openTag.match(/\bwidth=["']\s*([\d.]+)\s*cm\s*["']/i);
+        const wPxMatch = openTag.match(/\bwidth=["']\s*([\d.]+)\s*(?:px)?\s*["']/i);
         if (wCmMatch) wCm = parseFloat(wCmMatch[1]);
-        else if (wPxMatch && !svgString.includes('width="100%"')) {
+        else if (wPxMatch && !openTag.includes('width="100%"')) {
             const px = parseFloat(wPxMatch[1]);
             if (px > 0 && px < 2000) wCm = Math.min(16, Math.max(4, px / CM_TO_PX));
         }
     }
 
     if (!hCm) {
-        const hCmMatch = svgString.match(/\bheight=["']\s*([\d.]+)\s*cm\s*["']/i);
-        const hPxMatch = svgString.match(/\bheight=["']\s*([\d.]+)\s*(?:px)?\s*["']/i);
+        const hCmMatch = openTag.match(/\bheight=["']\s*([\d.]+)\s*cm\s*["']/i);
+        const hPxMatch = openTag.match(/\bheight=["']\s*([\d.]+)\s*(?:px)?\s*["']/i);
         if (hCmMatch) hCm = parseFloat(hCmMatch[1]);
-        else if (hPxMatch && !svgString.includes('height="100%"')) {
+        else if (hPxMatch && !openTag.includes('height="100%"')) {
             const px = parseFloat(hPxMatch[1]);
             if (px > 0 && px < 2000) hCm = Math.min(14, Math.max(3, px / CM_TO_PX));
         }
@@ -114,6 +117,36 @@ function parseSvgPhysicalDimensions(
 }
 
 /**
+ * Setzt Attribute gezielt nur im öffnenden <svg ...>-Root-Tag, ohne Kind-Elemente zu verändern.
+ */
+function normalizeSvgRootTag(svgString: string, widthPx: number, heightPx: number): string {
+    return svgString.trim().replace(/<svg\b([^>]*)>/i, (_full, attrs: string) => {
+        let a = attrs;
+
+        if (!/\bxmlns=/i.test(a)) {
+            a += ' xmlns="http://www.w3.org/2000/svg"';
+        }
+        if (!/\bxmlns:xlink=/i.test(a)) {
+            a += ' xmlns:xlink="http://www.w3.org/1999/xlink"';
+        }
+
+        if (/\bwidth=["'][^"']*["']/i.test(a)) {
+            a = a.replace(/\bwidth=["'][^"']*["']/i, `width="${widthPx}"`);
+        } else {
+            a += ` width="${widthPx}"`;
+        }
+
+        if (/\bheight=["'][^"']*["']/i.test(a)) {
+            a = a.replace(/\bheight=["'][^"']*["']/i, `height="${heightPx}"`);
+        } else {
+            a += ` height="${heightPx}"`;
+        }
+
+        return `<svg${a}>`;
+    });
+}
+
+/**
  * Rendert einen SVG-String auf ein hochauflösendes Offscreen-Canvas (300+ DPI)
  * und gibt den Base64-PNG-String (ohne Data-URL-Prefix) sowie die Zielgröße in Word-Points zurück.
  */
@@ -121,7 +154,7 @@ export async function svgToBase64Png(
     svgString: string,
     targetWidthCm?: number,
     targetHeightCm?: number,
-    scale = 4
+    scale = 3
 ): Promise<{ base64: string; dataUrl: string; blob: Blob | null; widthPt: number; heightPt: number }> {
     const { widthCm, heightCm } = parseSvgPhysicalDimensions(svgString, targetWidthCm, targetHeightCm);
     const widthPt = Math.round(widthCm * CM_TO_PT * 10) / 10;
@@ -130,32 +163,11 @@ export async function svgToBase64Png(
     const basePxW = Math.max(200, Math.round(widthCm * CM_TO_PX));
     const basePxH = Math.max(150, Math.round(heightCm * CM_TO_PX));
 
-    let cleanSvg = svgString.trim();
-    if (!cleanSvg.includes('xmlns="http://www.w3.org/2000/svg"')) {
-        cleanSvg = cleanSvg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
-    }
-    if (!cleanSvg.includes('xmlns:xlink=')) {
-        cleanSvg = cleanSvg.replace('<svg', '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
-    }
-
-    // Explizite Pixel-Dimensionen im Root-SVG setzen, damit Image() zuverlässig skaliert
-    if (/width=["'][^"']*["']/i.test(cleanSvg)) {
-        cleanSvg = cleanSvg.replace(/width=["'][^"']*["']/i, `width="${basePxW}"`);
-    } else {
-        cleanSvg = cleanSvg.replace('<svg', `<svg width="${basePxW}"`);
-    }
-    if (/height=["'][^"']*["']/i.test(cleanSvg)) {
-        cleanSvg = cleanSvg.replace(/height=["'][^"']*["']/i, `height="${basePxH}"`);
-    } else {
-        cleanSvg = cleanSvg.replace('<svg', `<svg height="${basePxH}"`);
-    }
-
-    const svgBlob = new Blob([cleanSvg], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(svgBlob);
+    const cleanSvg = normalizeSvgRootTag(svgString, basePxW, basePxH);
+    const svgDataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(cleanSvg);
 
     return new Promise((resolve, reject) => {
         const img = new Image();
-        img.crossOrigin = 'anonymous';
         img.onload = () => {
             try {
                 const canvas = document.createElement('canvas');
@@ -163,7 +175,6 @@ export async function svgToBase64Png(
                 canvas.height = basePxH * scale;
                 const ctx = canvas.getContext('2d');
                 if (!ctx) {
-                    URL.revokeObjectURL(url);
                     reject(new Error('Canvas 2D Context nicht verfügbar'));
                     return;
                 }
@@ -171,7 +182,6 @@ export async function svgToBase64Png(
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                URL.revokeObjectURL(url);
 
                 const dataUrl = canvas.toDataURL('image/png');
                 const base64 = dataUrl.replace(/^data:image\/png;base64,/, '');
@@ -180,15 +190,13 @@ export async function svgToBase64Png(
                     resolve({ base64, dataUrl, blob, widthPt, heightPt });
                 }, 'image/png');
             } catch (err) {
-                URL.revokeObjectURL(url);
                 reject(err);
             }
         };
         img.onerror = (err) => {
-            URL.revokeObjectURL(url);
             reject(err);
         };
-        img.src = url;
+        img.src = svgDataUrl;
     });
 }
 
@@ -202,17 +210,17 @@ export function extractJxgBoxSvg(jxgBoxEl: HTMLElement | null): string | null {
     if (!svgEl) return null;
 
     const svgRect = svgEl.getBoundingClientRect();
-    const w = Math.max(100, Math.round(svgRect.width || jxgBoxEl.clientWidth || 320));
-    const h = Math.max(80, Math.round(svgRect.height || jxgBoxEl.clientHeight || 240));
+    const w = Math.max(100, Math.round(svgRect.width || jxgBoxEl.clientWidth || 300));
+    const h = Math.max(80, Math.round(svgRect.height || jxgBoxEl.clientHeight || 220));
 
     const svgClone = svgEl.cloneNode(true) as SVGSVGElement;
+    // Entferne JSXGraph-Positionierungs-Styles (position: absolute; top: 0; left: 0)
+    svgClone.removeAttribute('style');
     svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svgClone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
     svgClone.setAttribute('width', `${w}`);
     svgClone.setAttribute('height', `${h}`);
-    if (!svgClone.getAttribute('viewBox')) {
-        svgClone.setAttribute('viewBox', `0 0 ${w} ${h}`);
-    }
-    svgClone.style.overflow = 'hidden';
+    svgClone.setAttribute('viewBox', `0 0 ${w} ${h}`);
 
     // Weißes Hintergrund-Rechteck als unterste Ebene einfügen
     const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -276,7 +284,7 @@ export function extractJxgBoxSvg(jxgBoxEl: HTMLElement | null): string | null {
 }
 
 /**
- * Fügt ein SVG als gestochen scharfes Bild (300+ DPI PNG mit exakten cm-Druckmaßen)
+ * Fügt ein SVG als gestochen scharfes Bild (PNG mit exakten cm-Druckmaßen)
  * direkt an der Cursorposition in Word ein.
  */
 export async function insertSvg(
@@ -340,23 +348,7 @@ export async function insertHtml(htmlString: string): Promise<{ success: boolean
 }
 
 function wrapWordHtml(innerHtml: string): string {
-    return `
-    <html>
-    <head>
-    <style>
-        body { font-family: 'Calibri', 'Segoe UI', sans-serif; font-size: 11pt; color: #0f172a; line-height: 1.35; }
-        p { margin: 4pt 0; }
-        ul { margin: 4pt 0 6pt 18pt; padding: 0; }
-        li { margin: 2pt 0; }
-        table { border-collapse: collapse; margin: 6pt 0; }
-        th, td { border: 1px solid #64748b; padding: 5px 10px; text-align: center; font-family: 'Calibri', sans-serif; font-size: 11pt; }
-        th { background-color: #f1f5f9; font-weight: bold; }
-    </style>
-    </head>
-    <body>
-        ${innerHtml}
-    </body>
-    </html>`;
+    return `<div style="font-family: Calibri, 'Segoe UI', sans-serif; font-size: 11pt; color: #0f172a; line-height: 1.35;">${innerHtml}</div>`;
 }
 
 /**
@@ -407,9 +399,9 @@ export function formatMathTextForWord(text: string): string {
         s = s.replace(/_([0-9a-zA-Z+-])/g, '<sub>$1</sub>');
 
         if (isBlock) {
-            return `<p style="text-align: center; margin: 6pt 0; font-family: 'Cambria Math', 'Calibri', serif; font-size: 11.5pt;"><strong>${s}</strong></p>`;
+            return `<p style="text-align: center; margin: 6pt 0; font-family: 'Cambria Math', Calibri, serif; font-size: 11.5pt;"><strong>${s}</strong></p>`;
         }
-        return `<span style="font-family: 'Cambria Math', 'Calibri', serif;">${s}</span>`;
+        return `<span style="font-family: 'Cambria Math', Calibri, serif;">${s}</span>`;
     };
 
     let out = text;
@@ -426,6 +418,8 @@ export function formatMathTextForWord(text: string): string {
 /**
  * Kombinierte Einfüge-Funktion für Analysis-Module, die sowohl Text/Bedingungen
  * als auch eine Grafik (und optional eine Musterlösung) in einem Schritt in Word einfügen.
+ * Wichtig: Range.insertInlinePictureFromBase64 unterstützt in der Word JS API nur
+ * 'Replace', 'Start' und 'End' (NICHT 'After' oder 'Before'!).
  */
 async function insertCompositeAnalysisIntoWord(options: {
     topHtml?: string;
@@ -438,32 +432,35 @@ async function insertCompositeAnalysisIntoWord(options: {
 
     let pngData: { base64: string; dataUrl: string; blob: Blob | null; widthPt: number; heightPt: number } | null = null;
     if (svgString) {
-        pngData = await svgToBase64Png(svgString, widthCm, heightCm);
+        try {
+            pngData = await svgToBase64Png(svgString, widthCm, heightCm);
+        } catch (convErr) {
+            console.error('Fehler bei SVG-Konvertierung:', convErr);
+        }
     }
 
     if (isWordHost()) {
         try {
             await Word.run(async (context: any) => {
-                let cursorRange = context.document.getSelection();
+                let range = context.document.getSelection();
                 let hasInsertedFirst = false;
 
                 if (topHtml && topHtml.trim() !== '') {
-                    cursorRange = cursorRange.insertHtml(wrapWordHtml(topHtml), Word.InsertLocation.replace);
+                    range = range.insertHtml(wrapWordHtml(topHtml + '<p></p>'), Word.InsertLocation.replace);
                     hasInsertedFirst = true;
                 }
 
                 if (pngData) {
-                    const loc = hasInsertedFirst ? Word.InsertLocation.after : Word.InsertLocation.replace;
-                    const pic = cursorRange.insertInlinePictureFromBase64(pngData.base64, loc);
+                    const loc = hasInsertedFirst ? Word.InsertLocation.end : Word.InsertLocation.replace;
+                    const pic = range.insertInlinePictureFromBase64(pngData.base64, loc);
                     pic.width = pngData.widthPt;
                     pic.height = pngData.heightPt;
-                    cursorRange = pic.getRange();
                     hasInsertedFirst = true;
                 }
 
                 if (bottomHtml && bottomHtml.trim() !== '') {
-                    const loc = hasInsertedFirst ? Word.InsertLocation.after : Word.InsertLocation.replace;
-                    cursorRange.insertHtml(wrapWordHtml(bottomHtml), loc);
+                    const loc = hasInsertedFirst ? Word.InsertLocation.end : Word.InsertLocation.replace;
+                    range.insertHtml(wrapWordHtml('<p></p>' + bottomHtml), loc);
                 }
 
                 await context.sync();
@@ -476,7 +473,7 @@ async function insertCompositeAnalysisIntoWord(options: {
             } else if (topHtml) {
                 await copyToClipboard(topHtml);
             }
-            return { success: true, mode: 'clipboard' };
+            return { success: false, mode: 'clipboard' };
         }
     } else {
         if (pngData?.blob) {
@@ -494,15 +491,32 @@ async function copyImageOrTextToClipboard(blob: Blob | null, fallbackText: strin
             await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
             return;
         }
-    } catch (e) {
-        console.warn('Bild-Zwischenablage nicht möglich, nutze Text-Fallback:', e);
+    } catch (_) {
+        // Ignorieren, falls WebView2 ClipboardItem blockiert
     }
     await copyToClipboard(fallbackText);
 }
 
 async function copyToClipboard(text: string): Promise<void> {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(text);
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+            return;
+        }
+    } catch (_) {
+        // Fallback über temporäres Textarea-Element (funktioniert auch in Office WebView2)
+    }
+    try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+    } catch (_) {
+        // Ignorieren
     }
 }
 
@@ -550,8 +564,8 @@ function buildSteckbriefConditionsHtml(d: any): string {
         .join('');
 
     return `
-        <p>Bestimme die Gleichung einer ganzrationalen Funktion ${degText}${symText}. Der Graph erfüllt folgende Bedingungen:</p>
-        <ul>${items}</ul>
+        <p style="margin: 4pt 0;">Bestimme die Gleichung einer ganzrationalen Funktion ${degText}${symText}. Der Graph erfüllt folgende Bedingungen:</p>
+        <ul style="margin: 4pt 0 6pt 18pt; padding: 0;">${items}</ul>
     `;
 }
 
@@ -568,9 +582,9 @@ function buildSteckbriefSolutionHtml(d: any): string {
 
     return `
         <div style="margin-top: 8pt; padding: 6pt 10pt; border-left: 3px solid #10b981; background-color: #f8fafc;">
-            <p><strong>Lösung (Steckbriefaufgabe):</strong></p>
-            ${stepsHtml ? `<ul>${stepsHtml}</ul>` : ''}
-            <p><strong>Gesuchte Funktion:</strong> ${formatMathTextForWord('$' + sol.formulaDisplay + '$')}</p>
+            <p style="margin: 2pt 0;"><strong>Lösung (Steckbriefaufgabe):</strong></p>
+            ${stepsHtml ? `<ul style="margin: 4pt 0 4pt 18pt;">${stepsHtml}</ul>` : ''}
+            <p style="margin: 2pt 0;"><strong>Gesuchte Funktion:</strong> ${formatMathTextForWord('$' + sol.formulaDisplay + '$')}</p>
         </div>
     `;
 }
@@ -607,8 +621,12 @@ async function insertPuzzleIntoWord(d: any): Promise<{ success: boolean; mode: '
             const box = document.getElementById(`word-puzzle-f-${i}`);
             const svg = extractJxgBoxSvg(box);
             if (svg) {
-                const png = await svgToBase64Png(svg, 5.2, 3.8, 3);
-                leftPngs.push({ base64: png.base64, widthPt: png.widthPt, heightPt: png.heightPt });
+                try {
+                    const png = await svgToBase64Png(svg, 4.8, 3.5, 3);
+                    leftPngs.push({ base64: png.base64, widthPt: png.widthPt, heightPt: png.heightPt });
+                } catch (_) {
+                    leftPngs.push(null);
+                }
             } else {
                 leftPngs.push(null);
             }
@@ -620,8 +638,12 @@ async function insertPuzzleIntoWord(d: any): Promise<{ success: boolean; mode: '
             const box = document.getElementById(`word-puzzle-fp-${i}`);
             const svg = extractJxgBoxSvg(box);
             if (svg) {
-                const png = await svgToBase64Png(svg, 5.2, 3.8, 3);
-                rightPngs.push({ base64: png.base64, widthPt: png.widthPt, heightPt: png.heightPt });
+                try {
+                    const png = await svgToBase64Png(svg, 4.8, 3.5, 3);
+                    rightPngs.push({ base64: png.base64, widthPt: png.widthPt, heightPt: png.heightPt });
+                } catch (_) {
+                    rightPngs.push(null);
+                }
             } else {
                 rightPngs.push(null);
             }
@@ -633,7 +655,6 @@ async function insertPuzzleIntoWord(d: any): Promise<{ success: boolean; mode: '
     const formatExpr = (expr: string) =>
         formatMathTextForWord('$' + (expr || '').replace(/\*/g, ' \\cdot ') + '$');
 
-    // Antworttabelle + optionales Begründungsfeld als HTML
     const headerCells = functions
         .map((_: any, i: number) => `<th style="border: 1px solid #64748b; background: #f1f5f9; padding: 6px 14px;">${roman[i] || i + 1}</th>`)
         .join('');
@@ -642,13 +663,11 @@ async function insertPuzzleIntoWord(d: any): Promise<{ success: boolean; mode: '
         .join('');
 
     let justHtml = '';
-    if (d.showJustification) {
-        if (d.justificationInTable) {
-            const reasonCells = functions
-                .map(() => `<td style="border: 1px solid #64748b; padding: 18px 10px;">&nbsp;</td>`)
-                .join('');
-            justHtml = `<tr><th style="border: 1px solid #64748b; background: #f1f5f9; padding: 6px 12px; text-align: left;">Begründung:</th>${reasonCells}</tr>`;
-        }
+    if (d.showJustification && d.justificationInTable) {
+        const reasonCells = functions
+            .map(() => `<td style="border: 1px solid #64748b; padding: 18px 10px;">&nbsp;</td>`)
+            .join('');
+        justHtml = `<tr><th style="border: 1px solid #64748b; background: #f1f5f9; padding: 6px 12px; text-align: left;">Begründung:</th>${reasonCells}</tr>`;
     }
 
     const bottomTableHtml = `
@@ -677,67 +696,57 @@ async function insertPuzzleIntoWord(d: any): Promise<{ success: boolean; mode: '
     if (isWordHost()) {
         try {
             await Word.run(async (context: any) => {
-                const sel = context.document.getSelection();
-                const introRange = sel.insertHtml(
-                    wrapWordHtml(`<p><strong>Zuordnungsaufgabe:</strong> ${introText}</p>`),
+                let range = context.document.getSelection();
+                range = range.insertHtml(
+                    wrapWordHtml(`<p><strong>Zuordnungsaufgabe:</strong> ${introText}</p><p><strong>${leftHeading}:</strong></p>`),
                     Word.InsertLocation.replace
                 );
 
-                // Erstelle eine 2-spaltige Word-Tabelle für (I, II, III) vs. (A, B, C)
-                const rowCount = functions.length + 1;
-                const wordTable = introRange.insertTable(rowCount, 2, Word.InsertLocation.after);
-                wordTable.getCell(0, 0).body.insertText(leftHeading, Word.InsertLocation.replace);
-                wordTable.getCell(0, 1).body.insertText(rightHeading, Word.InsertLocation.replace);
+                for (let i = 0; i < functions.length; i++) {
+                    const fn = functions[i];
+                    if (leftIsGraph && leftPngs[i]) {
+                        range = range.insertHtml(wrapWordHtml(`<p><strong>${roman[i] || i + 1})</strong> </p>`), Word.InsertLocation.end);
+                        const pic = range.insertInlinePictureFromBase64(leftPngs[i]!.base64, Word.InsertLocation.end);
+                        pic.width = leftPngs[i]!.widthPt;
+                        pic.height = leftPngs[i]!.heightPt;
+                    } else {
+                        range = range.insertHtml(
+                            wrapWordHtml(`<p><strong>${roman[i] || i + 1})</strong> f(x) = ${formatExpr(fn.expr)}</p>`),
+                            Word.InsertLocation.end
+                        );
+                    }
+                }
+
+                range = range.insertHtml(wrapWordHtml(`<p style="margin-top: 8pt;"><strong>${rightHeading}:</strong></p>`), Word.InsertLocation.end);
 
                 for (let i = 0; i < functions.length; i++) {
                     const fn = functions[i];
                     const shIdx = shuffled[i] ?? i;
                     const targetFn = functions[shIdx] || fn;
 
-                    const leftCell = wordTable.getCell(i + 1, 0).body;
-                    leftCell.clear();
-                    const leftLabel = leftCell.insertParagraph(`${roman[i] || i + 1}) `, Word.InsertLocation.start);
-                    leftLabel.font.bold = true;
-
-                    if (leftIsGraph && leftPngs[i]) {
-                        const pic = leftLabel.insertInlinePictureFromBase64(leftPngs[i]!.base64, Word.InsertLocation.end);
-                        pic.width = leftPngs[i]!.widthPt;
-                        pic.height = leftPngs[i]!.heightPt;
-                    } else {
-                        leftLabel.insertHtml(
-                            `<span><strong>${roman[i] || i + 1})</strong> f(x) = ${formatExpr(fn.expr)}</span>`,
-                            Word.InsertLocation.replace
-                        );
-                    }
-
-                    const rightCell = wordTable.getCell(i + 1, 1).body;
-                    rightCell.clear();
-                    const rightLabel = rightCell.insertParagraph(`${letters[i] || i + 1}) `, Word.InsertLocation.start);
-                    rightLabel.font.bold = true;
-
                     if (rightIsGraph && rightPngs[i]) {
-                        const pic = rightLabel.insertInlinePictureFromBase64(rightPngs[i]!.base64, Word.InsertLocation.end);
+                        range = range.insertHtml(wrapWordHtml(`<p><strong>${letters[i] || i + 1})</strong> </p>`), Word.InsertLocation.end);
+                        const pic = range.insertInlinePictureFromBase64(rightPngs[i]!.base64, Word.InsertLocation.end);
                         pic.width = rightPngs[i]!.widthPt;
                         pic.height = rightPngs[i]!.heightPt;
                     } else {
                         const eqPrefix = isGraphToEq ? 'f(x) = ' : "f'(x) = ";
                         const exprStr = isGraphToEq ? targetFn.expr : targetFn.exprFPrime;
-                        rightLabel.insertHtml(
-                            `<span><strong>${letters[i] || i + 1})</strong> ${eqPrefix}${formatExpr(exprStr)}</span>`,
-                            Word.InsertLocation.replace
+                        range = range.insertHtml(
+                            wrapWordHtml(`<p><strong>${letters[i] || i + 1})</strong> ${eqPrefix}${formatExpr(exprStr)}</p>`),
+                            Word.InsertLocation.end
                         );
                     }
                 }
 
-                // Antworttabelle unterhalb der Zuordnungstabelle einfügen
-                wordTable.getRange().insertHtml(wrapWordHtml(bottomTableHtml), Word.InsertLocation.after);
+                range.insertHtml(wrapWordHtml(bottomTableHtml), Word.InsertLocation.end);
                 await context.sync();
             });
             return { success: true, mode: 'word', message: 'Zuordnungspuzzle an Cursorposition eingefügt!' };
         } catch (err) {
             console.error('Fehler beim Einfügen des Puzzles in Word:', err);
             await copyToClipboard(bottomTableHtml);
-            return { success: true, mode: 'clipboard', message: 'Zuordnungspuzzle in Zwischenablage kopiert!' };
+            return { success: false, mode: 'clipboard', message: 'Zuordnungspuzzle in Zwischenablage kopiert!' };
         }
     } else {
         await copyToClipboard(bottomTableHtml);
