@@ -11,13 +11,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/main.css?v=1.1">
-    <link rel="stylesheet" href="css/builder-ui.css?v=1.1">
+    <link rel="stylesheet" href="css/main.css?v=1.2">
+    <link rel="stylesheet" href="css/builder-ui.css?v=1.2">
 
     <!-- Office.js CDN -->
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
 
-    <!-- JSXGraph for Geometry and Graphs -->
+    <!-- Math.js for Symbolic Derivatives, LGS Solver and Function Compilation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+
+    <!-- JSXGraph for Geometry and Analysis Graphs -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
 
@@ -172,36 +175,134 @@
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 8px;
+            padding: 8px 10px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .word-preview-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .word-preview-header {
             font-size: 0.68rem;
             font-weight: 700;
-            color: #94a3b8;
+            color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
 
+        .word-preview-size-tag {
+            font-size: 0.66rem;
+            font-weight: 600;
+            color: #6366f1;
+            background: #eef2ff;
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
         .word-preview-container {
-            min-height: 120px;
-            max-height: 220px;
+            min-height: 130px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: auto;
+            overflow: hidden;
             padding: 6px;
-            background: #fafafa;
+            background: #ffffff;
+            border: 1px solid #f1f5f9;
             border-radius: 6px;
+            gap: 6px;
         }
 
         .word-preview-container svg {
             max-width: 100%;
             height: auto;
+        }
+
+        .word-jxg-board-box {
+            width: 100%;
+            max-width: 310px;
+            height: 220px;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 6px;
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .word-preview-text-snippet {
+            width: 100%;
+            font-size: 0.74rem;
+            line-height: 1.4;
+            color: #334155;
+            background: #f8fafc;
+            border-left: 3px solid #6366f1;
+            padding: 6px 8px;
+            border-radius: 0 4px 4px 0;
+            box-sizing: border-box;
+        }
+
+        .word-preview-text-snippet ul {
+            margin: 4px 0 0 16px;
+            padding: 0;
+        }
+
+        .word-puzzle-preview-grid {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .word-puzzle-col-title {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .word-puzzle-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            padding: 4px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            margin-bottom: 5px;
+        }
+
+        .word-puzzle-badge {
+            align-self: flex-start;
+            font-size: 0.65rem;
+            font-weight: 700;
+            background: #eef2ff;
+            color: #4f46e5;
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+
+        .word-puzzle-board {
+            width: 125px;
+            height: 92px;
+            border: 1px solid #f1f5f9;
+            border-radius: 4px;
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .word-puzzle-eq {
+            font-size: 0.74rem;
+            padding: 8px 4px;
+            text-align: center;
         }
 
         .word-bottom-bar {
@@ -278,8 +379,8 @@
 
     <!-- Categories -->
     <nav class="word-category-bar">
-        <button type="button" class="word-cat-btn" :class="{ 'active': activeCategory === 'stochastik' }" @click="selectCategory('stochastik')">🎲 Stochastik</button>
         <button type="button" class="word-cat-btn" :class="{ 'active': activeCategory === 'analysis' }" @click="selectCategory('analysis')">📈 Analysis</button>
+        <button type="button" class="word-cat-btn" :class="{ 'active': activeCategory === 'stochastik' }" @click="selectCategory('stochastik')">🎲 Stochastik</button>
         <button type="button" class="word-cat-btn" :class="{ 'active': activeCategory === 'geometrie' }" @click="selectCategory('geometrie')">📐 Geometrie</button>
         <button type="button" class="word-cat-btn" :class="{ 'active': activeCategory === 'algebra' }" @click="selectCategory('algebra')">🧮 Algebra</button>
         <button type="button" class="word-cat-btn" :class="{ 'active': activeCategory === 'layout' }" @click="selectCategory('layout')">📝 Layout</button>
@@ -288,9 +389,9 @@
     <!-- Module Selector (Pills) -->
     <div class="word-module-pills-bar">
         <template x-for="m in getModulesForCategory(activeCategory)" :key="m.type">
-            <button type="button" 
-                    class="word-mod-pill" 
-                    :class="{ 'active': activeModuleType === m.type }" 
+            <button type="button"
+                    class="word-mod-pill"
+                    :class="{ 'active': activeModuleType === m.type }"
                     @click="loadModuleType(m.type)">
                 <span class="word-mod-pill-icon" x-text="m.icon || '▪'"></span>
                 <span class="word-mod-pill-name" x-text="m.name"></span>
@@ -303,13 +404,1076 @@
 
         <!-- 1. LIVE PREVIEW CARD -->
         <div class="word-preview-card">
-            <span class="word-preview-header">Live-Vorschau</span>
-            <div class="word-preview-container" x-html="renderPreview()"></div>
+            <div class="word-preview-header-row">
+                <span class="word-preview-header">Live-Vorschau</span>
+                <template x-if="d && d.settings && d.settings.width && d.settings.height">
+                    <span class="word-preview-size-tag" x-text="'Word-Maß: ' + d.settings.width + ' × ' + d.settings.height + ' cm'"></span>
+                </template>
+            </div>
+
+            <div class="word-preview-container">
+                <!-- Text-Vorschau für Rotationskörper -->
+                <template x-if="workingModule.type === 'analysis_rotationskoerper' && d.includeTaskText !== false">
+                    <div class="word-preview-text-snippet" x-html="formatSubtaskText(getRotationskoerperTaskText(d))"></div>
+                </template>
+
+                <!-- Text-Vorschau für Extremwertaufgabe -->
+                <template x-if="workingModule.type === 'analysis_extremwert' && d.includeTaskText !== false">
+                    <div class="word-preview-text-snippet" x-html="formatSubtaskText(getExtremwertTaskText(d))"></div>
+                </template>
+
+                <!-- Text-Vorschau für Steckbriefaufgabe -->
+                <template x-if="workingModule.type === 'analysis_steckbrief' && d.showTextual !== false">
+                    <div class="word-preview-text-snippet">
+                        <div>
+                            Bestimme die Gleichung einer ganzrationalen Funktion
+                            <strong x-text="d.degree === 2 ? '2. Grades' : (d.degree === 4 ? '4. Grades' : '3. Grades')"></strong><span x-show="d.symmetry === 'achsensymmetrisch'"> (achsensymm.)</span><span x-show="d.symmetry === 'punktsymmetrisch'"> (punktsymm.)</span>:
+                        </div>
+                        <ul>
+                            <template x-for="cond in (d.conditions || [])" :key="cond.id">
+                                <li>
+                                    <span x-show="cond.type === 'point'">Punkt <strong x-text="'P(' + cond.x + ' | ' + cond.y + ')'"></strong></span>
+                                    <span x-show="cond.type === 'extreme'">Extrempunkt <strong x-text="cond.y !== '' ? 'E(' + cond.x + ' | ' + cond.y + ')' : 'bei x = ' + cond.x"></strong></span>
+                                    <span x-show="cond.type === 'inflection'">Wendepunkt <strong x-text="cond.y !== '' ? 'W(' + cond.x + ' | ' + cond.y + ')' : 'bei x = ' + cond.x"></strong></span>
+                                    <span x-show="cond.type === 'saddle'">Sattelpunkt <strong x-text="cond.y !== '' ? 'S(' + cond.x + ' | ' + cond.y + ')' : 'bei x = ' + cond.x"></strong></span>
+                                    <span x-show="cond.type === 'slope'">Steigung <strong x-text="'m = ' + cond.y + ' bei x = ' + cond.x"></strong></span>
+                                    <span x-show="cond.type === 'yIntercept'">y-Achsenabschnitt <strong x-text="'y₀ = ' + cond.y"></strong></span>
+                                    <span x-show="cond.type === 'curvature'">Krümmung <strong x-text="'f\'\'(' + cond.x + ') = ' + cond.y"></strong></span>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </template>
+
+                <!-- JSXGraph Single Board (Kurve, Riemann, Rotationskörper, Extremwert, Steckbrief, Geometrie) -->
+                <div id="word-jxg-board"
+                     class="jxgbox word-jxg-board-box"
+                     x-show="isSingleJxgModule() && (workingModule.type !== 'analysis_extremwert' || d.includeSketch !== false)">
+                </div>
+
+                <!-- Zuordnungspuzzle Multi-Board Preview -->
+                <template x-if="workingModule.type === 'analysis_puzzle'">
+                    <div style="width: 100%;">
+                        <div class="word-puzzle-preview-grid">
+                            <!-- Linke Spalte -->
+                            <div>
+                                <div class="word-puzzle-col-title" x-text="d.mode === 'graph_to_equation' ? 'Graphen (I, II…)' : 'Funktionen f(x)'"></div>
+                                <template x-for="(fn, idx) in (d.functions || [])" :key="fn.id">
+                                    <div class="word-puzzle-card">
+                                        <span class="word-puzzle-badge" x-text="romanize(idx + 1)"></span>
+                                        <template x-if="d.mode === 'graph_to_equation' || d.typeF === 'graph'">
+                                            <div :id="'word-puzzle-f-' + idx" class="jxgbox word-puzzle-board"></div>
+                                        </template>
+                                        <template x-if="d.mode !== 'graph_to_equation' && d.typeF === 'equation'">
+                                            <div class="word-puzzle-eq" x-html="formatSubtaskText('$f(x) = ' + formatPuzzleFormula(fn.expr) + '$')"></div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                            <!-- Rechte Spalte -->
+                            <div>
+                                <div class="word-puzzle-col-title" x-text="d.mode === 'graph_to_equation' ? 'Gleichungen (A, B…)' : 'Ableitungen f\'(x)'"></div>
+                                <template x-for="(shIdx, idx) in (d.shuffledIndices || [])" :key="idx">
+                                    <div class="word-puzzle-card" x-data="{ get targetFn() { return d.functions[shIdx] || d.functions[idx]; } }">
+                                        <span class="word-puzzle-badge" x-text="['A','B','C','D','E','F'][idx]"></span>
+                                        <template x-if="targetFn && d.mode === 'graph_to_equation'">
+                                            <div class="word-puzzle-eq" x-html="formatSubtaskText('$f(x) = ' + formatPuzzleFormula(targetFn.expr) + '$')"></div>
+                                        </template>
+                                        <template x-if="targetFn && d.mode !== 'graph_to_equation' && d.typeFPrime === 'equation'">
+                                            <div class="word-puzzle-eq" x-html="formatSubtaskText('$f\'(x) = ' + formatPuzzleFormula(targetFn.exprFPrime) + '$')"></div>
+                                        </template>
+                                        <template x-if="targetFn && d.mode !== 'graph_to_equation' && d.typeFPrime === 'graph'">
+                                            <div :id="'word-puzzle-fp-' + idx" class="jxgbox word-puzzle-board"></div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Standard SVG Preview (Stochastik, Algebra, Geometrie-SVG) -->
+                <div x-show="!isSingleJxgModule() && workingModule.type !== 'analysis_puzzle' && workingModule.type !== 'analysis_steckbrief' && workingModule.type !== 'analysis_extremwert'"
+                     style="width: 100%; display: flex; justify-content: center;"
+                     x-html="renderPreview()">
+                </div>
+            </div>
         </div>
 
-        <!-- 2. MODULE SETTINGS -->
+        <!-- ========================================================= -->
+        <!-- 2. ANALYSIS MODULE INSPECTORS                             -->
+        <!-- ========================================================= -->
 
-        <!-- A) BAUMDIAGRAMM -->
+        <!-- A1) FUNKTIONSPLOTTER (analysis_kurve) -->
+        <template x-if="workingModule.type === 'analysis_kurve'">
+            <div class="inspector-body" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- 1. MODUS & VORLAGEN -->
+                <div class="insp-section insp-section-outline">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Modus &amp; Vorlagen</span>
+                    </div>
+
+                    <div class="insp-field">
+                        <label>Darstellungs-Modus</label>
+                        <select x-model="d.mode" @change="updateKurveCode(d)" class="insp-select">
+                            <option value="kurve">Kurvendiskussion (N, HP/TP, WP, f')</option>
+                            <option value="plot">Einfacher Funktionsplot (f &amp; g)</option>
+                            <option value="parabel">Parabel (Scheitelpunkt / Allg. Form)</option>
+                            <option value="tangente">Tangente &amp; Steigungsdreieck</option>
+                            <option value="integral">Flächenberechnung (Integral)</option>
+                        </select>
+                    </div>
+
+                    <div class="insp-field" x-show="d.mode !== 'parabel'">
+                        <label>Schnell-Vorlage („Schöne Funktion“)</label>
+                        <select @change="applyKurvePreset(d, $event.target.value); $event.target.value = ''" class="insp-select insp-select-preset">
+                            <option value="" selected disabled>✨ Vorlage wählen…</option>
+                            <option value="kubisch_sym">3. Grades punktsymm.: 0,25x³ − 0,75x</option>
+                            <option value="kubisch_allg">3. Grades glatte EP: −x³ + 3x²</option>
+                            <option value="grad4_w">4. Grades W-Form: 0,25x⁴ − 2x²</option>
+                            <option value="parabel_normal">Parabel mit glatten N: x² − 2x − 3</option>
+                            <option value="exp_wachstum">e-Funktion: 2x · e^(−0,5x)</option>
+                            <option value="trigo_sin">Trigonometrisch: 2 · sin(x)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 2. FUNKTIONSGLEICHUNG & MERKMALE -->
+                <div class="insp-section insp-section-modules">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Funktion &amp; Merkmale</span>
+                    </div>
+
+                    <template x-if="d.mode !== 'parabel'">
+                        <div class="insp-func-group">
+                            <div class="insp-func-input-row">
+                                <div class="insp-func-name-col">
+                                    <label>Name</label>
+                                    <input type="text" x-model="d.functionName" @input="updateKurveCode(d)" class="insp-text-input insp-input-center" placeholder="f">
+                                </div>
+                                <div class="insp-func-expr-col">
+                                    <label x-text="(d.functionName || 'f') + '(x) ='"></label>
+                                    <input type="text" x-model="d.formula" @input="updateKurveCode(d)" class="insp-text-input insp-input-mono" placeholder="z.B. 0.2*x^3 - 1.2*x">
+                                </div>
+                            </div>
+                            <span class="insp-field-hint">Tipp: Malzeichen als <code>*</code>, Potenz als <code>^</code>, Komma als <code>.</code></span>
+                        </div>
+                    </template>
+
+                    <!-- MODUS: Kurvendiskussion -->
+                    <template x-if="d.mode === 'kurve' || !d.mode">
+                        <div class="insp-chips-section">
+                            <span class="insp-sub-label">Punkte &amp; Ableitungen im Graphen:</span>
+                            <div class="insp-chip-grid">
+                                <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showNullstellen }" @click="d.showNullstellen = !d.showNullstellen; updateKurveCode(d)">
+                                    <span class="chip-dot dot-green"></span> Nullstellen (N)
+                                </button>
+                                <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showExtrema }" @click="d.showExtrema = !d.showExtrema; updateKurveCode(d)">
+                                    <span class="chip-dot dot-red"></span> Extrema (HP/TP)
+                                </button>
+                                <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showWendepunkte }" @click="d.showWendepunkte = !d.showWendepunkte; updateKurveCode(d)">
+                                    <span class="chip-dot dot-blue"></span> Wendepunkte (WP)
+                                </button>
+                                <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showDeriv1 }" @click="d.showDeriv1 = !d.showDeriv1; updateKurveCode(d)">
+                                    1. Ableitung f'(x)
+                                </button>
+                                <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showDeriv2 }" @click="d.showDeriv2 = !d.showDeriv2; updateKurveCode(d)">
+                                    2. Ableitung f''(x)
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- MODUS: Einfacher Plot -->
+                    <template x-if="d.mode === 'plot'">
+                        <div class="insp-sub-block">
+                            <label class="insp-check-row">
+                                <input type="checkbox" x-model="d.enableG" @change="updateKurveCode(d)">
+                                <span>Zweite Funktion g(x) einzeichnen</span>
+                            </label>
+                            <template x-if="d.enableG">
+                                <div class="insp-func-input-row margin-top-xs">
+                                    <div class="insp-func-name-col">
+                                        <label>Name</label>
+                                        <input type="text" x-model="d.functionName2" @input="updateKurveCode(d)" class="insp-text-input insp-input-center" placeholder="g">
+                                    </div>
+                                    <div class="insp-func-expr-col">
+                                        <label x-text="(d.functionName2 || 'g') + '(x) ='"></label>
+                                        <input type="text" x-model="d.formula2" @input="updateKurveCode(d)" class="insp-text-input insp-input-mono" placeholder="z.B. x - 1">
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <!-- MODUS: Parabel -->
+                    <template x-if="d.mode === 'parabel'">
+                        <div class="insp-sub-block">
+                            <div class="insp-func-input-row">
+                                <div class="insp-func-name-col">
+                                    <label>Name</label>
+                                    <input type="text" x-model="d.functionName" @input="updateKurveCode(d)" class="insp-text-input insp-input-center" placeholder="f">
+                                </div>
+                                <div class="insp-func-expr-col">
+                                    <label>Darstellungsform</label>
+                                    <select x-model="d.parabolaForm" @change="updateKurveCode(d)" class="insp-select">
+                                        <option value="vertex">a(x − d)² + e (Scheitelp.)</option>
+                                        <option value="general">ax² + bx + c (Allgemein)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <template x-if="d.parabolaForm !== 'general'">
+                                <div class="insp-3col-grid">
+                                    <div class="insp-field">
+                                        <label>Streckung a</label>
+                                        <input type="number" step="0.25" x-model="d.parabolaA" @input="updateKurveCode(d)" class="insp-text-input insp-input-center">
+                                    </div>
+                                    <div class="insp-field">
+                                        <label>x-Scheitel d</label>
+                                        <input type="number" step="0.5" x-model="d.parabolaD" @input="updateKurveCode(d)" class="insp-text-input insp-input-center">
+                                    </div>
+                                    <div class="insp-field">
+                                        <label>y-Scheitel e</label>
+                                        <input type="number" step="0.5" x-model="d.parabolaE" @input="updateKurveCode(d)" class="insp-text-input insp-input-center">
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template x-if="d.parabolaForm === 'general'">
+                                <div class="insp-3col-grid">
+                                    <div class="insp-field">
+                                        <label>Faktor a</label>
+                                        <input type="number" step="0.25" x-model="d.parabolaA" @input="updateKurveCode(d)" class="insp-text-input insp-input-center">
+                                    </div>
+                                    <div class="insp-field">
+                                        <label>Faktor b</label>
+                                        <input type="number" step="0.5" x-model="d.parabolaB" @input="updateKurveCode(d)" class="insp-text-input insp-input-center">
+                                    </div>
+                                    <div class="insp-field">
+                                        <label>Abschnitt c</label>
+                                        <input type="number" step="0.5" x-model="d.parabolaC" @input="updateKurveCode(d)" class="insp-text-input insp-input-center">
+                                    </div>
+                                </div>
+                            </template>
+
+                            <div class="insp-chip-grid margin-top-xs">
+                                <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showVertex }" @click="d.showVertex = !d.showVertex; updateKurveCode(d)">
+                                    Scheitelpunkt S
+                                </button>
+                                <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showSymmetryAxis }" @click="d.showSymmetryAxis = !d.showSymmetryAxis; updateKurveCode(d)">
+                                    Symmetrieachse
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- MODUS: Tangente -->
+                    <template x-if="d.mode === 'tangente'">
+                        <div class="insp-sub-block">
+                            <div class="insp-kv-row">
+                                <span class="insp-kv-label">Berührstelle x₀</span>
+                                <input type="number" step="0.5" x-model="d.tangentX" @input="updateKurveCode(d)" class="insp-text-input insp-input-short">
+                            </div>
+                            <div class="insp-chip-grid margin-top-xs">
+                                <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showTangent }" @click="d.showTangent = !d.showTangent; updateKurveCode(d)">
+                                    Tangente zeigen
+                                </button>
+                                <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showSlopeTriangle }" @click="d.showSlopeTriangle = !d.showSlopeTriangle; updateKurveCode(d)">
+                                    Steigungsdreieck
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- MODUS: Integral -->
+                    <template x-if="d.mode === 'integral'">
+                        <div class="insp-sub-block">
+                            <div class="insp-2col-grid">
+                                <div class="insp-field">
+                                    <label>Untere Grenze a</label>
+                                    <input type="number" step="0.5" x-model="d.xStart" @input="updateKurveCode(d)" class="insp-text-input insp-input-center">
+                                </div>
+                                <div class="insp-field">
+                                    <label>Obere Grenze b</label>
+                                    <input type="number" step="0.5" x-model="d.xEnd" @input="updateKurveCode(d)" class="insp-text-input insp-input-center">
+                                </div>
+                            </div>
+
+                            <label class="insp-check-row margin-top-xs">
+                                <input type="checkbox" x-model="d.enableG" @change="updateKurveCode(d)">
+                                <span>Fläche zwischen 2 Funktionen</span>
+                            </label>
+
+                            <template x-if="d.enableG">
+                                <div class="insp-func-input-row margin-top-xs">
+                                    <div class="insp-func-name-col">
+                                        <label>Name</label>
+                                        <input type="text" x-model="d.functionName2" @input="updateKurveCode(d)" class="insp-text-input insp-input-center" placeholder="g">
+                                    </div>
+                                    <div class="insp-func-expr-col">
+                                        <label x-text="(d.functionName2 || 'g') + '(x) ='"></label>
+                                        <input type="text" x-model="d.formula2" @input="updateKurveCode(d)" class="insp-text-input insp-input-mono" placeholder="z.B. x - 1">
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- 3. KOORDINATENSYSTEM -->
+                <div class="insp-section insp-section-space">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Koordinatensystem</span>
+                        <button type="button" class="insp-mini-action-btn" @click="autoFitKurveBounds(d, 'analysis_kurve')" title="y-Achse automatisch anpassen">
+                            🎯 Auto-Y
+                        </button>
+                    </div>
+
+                    <div class="insp-chip-grid">
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.settings.axis }" @click="d.settings.axis = !d.settings.axis; refreshJxgPreview()">
+                            Achsen anzeigen
+                        </button>
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.settings.grid }" @click="d.settings.grid = !d.settings.grid; refreshJxgPreview()">
+                            Gitter anzeigen
+                        </button>
+                    </div>
+
+                    <div class="insp-bounds-grid">
+                        <div class="insp-field">
+                            <label>x von</label>
+                            <input type="number" step="1" x-model.number="d.settings.xMin" @input="updateKurveCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>x bis</label>
+                            <input type="number" step="1" x-model.number="d.settings.xMax" @input="updateKurveCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>y von</label>
+                            <input type="number" step="1" x-model.number="d.settings.yMin" @input="updateKurveCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>y bis</label>
+                            <input type="number" step="1" x-model.number="d.settings.yMax" @input="updateKurveCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. DRUCKGRÖSSE IN WORD -->
+                <div class="insp-section insp-section-layout">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Größe in Word (cm)</span>
+                        <div class="insp-seg-compact insp-seg-layout">
+                            <button type="button" :class="{ 'active': d.settings.width == 7 && d.settings.height == 6 }" @click="setKurveSizePreset(d, 'S')">S</button>
+                            <button type="button" :class="{ 'active': d.settings.width == 10 && d.settings.height == 8 }" @click="setKurveSizePreset(d, 'M')">M</button>
+                            <button type="button" :class="{ 'active': d.settings.width == 14 && d.settings.height == 10 }" @click="setKurveSizePreset(d, 'L')">L</button>
+                        </div>
+                    </div>
+                    <div class="insp-kv-row">
+                        <span class="insp-kv-label">Breite (cm)</span>
+                        <div class="insp-stepper">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'width', -0.5)">−</button>
+                            <input type="number" step="0.5" min="5" max="17" x-model.number="d.settings.width" class="insp-step-input">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'width', 0.5)">+</button>
+                        </div>
+                    </div>
+                    <div class="insp-kv-row">
+                        <span class="insp-kv-label">Höhe (cm)</span>
+                        <div class="insp-stepper">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'height', -0.5)">−</button>
+                            <input type="number" step="0.5" min="3" max="15" x-model.number="d.settings.height" class="insp-step-input">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'height', 0.5)">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- A2) RIEMANN-SUMMEN (analysis_riemann) -->
+        <template x-if="workingModule.type === 'analysis_riemann'">
+            <div class="inspector-body" style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="insp-section insp-section-modules">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Funktion &amp; Zerlegung</span>
+                    </div>
+
+                    <div class="insp-field">
+                        <label>Funktionsgleichung f(x) =</label>
+                        <input type="text" x-model="d.formula" @input="updateRiemannCode(d)" class="insp-text-input insp-input-mono" placeholder="z.B. 0.5*x^2 + 1">
+                        <span class="insp-field-hint">Tipp: Malzeichen als <code>*</code>, Potenz als <code>^</code>, Komma als <code>.</code></span>
+                    </div>
+
+                    <div class="insp-3col-grid">
+                        <div class="insp-field">
+                            <label>Rechtecke n</label>
+                            <input type="number" min="1" max="50" step="1" x-model.number="d.rectangles" @input="updateRiemannCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>Start a</label>
+                            <input type="number" step="0.5" x-model="d.xStart" @input="updateRiemannCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>Ende b</label>
+                            <input type="number" step="0.5" x-model="d.xEnd" @input="updateRiemannCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insp-section insp-section-outline">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Summenart &amp; Beschriftung</span>
+                    </div>
+
+                    <div class="insp-seg-bar insp-seg-space">
+                        <button type="button" :class="{ 'active': d.sumType === 'lower' }" @click="d.sumType = 'lower'; updateRiemannCode(d)">
+                            Untersumme (Uₙ)
+                        </button>
+                        <button type="button" :class="{ 'active': d.sumType === 'upper' }" @click="d.sumType = 'upper'; updateRiemannCode(d)">
+                            Obersumme (Oₙ)
+                        </button>
+                        <button type="button" :class="{ 'active': d.sumType === 'both' }" @click="d.sumType = 'both'; updateRiemannCode(d)">
+                            Beide
+                        </button>
+                    </div>
+
+                    <div class="insp-chip-grid margin-top-xs">
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showValue }" @click="d.showValue = !d.showValue; updateRiemannCode(d)">
+                            <span class="chip-dot dot-blue"></span> Summenwert im Graphen anzeigen
+                        </button>
+                    </div>
+                </div>
+
+                <div class="insp-section insp-section-space">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Koordinatensystem</span>
+                        <button type="button" class="insp-mini-action-btn" @click="autoFitKurveBounds(d, 'analysis_riemann')">
+                            🎯 Auto-Y
+                        </button>
+                    </div>
+
+                    <div class="insp-chip-grid">
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.settings.axis }" @click="d.settings.axis = !d.settings.axis; refreshJxgPreview()">
+                            Achsen anzeigen
+                        </button>
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.settings.grid }" @click="d.settings.grid = !d.settings.grid; refreshJxgPreview()">
+                            Gitter anzeigen
+                        </button>
+                    </div>
+
+                    <div class="insp-bounds-grid">
+                        <div class="insp-field">
+                            <label>x von</label>
+                            <input type="number" step="1" x-model.number="d.settings.xMin" @input="updateRiemannCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>x bis</label>
+                            <input type="number" step="1" x-model.number="d.settings.xMax" @input="updateRiemannCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>y von</label>
+                            <input type="number" step="1" x-model.number="d.settings.yMin" @input="updateRiemannCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>y bis</label>
+                            <input type="number" step="1" x-model.number="d.settings.yMax" @input="updateRiemannCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insp-section insp-section-layout">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Größe in Word (cm)</span>
+                        <div class="insp-seg-compact insp-seg-layout">
+                            <button type="button" :class="{ 'active': d.settings.width == 7 && d.settings.height == 6 }" @click="setKurveSizePreset(d, 'S')">S</button>
+                            <button type="button" :class="{ 'active': d.settings.width == 10 && d.settings.height == 8 }" @click="setKurveSizePreset(d, 'M')">M</button>
+                            <button type="button" :class="{ 'active': d.settings.width == 14 && d.settings.height == 10 }" @click="setKurveSizePreset(d, 'L')">L</button>
+                        </div>
+                    </div>
+                    <div class="insp-kv-row">
+                        <span class="insp-kv-label">Breite (cm)</span>
+                        <div class="insp-stepper">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'width', -0.5)">−</button>
+                            <input type="number" step="0.5" min="5" max="17" x-model.number="d.settings.width" class="insp-step-input">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'width', 0.5)">+</button>
+                        </div>
+                    </div>
+                    <div class="insp-kv-row">
+                        <span class="insp-kv-label">Höhe (cm)</span>
+                        <div class="insp-stepper">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'height', -0.5)">−</button>
+                            <input type="number" step="0.5" min="3" max="15" x-model.number="d.settings.height" class="insp-step-input">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'height', 0.5)">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- A3) ROTATIONSKÖRPER (analysis_rotationskoerper) -->
+        <template x-if="workingModule.type === 'analysis_rotationskoerper'">
+            <div class="inspector-body" style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="insp-section insp-section-modules">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Randfunktion &amp; Intervall</span>
+                    </div>
+
+                    <div class="insp-field">
+                        <label>Randfunktion f(x) =</label>
+                        <input type="text" x-model="d.formula" @input="updateRotationskoerperCode(d)" class="insp-text-input insp-input-mono" placeholder="z.B. sqrt(x) oder 0.5*x">
+                        <span class="insp-field-hint">Tipp: Wurzel als <code>sqrt(x)</code>, Potenz als <code>^</code></span>
+                    </div>
+
+                    <div class="insp-2col-grid">
+                        <div class="insp-field">
+                            <label>Untere Grenze a</label>
+                            <input type="number" step="0.5" x-model="d.xStart" @input="updateRotationskoerperCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>Obere Grenze b</label>
+                            <input type="number" step="0.5" x-model="d.xEnd" @input="updateRotationskoerperCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                    </div>
+
+                    <div class="insp-solver-badge is-solved">
+                        <span class="solver-badge-label">Volumen V = π · ∫ [f(x)]² dx</span>
+                        <strong class="solver-badge-val" x-text="calculateRotationVolume(d.formula, d.xStart, d.xEnd)"></strong>
+                    </div>
+
+                    <div class="insp-chip-grid margin-top-xs">
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.includeTaskText !== false }" @click="d.includeTaskText = !(d.includeTaskText !== false)">
+                            <span class="chip-dot dot-blue"></span> Aufgabentext in Word mit einfügen
+                        </button>
+                    </div>
+                </div>
+
+                <div class="insp-section insp-section-space">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Koordinatensystem</span>
+                        <button type="button" class="insp-mini-action-btn" @click="autoFitKurveBounds(d, 'analysis_rotationskoerper')">
+                            🎯 Auto-Y
+                        </button>
+                    </div>
+
+                    <div class="insp-chip-grid">
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.settings.axis }" @click="d.settings.axis = !d.settings.axis; refreshJxgPreview()">
+                            Achsen anzeigen
+                        </button>
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.settings.grid }" @click="d.settings.grid = !d.settings.grid; refreshJxgPreview()">
+                            Gitter anzeigen
+                        </button>
+                    </div>
+
+                    <div class="insp-bounds-grid">
+                        <div class="insp-field">
+                            <label>x von</label>
+                            <input type="number" step="1" x-model.number="d.settings.xMin" @input="updateRotationskoerperCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>x bis</label>
+                            <input type="number" step="1" x-model.number="d.settings.xMax" @input="updateRotationskoerperCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>y von</label>
+                            <input type="number" step="1" x-model.number="d.settings.yMin" @input="updateRotationskoerperCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>y bis</label>
+                            <input type="number" step="1" x-model.number="d.settings.yMax" @input="updateRotationskoerperCode(d)" class="insp-text-input insp-input-center">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insp-section insp-section-layout">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Größe in Word (cm)</span>
+                        <div class="insp-seg-compact insp-seg-layout">
+                            <button type="button" :class="{ 'active': d.settings.width == 7 && d.settings.height == 6 }" @click="setKurveSizePreset(d, 'S')">S</button>
+                            <button type="button" :class="{ 'active': d.settings.width == 10 && d.settings.height == 8 }" @click="setKurveSizePreset(d, 'M')">M</button>
+                            <button type="button" :class="{ 'active': d.settings.width == 14 && d.settings.height == 10 }" @click="setKurveSizePreset(d, 'L')">L</button>
+                        </div>
+                    </div>
+                    <div class="insp-kv-row">
+                        <span class="insp-kv-label">Breite (cm)</span>
+                        <div class="insp-stepper">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'width', -0.5)">−</button>
+                            <input type="number" step="0.5" min="5" max="17" x-model.number="d.settings.width" class="insp-step-input">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'width', 0.5)">+</button>
+                        </div>
+                    </div>
+                    <div class="insp-kv-row">
+                        <span class="insp-kv-label">Höhe (cm)</span>
+                        <div class="insp-stepper">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'height', -0.5)">−</button>
+                            <input type="number" step="0.5" min="3" max="15" x-model.number="d.settings.height" class="insp-step-input">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'height', 0.5)">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- A4) EXTREMWERTAUFGABE (analysis_extremwert) -->
+        <template x-if="workingModule.type === 'analysis_extremwert'">
+            <div class="inspector-body" style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="insp-section insp-section-outline">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Szenario &amp; Gegebene Größen</span>
+                    </div>
+
+                    <div class="insp-field">
+                        <label>Aufgaben-Szenario</label>
+                        <select x-model="d.scenarioType" @change="updateAnalysisExtremwertCode(d)" class="insp-select">
+                            <option value="pasture">🐑 Weidezaun am Fluss (Fläche max.)</option>
+                            <option value="box">📦 Offene Schachtel falten (Volumen max.)</option>
+                            <option value="cylinder">🥫 Getränkedose (Volumen max. bei O)</option>
+                            <option value="cylinder_min">🥫 Konservendose (Oberfläche min. bei V)</option>
+                            <option value="prism_min">📦 Quadratische Säule (Oberfläche min.)</option>
+                            <option value="cylinder_in_sphere">🔮 Zylinder in Kugel (Volumen max.)</option>
+                            <option value="function_rect">📈 Rechteck unter Parabel (Fläche max.)</option>
+                        </select>
+                    </div>
+
+                    <template x-if="d.scenarioType === 'pasture'">
+                        <div class="insp-sub-block">
+                            <div class="insp-kv-row">
+                                <span class="insp-kv-label">Zaunlänge L (m)</span>
+                                <input type="number" step="10" x-model="d.parameterValue" @input="updateAnalysisExtremwertCode(d)" class="insp-text-input insp-input-short">
+                            </div>
+                            <label class="insp-check-row margin-top-xs">
+                                <input type="checkbox" x-model="d.isFourSided" @change="updateAnalysisExtremwertCode(d)">
+                                <span>Alle 4 Seiten einzäunen (ohne Fluss)</span>
+                            </label>
+                        </div>
+                    </template>
+
+                    <template x-if="d.scenarioType === 'box'">
+                        <div class="insp-2col-grid">
+                            <div class="insp-field">
+                                <label>Karton-Breite W (cm)</label>
+                                <input type="number" step="5" x-model="d.parameterValue" @input="updateAnalysisExtremwertCode(d)" class="insp-text-input insp-input-center">
+                            </div>
+                            <div class="insp-field">
+                                <label>Karton-Tiefe H (cm)</label>
+                                <input type="number" step="5" x-model="d.parameterValue2" @input="updateAnalysisExtremwertCode(d)" class="insp-text-input insp-input-center">
+                            </div>
+                        </div>
+                    </template>
+
+                    <template x-if="d.scenarioType === 'cylinder'">
+                        <div class="insp-kv-row">
+                            <span class="insp-kv-label">Oberfläche O (cm²)</span>
+                            <input type="number" step="50" x-model="d.parameterValue" @input="updateAnalysisExtremwertCode(d)" class="insp-text-input insp-input-short">
+                        </div>
+                    </template>
+
+                    <template x-if="d.scenarioType === 'cylinder_min' || d.scenarioType === 'prism_min'">
+                        <div class="insp-kv-row">
+                            <span class="insp-kv-label">Volumen V (cm³)</span>
+                            <input type="number" step="100" x-model="d.parameterValue" @input="updateAnalysisExtremwertCode(d)" class="insp-text-input insp-input-short">
+                        </div>
+                    </template>
+
+                    <template x-if="d.scenarioType === 'cylinder_in_sphere'">
+                        <div class="insp-kv-row">
+                            <span class="insp-kv-label">Kugelradius R (cm)</span>
+                            <input type="number" step="1" x-model="d.parameterValue" @input="updateAnalysisExtremwertCode(d)" class="insp-text-input insp-input-short">
+                        </div>
+                    </template>
+
+                    <template x-if="d.scenarioType === 'function_rect'">
+                        <div class="insp-sub-block">
+                            <span class="insp-field-hint">Parabelgleichung: f(x) = −a·x² + c</span>
+                            <div class="insp-2col-grid margin-top-xs">
+                                <div class="insp-field">
+                                    <label>Faktor a (&gt; 0)</label>
+                                    <input type="number" step="0.5" x-model="d.parameterValue" @input="updateAnalysisExtremwertCode(d)" class="insp-text-input insp-input-center">
+                                </div>
+                                <div class="insp-field">
+                                    <label>Scheitelhöhe c</label>
+                                    <input type="number" step="1" x-model="d.parameterValue2" @input="updateAnalysisExtremwertCode(d)" class="insp-text-input insp-input-center">
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- 2. AUSWAHL FÜR WORD-EINFÜGUNG & LÖSUNG -->
+                <div class="insp-section insp-section-modules">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">In Word einfügen</span>
+                        <button type="button" class="insp-mini-action-btn" @click="showExtremwertSol = !showExtremwertSol" x-text="showExtremwertSol ? 'Lösung ▲' : '💡 Lösung ▼'"></button>
+                    </div>
+
+                    <div class="insp-chip-grid">
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.includeTaskText !== false }" @click="d.includeTaskText = !(d.includeTaskText !== false)">
+                            <span class="chip-dot dot-blue"></span> Aufgabentext
+                        </button>
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.includeSketch !== false }" @click="d.includeSketch = !(d.includeSketch !== false); refreshJxgPreview()">
+                            <span class="chip-dot dot-green"></span> Skizze
+                        </button>
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.includeSolution }" @click="d.includeSolution = !d.includeSolution">
+                            <span class="chip-dot dot-red"></span> Musterlösung
+                        </button>
+                    </div>
+
+                    <template x-if="showExtremwertSol">
+                        <div class="insp-solution-preview margin-top-xs" x-html="formatSubtaskText(solveExtremwert(d.scenarioType, d.parameterValue, d.parameterValue2, !!d.isFourSided))"></div>
+                    </template>
+                </div>
+
+                <!-- 3. SKIZZENGRÖSSE IN WORD -->
+                <div class="insp-section insp-section-layout">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Skizzengröße in Word (cm)</span>
+                        <div class="insp-seg-compact insp-seg-layout">
+                            <button type="button" :class="{ 'active': d.settings.width == 7 && d.settings.height == 6 }" @click="setKurveSizePreset(d, 'S')">S</button>
+                            <button type="button" :class="{ 'active': d.settings.width == 10 && d.settings.height == 8 }" @click="setKurveSizePreset(d, 'M')">M</button>
+                            <button type="button" :class="{ 'active': d.settings.width == 14 && d.settings.height == 10 }" @click="setKurveSizePreset(d, 'L')">L</button>
+                        </div>
+                    </div>
+                    <div class="insp-kv-row">
+                        <span class="insp-kv-label">Breite (cm)</span>
+                        <div class="insp-stepper">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'width', -0.5)">−</button>
+                            <input type="number" step="0.5" min="5" max="17" x-model.number="d.settings.width" class="insp-step-input">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'width', 0.5)">+</button>
+                        </div>
+                    </div>
+                    <div class="insp-kv-row">
+                        <span class="insp-kv-label">Höhe (cm)</span>
+                        <div class="insp-stepper">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'height', -0.5)">−</button>
+                            <input type="number" step="0.5" min="3" max="15" x-model.number="d.settings.height" class="insp-step-input">
+                            <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'height', 0.5)">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- A5) STECKBRIEFAUFGABE (analysis_steckbrief) -->
+        <template x-if="workingModule.type === 'analysis_steckbrief'">
+            <div class="inspector-body" style="display: flex; flex-direction: column; gap: 10px;" x-data="{ get sol() { return solveSteckbrief(d); } }">
+                <!-- 1. GRAD, SYMMETRIE & VORLAGEN -->
+                <div class="insp-section insp-section-outline">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Ansatz &amp; Vorlagen</span>
+                    </div>
+
+                    <div class="insp-2col-grid">
+                        <div class="insp-field">
+                            <label>Grad der Funktion</label>
+                            <select x-model.number="d.degree" @change="updateSteckbriefCode(d)" class="insp-select">
+                                <option :value="2">2. Grades (Parabel)</option>
+                                <option :value="3">3. Grades</option>
+                                <option :value="4">4. Grades</option>
+                            </select>
+                        </div>
+                        <div class="insp-field">
+                            <label>Symmetrie</label>
+                            <select x-model="d.symmetry" @change="updateSteckbriefCode(d)" class="insp-select">
+                                <option value="none">Keine</option>
+                                <option value="achsensymmetrisch">Achsensymm. (y)</option>
+                                <option value="punktsymmetrisch">Punktsymm. (0|0)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="insp-field">
+                        <label>Schnell-Vorlage (Aufgabenbeispiel)</label>
+                        <select @change="applySteckbriefPreset(d, $event.target.value); $event.target.value = ''" class="insp-select insp-select-preset">
+                            <option value="" selected disabled>✨ Steckbrief-Vorlage wählen…</option>
+                            <option value="deg3_wp_ep">3. Grades mit Sy(0|4), TP(2|0), WP(1|2)</option>
+                            <option value="deg3_sym">3. Grades punktsymm. mit HP(1|2)</option>
+                            <option value="deg4_sym">4. Grades achsensymm. mit TP(2|−4)</option>
+                            <option value="deg2_parabel">2. Grades Parabel mit S(1|−4), P(3|0)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 2. BEDINGUNGEN & LIVE-SOLVER -->
+                <div class="insp-section insp-section-modules">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Bedingungen</span>
+                        <button type="button" class="insp-mini-action-btn" @click="addSteckbriefCondition(d)">+ Bedingung</button>
+                    </div>
+
+                    <div class="insp-cond-list">
+                        <template x-for="(cond, cIdx) in d.conditions" :key="cond.id">
+                            <div class="insp-cond-card">
+                                <div class="insp-cond-top">
+                                    <span class="insp-cond-num" x-text="(cIdx + 1) + '.'"></span>
+                                    <select x-model="cond.type"
+                                            @change="if(cond.type === 'yIntercept') cond.x = '0'; updateSteckbriefCode(d)"
+                                            class="insp-select insp-cond-select">
+                                        <option value="point">Punkt P(x | y)</option>
+                                        <option value="extreme">Extrempunkt E(x | y)</option>
+                                        <option value="inflection">Wendepunkt W(x | y)</option>
+                                        <option value="saddle">Sattelpunkt S(x | y)</option>
+                                        <option value="slope">Steigung m bei x</option>
+                                        <option value="yIntercept">y-Achsenabschnitt y₀</option>
+                                        <option value="curvature">Krümmung f''(x)</option>
+                                    </select>
+                                    <button type="button" class="insp-mod-del" @click="removeSteckbriefCondition(d, cIdx)" title="Bedingung entfernen">×</button>
+                                </div>
+                                <div class="insp-cond-inputs">
+                                    <template x-if="cond.type !== 'yIntercept'">
+                                        <div class="insp-cond-coord">
+                                            <span>x =</span>
+                                            <input type="text" x-model="cond.x" @input="updateSteckbriefCode(d)" class="insp-text-input insp-input-center" placeholder="0">
+                                        </div>
+                                    </template>
+                                    <div class="insp-cond-coord">
+                                        <span x-text="cond.type === 'slope' ? 'm =' : (cond.type === 'yIntercept' ? 'y₀ =' : (cond.type === 'curvature' ? 'f\'\' =' : 'y ='))"></span>
+                                        <input type="text" x-model="cond.y" @input="updateSteckbriefCode(d)" class="insp-text-input insp-input-center" :placeholder="['extreme','inflection','saddle'].includes(cond.type) ? 'opt.' : '0'">
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Live LGS-Solver Badge -->
+                    <div class="insp-solver-badge"
+                         :class="{
+                             'is-solved': sol.status === 'solved',
+                             'is-warn': sol.status === 'underdetermined',
+                             'is-err': sol.status === 'contradictory' || sol.status === 'error'
+                         }">
+                        <div class="solver-badge-row">
+                            <span class="solver-badge-label" x-text="sol.status === 'solved' ? '✓ Eindeutig lösbar:' : '⚠ Hinweis:'"></span>
+                            <template x-if="sol.equationsText && sol.equationsText.length > 0">
+                                <button type="button" class="solver-lgs-toggle" @click="showSteckbriefLgs = !showSteckbriefLgs" x-text="showSteckbriefLgs ? 'LGS ▲' : 'LGS ▼'"></button>
+                            </template>
+                        </div>
+                        <template x-if="sol.status === 'solved'">
+                            <div class="solver-formula-out" x-html="formatSubtaskText('$$' + sol.formulaDisplay + '$$')"></div>
+                        </template>
+                        <template x-if="sol.status !== 'solved'">
+                            <strong class="solver-badge-val" x-text="sol.errorMessage"></strong>
+                        </template>
+                        <template x-if="showSteckbriefLgs && sol.lgsStepsText && sol.lgsStepsText.length > 0">
+                            <div class="solver-lgs-details">
+                                <template x-for="(step, sIdx) in sol.lgsStepsText" :key="sIdx">
+                                    <div x-html="formatSubtaskText('$' + step + '$')"></div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- 3. IN WORD EINFÜGEN & KOORDINATENSYSTEM -->
+                <div class="insp-section insp-section-space">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">In Word einfügen</span>
+                        <template x-if="d.showGraph">
+                            <button type="button" class="insp-mini-action-btn" @click="autoFitKurveBounds(d, 'analysis_steckbrief')">
+                                🎯 Auto-Y
+                            </button>
+                        </template>
+                    </div>
+
+                    <div class="insp-chip-grid">
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showTextual }" @click="d.showTextual = !d.showTextual">
+                            <span class="chip-dot dot-blue"></span> Bedingungen als Text
+                        </button>
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showGraph }" @click="d.showGraph = !d.showGraph; refreshJxgPreview()">
+                            <span class="chip-dot dot-green"></span> Funktionsgraph
+                        </button>
+                        <button type="button" class="insp-toggle-chip" :class="{ 'active': d.includeSolution }" @click="d.includeSolution = !d.includeSolution">
+                            <span class="chip-dot dot-red"></span> Lösung &amp; LGS
+                        </button>
+                    </div>
+
+                    <template x-if="d.showGraph">
+                        <div class="insp-sub-block margin-top-xs">
+                            <div class="insp-chip-grid">
+                                <button type="button" class="insp-toggle-chip" :class="{ 'active': d.settings.axis }" @click="d.settings.axis = !d.settings.axis; refreshJxgPreview()">
+                                    Achsen anzeigen
+                                </button>
+                                <button type="button" class="insp-toggle-chip" :class="{ 'active': d.settings.grid }" @click="d.settings.grid = !d.settings.grid; refreshJxgPreview()">
+                                    Gitter anzeigen
+                                </button>
+                            </div>
+
+                            <div class="insp-bounds-grid margin-top-xs">
+                                <div class="insp-field">
+                                    <label>x von</label>
+                                    <input type="number" step="1" x-model.number="d.settings.xMin" @input="updateSteckbriefCode(d)" class="insp-text-input insp-input-center">
+                                </div>
+                                <div class="insp-field">
+                                    <label>x bis</label>
+                                    <input type="number" step="1" x-model.number="d.settings.xMax" @input="updateSteckbriefCode(d)" class="insp-text-input insp-input-center">
+                                </div>
+                                <div class="insp-field">
+                                    <label>y von</label>
+                                    <input type="number" step="1" x-model.number="d.settings.yMin" @input="updateSteckbriefCode(d)" class="insp-text-input insp-input-center">
+                                </div>
+                                <div class="insp-field">
+                                    <label>y bis</label>
+                                    <input type="number" step="1" x-model.number="d.settings.yMax" @input="updateSteckbriefCode(d)" class="insp-text-input insp-input-center">
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- 4. GRAPHGRÖSSE IN WORD -->
+                <template x-if="d.showGraph">
+                    <div class="insp-section insp-section-layout">
+                        <div class="insp-section-header">
+                            <span class="insp-section-label">Graphgröße in Word (cm)</span>
+                            <div class="insp-seg-compact insp-seg-layout">
+                                <button type="button" :class="{ 'active': d.settings.width == 7 && d.settings.height == 6 }" @click="setKurveSizePreset(d, 'S')">S</button>
+                                <button type="button" :class="{ 'active': d.settings.width == 10 && d.settings.height == 8 }" @click="setKurveSizePreset(d, 'M')">M</button>
+                                <button type="button" :class="{ 'active': d.settings.width == 14 && d.settings.height == 10 }" @click="setKurveSizePreset(d, 'L')">L</button>
+                            </div>
+                        </div>
+                        <div class="insp-kv-row">
+                            <span class="insp-kv-label">Breite (cm)</span>
+                            <div class="insp-stepper">
+                                <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'width', -0.5)">−</button>
+                                <input type="number" step="0.5" min="5" max="17" x-model.number="d.settings.width" class="insp-step-input">
+                                <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'width', 0.5)">+</button>
+                            </div>
+                        </div>
+                        <div class="insp-kv-row">
+                            <span class="insp-kv-label">Höhe (cm)</span>
+                            <div class="insp-stepper">
+                                <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'height', -0.5)">−</button>
+                                <input type="number" step="0.5" min="3" max="15" x-model.number="d.settings.height" class="insp-step-input">
+                                <button type="button" class="insp-step-btn" @click="adjustKurveDimension(d, 'height', 0.5)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- A6) ZUORDNUNGSPUZZLE (analysis_puzzle) -->
+        <template x-if="workingModule.type === 'analysis_puzzle'">
+            <div class="inspector-body" style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="insp-section insp-section-outline">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Zuordnungs-Modus</span>
+                    </div>
+
+                    <div class="insp-field">
+                        <label>Aufgabentyp</label>
+                        <select x-model="d.mode" @change="updatePuzzleCode(d)" class="insp-select">
+                            <option value="derivative">Ableitungspuzzle: f(x) ↔ f'(x)</option>
+                            <option value="graph_to_equation">Funktionsgraphen ↔ Gleichungen</option>
+                        </select>
+                    </div>
+
+                    <template x-if="d.mode === 'derivative' || !d.mode">
+                        <div class="insp-2col-grid">
+                            <div class="insp-field">
+                                <label>Links (I, II, III): f(x)</label>
+                                <select x-model="d.typeF" @change="updatePuzzleCode(d)" class="insp-select">
+                                    <option value="graph">Als Graph</option>
+                                    <option value="equation">Als Gleichung</option>
+                                </select>
+                            </div>
+                            <div class="insp-field">
+                                <label>Rechts (A, B, C): f'(x)</label>
+                                <select x-model="d.typeFPrime" @change="updatePuzzleCode(d)" class="insp-select">
+                                    <option value="graph">Als Graph</option>
+                                    <option value="equation">Als Gleichung</option>
+                                </select>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- 2. FUNKTIONEN & MISCHEN -->
+                <div class="insp-section insp-section-modules">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Funktionen (I, II, III…)</span>
+                        <div style="display: flex; gap: 4px;">
+                            <button type="button" class="insp-mini-action-btn" @click="reshufflePuzzle(d)" title="Reihenfolge von A, B, C neu würfeln">🎲 Mischen</button>
+                            <template x-if="d.functions.length < 6">
+                                <button type="button" class="insp-mini-action-btn" @click="addPuzzleFunction(d)">+ Neu</button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="insp-cond-list">
+                        <template x-for="(fn, fIdx) in d.functions" :key="fn.id">
+                            <div class="insp-cond-card">
+                                <div class="insp-cond-top">
+                                    <span class="insp-cond-num" x-text="romanize(fIdx + 1)"></span>
+                                    <input type="text"
+                                           x-model="fn.expr"
+                                           @input="updatePuzzleCode(d)"
+                                           class="insp-text-input insp-input-mono"
+                                           style="flex: 1;"
+                                           placeholder="z.B. x^3 - 3*x">
+                                    <button type="button"
+                                            class="insp-mod-del"
+                                            x-show="d.functions.length > 2"
+                                            @click="removePuzzleFunction(d, fIdx)">×</button>
+                                </div>
+                                <template x-if="d.mode !== 'graph_to_equation'">
+                                    <div class="insp-puzzle-deriv-hint">
+                                        <span>f'(x) =</span>
+                                        <code x-text="fn.exprFPrime || '…'"></code>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- 3. ANTWORTTABELLE & AUSSCHNITT -->
+                <div class="insp-section insp-section-space">
+                    <div class="insp-section-header">
+                        <span class="insp-section-label">Antworttabelle &amp; Ausschnitt</span>
+                    </div>
+
+                    <button type="button" class="insp-toggle-chip" :class="{ 'active': d.showJustification }" @click="d.showJustification = !d.showJustification">
+                        <span class="chip-dot dot-blue"></span> Begründungsfeld unter Tabelle einfügen
+                    </button>
+
+                    <template x-if="d.showJustification">
+                        <div class="insp-sub-block margin-top-xs">
+                            <div class="insp-seg-bar insp-seg-space">
+                                <button type="button" :class="{ 'active': !d.justificationInTable }" @click="d.justificationInTable = false">
+                                    Linien darunter
+                                </button>
+                                <button type="button" :class="{ 'active': d.justificationInTable }" @click="d.justificationInTable = true">
+                                    Direkt in Tabelle
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <div class="insp-bounds-grid margin-top-xs">
+                        <div class="insp-field">
+                            <label>x von</label>
+                            <input type="number" step="1" x-model.number="d.settings.xMin" @input="refreshPuzzleBoards()" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>x bis</label>
+                            <input type="number" step="1" x-model.number="d.settings.xMax" @input="refreshPuzzleBoards()" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>y von</label>
+                            <input type="number" step="1" x-model.number="d.settings.yMin" @input="refreshPuzzleBoards()" class="insp-text-input insp-input-center">
+                        </div>
+                        <div class="insp-field">
+                            <label>y bis</label>
+                            <input type="number" step="1" x-model.number="d.settings.yMax" @input="refreshPuzzleBoards()" class="insp-text-input insp-input-center">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- ========================================================= -->
+        <!-- 3. WEITERE MODULE (STOCHASTIK, ALGEBRA, LAYOUT)           -->
+        <!-- ========================================================= -->
+
+        <!-- BAUMDIAGRAMM -->
         <template x-if="workingModule.type === 'baum'">
             <div class="insp-section insp-section-outline">
                 <div class="insp-section-header"><span class="insp-section-label">Struktur &amp; Stufen</span></div>
@@ -342,7 +1506,7 @@
             </div>
         </template>
 
-        <!-- B) 4-FELDER-TAFEL -->
+        <!-- 4-FELDER-TAFEL -->
         <template x-if="workingModule.type === 'vierfeldertafel'">
             <div class="insp-section insp-section-outline">
                 <div class="insp-section-header"><span class="insp-section-label">Ereignisse</span></div>
@@ -369,7 +1533,7 @@
             </div>
         </template>
 
-        <!-- C) URNE -->
+        <!-- URNE -->
         <template x-if="workingModule.type === 'urne'">
             <div class="insp-section insp-section-outline">
                 <div class="insp-section-header"><span class="insp-section-label">Urne füllen</span></div>
@@ -405,7 +1569,7 @@
             </div>
         </template>
 
-        <!-- D) GLÜCKSRAD -->
+        <!-- GLÜCKSRAD -->
         <template x-if="workingModule.type === 'gluecksrad'">
             <div class="insp-section insp-section-outline">
                 <div class="insp-section-header"><span class="insp-section-label">Sektoren</span></div>
@@ -425,7 +1589,7 @@
             </div>
         </template>
 
-        <!-- E) MULTIPLE CHOICE -->
+        <!-- MULTIPLE CHOICE -->
         <template x-if="workingModule.type === 'mcq'">
             <div class="insp-section insp-section-outline">
                 <div class="insp-section-header">
@@ -453,7 +1617,7 @@
             </div>
         </template>
 
-        <!-- F) ZUORDNUNG -->
+        <!-- ZUORDNUNG -->
         <template x-if="workingModule.type === 'matching'">
             <div class="insp-section insp-section-outline">
                 <div class="insp-section-header">
@@ -486,7 +1650,7 @@
             </div>
         </template>
 
-        <!-- G) WAHR / FALSCH -->
+        <!-- WAHR / FALSCH -->
         <template x-if="workingModule.type === 'trueFalse'">
             <div class="insp-section insp-section-outline">
                 <div class="insp-section-header"><span class="insp-section-label">Begründungsfeld</span></div>
@@ -504,7 +1668,7 @@
             </div>
         </template>
 
-        <!-- H) ZAHLENSTRAHL -->
+        <!-- ZAHLENSTRAHL -->
         <template x-if="workingModule.type === 'zahlenstrahl'">
             <div class="insp-section insp-section-outline">
                 <div class="insp-section-header"><span class="insp-section-label">Skalierung</span></div>
@@ -517,7 +1681,7 @@
             </div>
         </template>
 
-        <!-- I) BRUCHTEILE -->
+        <!-- BRUCHTEILE -->
         <template x-if="workingModule.type === 'bruch'">
             <div class="insp-section insp-section-outline">
                 <div class="insp-section-header"><span class="insp-section-label">Bruch</span></div>
